@@ -15,7 +15,7 @@ env:
   DEX_RPCPORT: 7762
   DEX_RPC: "http://127.0.0.1:7762"
   DEX_PROJECT_NAME: "komodo-wallet"
-  DEX_DISPLAY_NAME: "Komodo Wallet"
+  DEX_DISPLAY_NAME: "Cheetahdex Wallet"
   DEX_COMPANY: "KomodoPlatform"
   DEX_VERSION: "0.8.2"
   DEX_WEBSITE: "https://atomicdex.io/"
@@ -220,7 +220,7 @@ jobs:
           p12-file-base64: ${{ secrets.CERTIFICATES_INSTALLER_P12 }}
           p12-password: ${{ secrets.CERTIFICATES_P12_PASSWORD }}
 
-      - name: Build Komodo Wallet (MacOS)
+      - name: Build Cheetahdex Wallet (MacOS)
         if: runner.os == 'macOS'
         run: |
           xcrun --sdk macosx --show-sdk-path
@@ -247,7 +247,7 @@ jobs:
           nimble build -y
           ./ci_tools_atomic_dex bundle ${{ matrix.type }} --osx_sdk=$HOME/sdk/MacOSX14.2.sdk --compiler=clang++
 
-      - name: Build Komodo Wallet (Linux)
+      - name: Build Cheetahdex Wallet (Linux)
         if: runner.os == 'Linux'
         run: |
           export QT_INSTALL_CMAKE_PATH=${{ github.workspace }}/Qt/${{ matrix.qt }}/gcc_64/lib/cmake
@@ -264,7 +264,7 @@ jobs:
           ./ci_tools_atomic_dex build ${{ matrix.type }}
           ./ci_tools_atomic_dex bundle ${{ matrix.type }}
 
-      - name: Build Komodo Wallet (Windows)
+      - name: Build Cheetahdex Wallet (Windows)
         if: runner.os == 'Windows'
         shell: powershell
         run: |

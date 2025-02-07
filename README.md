@@ -1,5 +1,5 @@
 <p align="center">
-    <a href="https://atomicdex.io" alt="Komodo Wallet">
+    <a href="https://atomicdex.io" alt="Cheetahdex Wallet">
 	<img width="420" alt="komodo-wallet-logo_dark-theme" src="https://user-images.githubusercontent.com/24797699/252409662-eb03b0b1-5f6e-4494-9267-132eba827718.png">
     </a>
 </p>
@@ -47,12 +47,12 @@
 </p>
 
 
-## What is Komodo Wallet?
+## What is Cheetahdex Wallet?
 
-Komodo Wallet is a secure wallet and non-custodial decentralized exchange rolled into one application. Store your coins,
+Cheetahdex Wallet is a secure wallet and non-custodial decentralized exchange rolled into one application. Store your coins,
 trade peer-to-peer with minimal fees and never give up control over your digital assets.
 
-Komodo Wallet has been tested on the following platforms:
+Cheetahdex Wallet has been tested on the following platforms:
 
 - Windows 10
 - Linux (Ubuntu 18.04+)
@@ -72,16 +72,16 @@ feedback.
 
 ## Useful links
 
-- :book: [Komodo Wallet Documentation](https://developers.komodoplatform.com/basic-docs/atomicdex/atomicdex-tutorials/introduction-to-atomicdex.html)
-- :link: [Komodo Wallet Website](https://atomicdex.io/)
-- :speech_balloon: [Komodo Wallet Discord](https://discord.gg/tvp96Gf)
-- :hammer_and_wrench: [Komodo Wallet Development Boards](https://github.com/KomodoPlatform/komodo-wallet-desktop/projects)
-- :notebook_with_decorative_cover: [Komodo Wallet Wiki](https://github.com/KomodoPlatform/komodo-wallet-desktop/wiki/)
+- :book: [Cheetahdex Wallet Documentation](https://developers.komodoplatform.com/basic-docs/atomicdex/atomicdex-tutorials/introduction-to-atomicdex.html)
+- :link: [Cheetahdex Wallet Website](https://atomicdex.io/)
+- :speech_balloon: [Cheetahdex Wallet Discord](https://discord.gg/tvp96Gf)
+- :hammer_and_wrench: [Cheetahdex Wallet Development Boards](https://github.com/KomodoPlatform/komodo-wallet-desktop/projects)
+- :notebook_with_decorative_cover: [Cheetahdex Wallet Wiki](https://github.com/KomodoPlatform/komodo-wallet-desktop/wiki/)
 
 
-## Komodo Wallet mobile
+## Cheetahdex Wallet mobile
 
-Check out Komodo Wallet mobile, available for [Android and iOS](https://atomicdex.io)
+Check out Cheetahdex Wallet mobile, available for [Android and iOS](https://atomicdex.io)
 
 
 ## Self-Hosted Dependencies
