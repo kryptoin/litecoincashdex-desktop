@@ -1,4 +1,4 @@
-# Building Komodo Wallet Desktop on Linux
+# Building Cheetahdex Wallet Desktop on Linux
 
 _Note: These instructions may not be up to date. Please refer to the github actions workflows for more recent build requirements_
 
@@ -16,7 +16,7 @@ Output will be found in the `bundled` subfolder.
 - [CMake](https://cmake.org/install/) 3.18 minimum
 
 
-### Clone Komodo Wallet Desktop repository (with submodules)
+### Clone Cheetahdex Wallet Desktop repository (with submodules)
 
 `git clone --recurse-submodules https://github.com/KomodoPlatform/komodo-wallet-desktop.git`
 

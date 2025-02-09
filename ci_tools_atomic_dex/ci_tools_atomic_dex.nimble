@@ -2,7 +2,7 @@
 
 version       = "0.1.0"
 author        = "romanszterg"
-description   = "Komodo Wallet CI utilities"
+description   = "Cheetahdex Wallet CI utilities"
 license       = "MIT"
 srcDir        = "src"
 bin           = @["ci_tools_atomic_dex"]

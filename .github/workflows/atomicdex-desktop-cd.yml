@@ -7,7 +7,7 @@ on:
 
 env:
   DEX_PROJECT_NAME: "komodo-wallet"
-  DEX_DISPLAY_NAME: "Komodo Wallet"
+  DEX_DISPLAY_NAME: "Cheetahdex Wallet"
   DEX_COMPANY: "KomodoPlatform"
   DEX_VERSION: "0.8.2"
   DEX_WEBSITE: "https://atomicdex.io/"
