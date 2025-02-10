@@ -18,7 +18,7 @@ Output will be found in the `bundled` subfolder.
 
 ### Clone Cheetahdex Wallet Desktop repository (with submodules)
 
-`git clone --recurse-submodules https://github.com/KomodoPlatform/cheetahdex-wallet-desktop.git`
+`git clone --recurse-submodules https://github.com/ShorelineCrypto/cheetahdex-wallet-desktop.git`
 
 
 ### Install Qt
@@ -175,7 +175,7 @@ ninja install
 
 ### Clone AtomicDEX repository (with submodules)
 
-`git clone --recurse-submodules https://github.com/KomodoPlatform/cheetahdex-wallet-desktop.git`
+`git clone --recurse-submodules https://github.com/ShorelineCrypto/cheetahdex-wallet-desktop.git`
 
 
 ### Install Qt
@@ -287,7 +287,7 @@ ninja install
 
 ### Clone AtomicDEX repository (with submodules)
 
-`git clone --recurse-submodules https://github.com/KomodoPlatform/cheetahdex-wallet-desktop.git`
+`git clone --recurse-submodules https://github.com/ShorelineCrypto/cheetahdex-wallet-desktop.git`
 
 
 ### Install Qt

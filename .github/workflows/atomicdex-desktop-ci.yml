@@ -202,7 +202,7 @@ jobs:
           vcpkgJsonGlob: 'vcpkg.json'
 
       - name: import code signing certificates (macos)
-        if: runner.os == 'macOS'  && 'KomodoPlatform/cheetahdex-wallet-desktop' == github.repository
+        if: runner.os == 'macOS'  && 'ShorelineCrypto/cheetahdex-wallet-desktop' == github.repository
         uses: Apple-Actions/import-codesign-certs@v3
         with:
           keychain: ${{ github.run_id }}
@@ -211,7 +211,7 @@ jobs:
           p12-password: ${{ secrets.CERTIFICATES_P12_PASSWORD }}
 
       - name: import installer code signing certificates (macos)
-        if: runner.os == 'macOS'  && 'KomodoPlatform/cheetahdex-wallet-desktop' == github.repository
+        if: runner.os == 'macOS'  && 'ShorelineCrypto/cheetahdex-wallet-desktop' == github.repository
         uses: apple-actions/import-codesign-certs@v3
         with:
           keychain: ${{ github.run_id }}
@@ -354,7 +354,7 @@ jobs:
       - name: Running Tests (Linux)
         working-directory: ci_tools_atomic_dex
         continue-on-error: true
-        if: runner.os == 'Linux' && 'KomodoPlatform/cheetahdex-wallet-desktop' == github.repository
+        if: runner.os == 'Linux' && 'ShorelineCrypto/cheetahdex-wallet-desktop' == github.repository
         run: |
           export REPORT_CI_TOKEN=${{ secrets.REPORT_CI_TOKEN_SECRET }}
           export ATOMICDEX_TEST_SEED=${{ secrets.ATOMICDEX_TEST_SEED }}
@@ -373,7 +373,7 @@ jobs:
       - name: Running Tests (MacOS)
         working-directory: ci_tools_atomic_dex
         continue-on-error: true
-        if: runner.os == 'macOS' &&  'KomodoPlatform/cheetahdex-wallet-desktop' == github.repository
+        if: runner.os == 'macOS' &&  'ShorelineCrypto/cheetahdex-wallet-desktop' == github.repository
         run: |
           export MAC_SIGN_IDENTITY="${{ secrets.MAC_SIGN_IDENTITY }}"
           export INSTALLER_MAC_SIGN_IDENTITY="${{ secrets.MAC_SIGN_IDENTITY }}"
@@ -398,7 +398,7 @@ jobs:
       - name: Running Tests (Windows)
         shell: powershell
         continue-on-error: true
-        if: runner.os == 'Windows' && 'KomodoPlatform/cheetahdex-wallet-desktop' == github.repository
+        if: runner.os == 'Windows' && 'ShorelineCrypto/cheetahdex-wallet-desktop' == github.repository
         run: |
           #echo "Running tests"
           $Env:REPORT_CI_TOKEN = "${{ secrets.REPORT_CI_TOKEN_SECRET }}"

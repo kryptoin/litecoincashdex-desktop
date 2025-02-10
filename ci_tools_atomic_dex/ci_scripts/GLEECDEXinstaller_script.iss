@@ -4,7 +4,7 @@
 #define MyAppName "GleecDEX-Desktop"
 #define MyAppVersion "0.5.0"
 #define MyAppPublisher "Komodo Platform"
-#define MyAppURL "https://github.com/KomodoPlatform/cheetahdex-wallet-desktop"
+#define MyAppURL "https://github.com/ShorelineCrypto/cheetahdex-wallet-desktop"
 #define MyAppExeName "GleecDEX.exe"
 #define MyUserName "smk"
 #define CommitHash "cc57ab3"

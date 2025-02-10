@@ -81,7 +81,7 @@ FetchContent_Declare(jl777-coins
         URL https://github.com/KomodoPlatform/coins/archive/master.zip)
 
 #FetchContent_Declare(adex-generics-coins
-#        URL https://github.com/KomodoPlatform/cheetahdex-wallet-desktop/archive/main.zip)
+#        URL https://github.com/ShorelineCrypto/cheetahdex-wallet-desktop/archive/main.zip)
 
 FetchContent_MakeAvailable(kdf jl777-coins qmaterial)
 
