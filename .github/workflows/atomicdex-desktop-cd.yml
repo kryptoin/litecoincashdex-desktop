@@ -1,4 +1,4 @@
-name: komodo-wallet-desktop CD releases
+name: cheetahdex-wallet-desktop CD releases
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
     - temporary_disabled
 
 env:
-  DEX_PROJECT_NAME: "komodo-wallet"
+  DEX_PROJECT_NAME: "cheetahdex-wallet"
   DEX_DISPLAY_NAME: "Cheetahdex Wallet"
   DEX_COMPANY: "KomodoPlatform"
   DEX_VERSION: "0.8.2"
