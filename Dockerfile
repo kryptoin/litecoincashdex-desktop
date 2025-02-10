@@ -7,8 +7,8 @@ ENV TZ=Etc/UTC
 ENV SHELL=/bin/bash
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-WORKDIR /build/komodo-wallet-desktop
-COPY . /build/komodo-wallet-desktop
+WORKDIR /build/cheetahdex-wallet-desktop
+COPY . /build/cheetahdex-wallet-desktop
 RUN rm -rf .git build logs tmp
 
 RUN apt-get update -y && \
@@ -78,8 +78,8 @@ RUN apt-get update -y && \
     libqt5webchannel5-dev \
     libasound2-dev
 
-RUN git config --global --add safe.directory /build/komodo-wallet-desktop
-RUN cd /build/komodo-wallet-desktop && ./ci_tools_atomic_dex/ci_scripts/linux_script_docker.sh
+RUN git config --global --add safe.directory /build/cheetahdex-wallet-desktop
+RUN cd /build/cheetahdex-wallet-desktop && ./ci_tools_atomic_dex/ci_scripts/linux_script_docker.sh
 
 
 ENV CXX=clang++-12
@@ -102,12 +102,12 @@ ENV PATH=/root/Qt/5.15.2/gcc_64/bin:$PATH
 
 # Install Nim
 ENV CHOOSENIM_CHOOSE_VERSION=1.6.2
-RUN /build/komodo-wallet-desktop/ci_tools_atomic_dex/ci_scripts/choosenim.sh -y && \
+RUN /build/cheetahdex-wallet-desktop/ci_tools_atomic_dex/ci_scripts/choosenim.sh -y && \
     export PATH=/root/.nimble/bin:$PATH && \
     chmod +x /root/.choosenim/toolchains/nim-1.6.2/bin/*
 ENV PATH=/root/.nimble/bin:$PATH
     
-RUN cd /build/komodo-wallet-desktop/ci_tools_atomic_dex/vcpkg-repo && ./bootstrap-vcpkg.sh
+RUN cd /build/cheetahdex-wallet-desktop/ci_tools_atomic_dex/vcpkg-repo && ./bootstrap-vcpkg.sh
 
 
 # USAGE: ###

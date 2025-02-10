@@ -1,5 +1,5 @@
 {
-  "name": "komodo-wallet-desktop",
+  "name": "cheetahdex-wallet-desktop",
   "version-string": "0.8.2",
   "dependencies": [
     "entt",
