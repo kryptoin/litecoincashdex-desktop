@@ -1,48 +1,6 @@
 <p align="center">
     <a href="https://atomicdex.io" alt="Cheetahdex Wallet">
-	<img width="420" alt="cheetahdex-wallet-logo_dark-theme" src="https://user-images.githubusercontent.com/24797699/252409662-eb03b0b1-5f6e-4494-9267-132eba827718.png">
-    </a>
-</p>
-
-<p align="center">
-    <a href="https://github.com/shorelinecrypto/cheetahdex-wallet-desktop/graphs/contributors" alt="Contributors">
-        <img src="https://img.shields.io/github/contributors/shorelinecrypto/cheetahdex-wallet-desktop" />
-    </a>
-    <a href="https://github.com/shorelinecrypto/cheetahdex-wallet-desktop/releases">
-        <img src="https://img.shields.io/github/downloads/shorelinecrypto/cheetahdex-wallet-desktop/total" alt="downloads">
-    </a>
-    <a href="https://github.com/shorelinecrypto/cheetahdex-wallet-desktop/">
-        <img src="https://img.shields.io/github/last-commit/shorelinecrypto/cheetahdex-wallet-desktop" alt="last commit">
-    </a>
-    <a href="https://github.com/shorelinecrypto/cheetahdex-wallet-desktop/pulse" alt="Activity">
-        <img src="https://img.shields.io/github/commit-activity/m/shorelinecrypto/cheetahdex-wallet-desktop" />
-    </a>
-	<br/>
-    <a href="https://github.com/shorelinecrypto/cheetahdex-wallet-desktop/issues">
-        <img src="https://img.shields.io/github/issues-raw/shorelinecrypto/cheetahdex-wallet-desktop" alt="issues">
-    </a>
-    <a href="https://github.com/shorelinecrypto/cheetahdex-wallet-desktop/issues?q=is%3Aissue+is%3Aclosed">
-        <img src="https://img.shields.io/github/issues-closed-raw/shorelinecrypto/cheetahdex-wallet-desktop" alt="issues closed">
-    </a>
-    <a href="https://github.com/shorelinecrypto/cheetahdex-wallet-desktop/pulls">
-        <img src="https://img.shields.io/github/issues-pr/shorelinecrypto/cheetahdex-wallet-desktop" alt="pulls">
-    </a>
-    <a href="https://github.com/shorelinecrypto/cheetahdex-wallet-desktop/pulls?q=is%3Apr+is%3Aclosed">
-        <img src="https://img.shields.io/github/issues-pr-closed/shorelinecrypto/cheetahdex-wallet-desktop" alt="pulls closed">
-    </a>
-	<br/>
-    <a href="https://github.com/ShorelineCrypto/cheetahdex-wallet-desktop/actions/workflows/cheetahdex-wallet-desktop-ci.yml">
-        <img src="https://github.com/ShorelineCrypto/cheetahdex-wallet-desktop/actions/workflows/cheetahdex-wallet-desktop-ci.yml/badge.svg?branch=master" alt="build status">
-    </a>
-    <a href="https://github.com/ShorelineCrypto/cheetahdex-wallet-desktop/releases">
-        <img src="https://img.shields.io/github/v/release/shorelinecrypto/cheetahdex-wallet-desktop" alt="release version">
-    </a>
-    <a href="https://discord.gg/3rzDPAr">
-        <img src="https://img.shields.io/discord/302123079818149888?logo=discord" alt="chat on Discord">
-    </a>
-    <a href="https://twitter.com/KomodoPlatform">
-        <img src="https://img.shields.io/twitter/follow/komodoplatform?style=social&logo=twitter"
-            alt="follow on Twitter">
+	<img width="420" alt="cheetahdex-wallet-logo_dark-theme" src="https://raw.githubusercontent.com/ShorelineCrypto/cheetahdex-wallet-desktop/cheetahdex/assets/logo/dex-logo.png">
     </a>
 </p>
 
@@ -64,24 +22,20 @@ Cheetahdex Wallet has been tested on the following platforms:
 You can [download](https://github.com/ShorelineCrypto/cheetahdex-wallet-desktop/releases) the pre-built <b>beta</b> binaries on
 our [GitHub release page](https://github.com/ShorelineCrypto/cheetahdex-wallet-desktop/releases).
 
-Build instructions can be found [here](https://github.com/ShorelineCrypto/cheetahdex-wallet-desktop/wiki/Build-Instructions)
+Build instructions can be found [here](https://github.com/ShorelineCrypto/cheetahdex-wallet-desktop/tree/cheetahdex/docs)
 
-Please join our [Discord Server](https://komodoplatform.com/discord) for support, discussions and general UI/UX
+Please join our [Discord Server](https://discord.com/invite/jZMyhKm) for support, discussions and general UI/UX
 feedback.
 
 
 ## Useful links
 
-- :book: [Cheetahdex Wallet Documentation](https://developers.komodoplatform.com/basic-docs/atomicdex/atomicdex-tutorials/introduction-to-atomicdex.html)
-- :link: [Cheetahdex Wallet Website](https://atomicdex.io/)
-- :speech_balloon: [Cheetahdex Wallet Discord](https://discord.gg/tvp96Gf)
-- :hammer_and_wrench: [Cheetahdex Wallet Development Boards](https://github.com/ShorelineCrypto/cheetahdex-wallet-desktop/projects)
-- :notebook_with_decorative_cover: [Cheetahdex Wallet Wiki](https://github.com/ShorelineCrypto/cheetahdex-wallet-desktop/wiki/)
-
-
-## Cheetahdex Wallet mobile
-
-Check out Cheetahdex Wallet mobile, available for [Android and iOS](https://atomicdex.io)
+- :speech_balloon: [Cheetahdex Wallet Discord](https://discord.com/invite/jZMyhKm)
+- :notebook_with_decorative_cover: [ShorelineCrypto Reddit](https://www.reddit.com/r/shorelinecrypto/)
+- :hammer_and_wrench: [ShorelineCrypto X](https://x.com/shorelinecrypto)
+- :book: [Atomicdex Wallet Documentation](https://developers.komodoplatform.com/basic-docs/atomicdex/atomicdex-tutorials/introduction-to-atomicdex.html)
+- :link: [Komodo Wallet Website](https://atomicdex.io/)
+- :speech_balloon: [Komodo Wallet Discord](https://discord.gg/tvp96Gf)
 
 
 ## Self-Hosted Dependencies
