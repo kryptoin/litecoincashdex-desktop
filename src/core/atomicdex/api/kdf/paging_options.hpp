@@ -1,4 +1,4 @@
-// komodo-wallet
+// cheetahdex-wallet
 // Author(s): syl
 
 #pragma once

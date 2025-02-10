@@ -146,7 +146,7 @@ In your shell command prompt (Powershell/Zsh/Bash), from within the `root` folde
 ```bash
 cd cheetahdex-wallet-desktop\build              # create the 'build' folder if it doesn't exist
 cmake -DCMAKE_BUILD_TYPE=Release ../    # add -GNinja if you want to use the ninja build system.
-cmake --build . --config Release --target komodo-wallet
+cmake --build . --config Release --target cheetahdex-wallet
 ```
 
 
@@ -156,7 +156,7 @@ cmake --build . --config Release --target komodo-wallet
 ```
 cd cheetahdex-wallet-desktop\build              # create the 'build' folder if it doesn't exist
 cmake -DCMAKE_BUILD_TYPE=Release -GNinja ../
-cmake --build . --config Release --target komodo-wallet
+cmake --build . --config Release --target cheetahdex-wallet
 ninja install
 ```
 
@@ -245,7 +245,7 @@ In your shell command prompt (Powershell/Zsh/Bash), from within the `root` folde
 ```bash
 cd cheetahdex-wallet-desktop\build              # create the 'build' folder if it doesn't exist
 cmake -DCMAKE_BUILD_TYPE=Release ../    # add -GNinja if you want to use the ninja build system.
-cmake --build . --config Release --target komodo-wallet
+cmake --build . --config Release --target cheetahdex-wallet
 ```
 
 ### Bundle cheetahdex-wallet-desktop (installer)
@@ -270,7 +270,7 @@ export APPLE_ID="satoshinakamoto@bitcoin.com"
 ```
 cd cheetahdex-wallet-desktop\build              # create the 'build' folder if it doesn't exist
 cmake -DCMAKE_BUILD_TYPE=Release -GNinja ../
-cmake --build . --config Release --target komodo-wallet
+cmake --build . --config Release --target cheetahdex-wallet
 ninja install
 ```
 
@@ -365,7 +365,7 @@ In your shell command prompt (Powershell/Zsh/Bash), from within the `root` folde
 ```bash
 cd cheetahdex-wallet-desktop\build              # create the 'build' folder if it doesn't exist
 cmake -DCMAKE_BUILD_TYPE=Release ../ -GNinja
-cmake --build . --config Release --target komodo-wallet
+cmake --build . --config Release --target cheetahdex-wallet
 ```
 
 ### Bundle cheetahdex-wallet-desktop (installer)
@@ -373,6 +373,6 @@ cmake --build . --config Release --target komodo-wallet
 ```
 cd cheetahdex-wallet-desktop\build              # create the 'build' folder if it doesn't exist
 cmake -DCMAKE_BUILD_TYPE=Release -GNinja ../
-cmake --build . --config Release --target komodo-wallet
+cmake --build . --config Release --target cheetahdex-wallet
 ninja install
 ```

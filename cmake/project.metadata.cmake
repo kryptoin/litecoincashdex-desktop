@@ -2,7 +2,7 @@
 set(DEX_API "kdf_kwd")
 set(DEX_RPCPORT 7762)
 set(DEX_RPC "http://127.0.0.1:7762")
-set(DEX_PROJECT_NAME "komodo-wallet")
+set(DEX_PROJECT_NAME "cheetahdex-wallet")
 set(DEX_DISPLAY_NAME "Cheetahdex Wallet")
 set(DEX_MAINTENANCE_TOOL_NAME "Cheetahdex Wallet Maintenance Tool")
 set(DEX_COMPANY "KomodoPlatform")
