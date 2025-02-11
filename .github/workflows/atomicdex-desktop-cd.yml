@@ -8,7 +8,7 @@ on:
 env:
   DEX_PROJECT_NAME: "cheetahdex-wallet"
   DEX_DISPLAY_NAME: "Cheetahdex Wallet"
-  DEX_COMPANY: "KomodoPlatform"
+  DEX_COMPANY: "ShorelineCrypto"
   DEX_VERSION: "0.8.2"
   DEX_WEBSITE: "https://atomicdex.io/"
 
