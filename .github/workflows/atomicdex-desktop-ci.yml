@@ -201,24 +201,6 @@ jobs:
           vcpkgDirectory: '${{ github.workspace }}/ci_tools_atomic_dex/vcpkg-repo'
           vcpkgJsonGlob: 'vcpkg.json'
 
-      - name: import code signing certificates (macos)
-        if: runner.os == 'macOS'  && 'ShorelineCrypto/cheetahdex-wallet-desktop' == github.repository
-        uses: Apple-Actions/import-codesign-certs@v3
-        with:
-          keychain: ${{ github.run_id }}
-          keychain-password: ${{ github.run_id }}
-          p12-file-base64: ${{ secrets.CERTIFICATES_P12 }}
-          p12-password: ${{ secrets.CERTIFICATES_P12_PASSWORD }}
-
-      - name: import installer code signing certificates (macos)
-        if: runner.os == 'macOS'  && 'ShorelineCrypto/cheetahdex-wallet-desktop' == github.repository
-        uses: apple-actions/import-codesign-certs@v3
-        with:
-          keychain: ${{ github.run_id }}
-          keychain-password: ${{ github.run_id }}
-          create-keychain: false
-          p12-file-base64: ${{ secrets.CERTIFICATES_INSTALLER_P12 }}
-          p12-password: ${{ secrets.CERTIFICATES_P12_PASSWORD }}
 
       - name: Build Cheetahdex Wallet (MacOS)
         if: runner.os == 'macOS'
