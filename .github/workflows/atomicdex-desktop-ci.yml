@@ -11,14 +11,14 @@ on:
   workflow_dispatch:
 
 env:
-  DEX_API: "kdf_kwd"
-  DEX_RPCPORT: 7762
-  DEX_RPC: "http://127.0.0.1:7762"
+  DEX_API: "mm2_cheetah"
+  DEX_RPCPORT: 7862
+  DEX_RPC: "http://127.0.0.1:7862"
   DEX_PROJECT_NAME: "cheetahdex-wallet"
   DEX_DISPLAY_NAME: "Cheetahdex Wallet"
   DEX_COMPANY: "ShorelineCrypto"
   DEX_VERSION: "0.8.2"
-  DEX_WEBSITE: "https://atomicdex.io/"
+  DEX_WEBSITE: "https://cheetahdex.shorelinecrypto.com/"
   VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}/b/vcpkg_cache
   VCPKG_BINARY_SOURCES: clear;x-gha,readwrite
   RUNVCPKG_VCPKG_ROOT: ${{ github.workspace }}\cheetahdex-wallet-desktop\ci_tools_atomic_dex\vcpkg-repo

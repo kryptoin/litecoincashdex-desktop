@@ -47,7 +47,9 @@
     "ETH_ALT": "Ξ",
     "BTC": "₿",
     "BTC_ALT": "฿",
-    "LTC": "Ł"
+    "LTC": "Ł",
+    "CHTA": "CHTA",
+    "NENG": "NENG"
   },
   "available_fiat": [
     "USD",
@@ -97,6 +99,8 @@
     "BTC",
     "KMD",
     "LTC",
-    "DOGE"
+    "DOGE",
+    "CHTA",
+    "NENG"
   ]
 }
