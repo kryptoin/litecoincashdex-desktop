@@ -1,5 +1,5 @@
 <p align="center">
-    <a href="https://atomicdex.io" alt="Cheetahdex Wallet">
+    <a href="https://github.com/ShorelineCrypto/cheetahdex-wallet-desktop" alt="Cheetahdex Wallet">
 	<img width="420" alt="cheetahdex-wallet-logo_dark-theme" src="https://raw.githubusercontent.com/ShorelineCrypto/cheetahdex-wallet-desktop/cheetahdex/assets/logo/dex-logo.png">
     </a>
 </p>
