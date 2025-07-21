@@ -18,7 +18,7 @@ scoop cache rm llvm
 $Env:QT_INSTALL_CMAKE_PATH = "C:\Qt\$Env:QT_VERSION\msvc2019_64"
 $Env:QT_ROOT = "C:\Qt"
 
-git clone https://github.com/komodoce/coins-ce/ -b master
+git clone https://github.com/ShorelineCrypto/coins/ -b master
 mkdir -p atomic_defi_design\assets\images\coins
 Get-Item -Path "coins\icons\*.png" | Move-Item -Destination "atomic_defi_design\assets\images\coins"
 
