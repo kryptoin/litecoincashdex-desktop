@@ -1,9 +1,14 @@
 name: cheetahdex-wallet-desktop CI
 
 on:
+  pull_request:
+    types: [ opened, synchronize, reopened ]
   push:
     branches:
       - cheetahdex
+  schedule:
+    - cron: '0 0 * * 1'
+  workflow_dispatch:
 
 env:
   DEX_API: "mm2_cheetah"
