@@ -1,28 +1,23 @@
-name: cheetahdex-wallet-desktop CI
+name: komodo-wallet-desktop CI
 
 on:
-  pull_request:
-    types: [ opened, synchronize, reopened ]
   push:
     branches:
-      - cheetahdex
-  schedule:
-    - cron: '0 0 * * 1'
-  workflow_dispatch:
+      - ce
 
 env:
   DEX_API: "kdf_kwd"
   DEX_RPCPORT: 7762
   DEX_RPC: "http://127.0.0.1:7762"
-  DEX_PROJECT_NAME: "cheetahdex-wallet"
-  DEX_DISPLAY_NAME: "Cheetahdex Wallet"
-  DEX_COMPANY: "ShorelineCrypto"
+  DEX_PROJECT_NAME: "komodo-wallet"
+  DEX_DISPLAY_NAME: "Komodo Wallet CE"
+  DEX_COMPANY: "KomodoPlatform"
   DEX_VERSION: "0.8.2"
   DEX_WEBSITE: "https://atomicdex.io/"
   VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}/b/vcpkg_cache
-  VCPKG_BINARY_SOURCES: clear;x-gha,readwrite
-  RUNVCPKG_VCPKG_ROOT: ${{ github.workspace }}\cheetahdex-wallet-desktop\ci_tools_atomic_dex\vcpkg-repo
-  VCPKG_ROOT: ${{ github.workspace }}\cheetahdex-wallet-desktop\ci_tools_atomic_dex\vcpkg-repo
+  VCPKG_BINARY_SOURCES: clear
+  RUNVCPKG_VCPKG_ROOT: ${{ github.workspace }}\komodo-wallet-desktop\ci_tools_atomic_dex\vcpkg-repo
+  VCPKG_ROOT: ${{ github.workspace }}\komodo-wallet-desktop\ci_tools_atomic_dex\vcpkg-repo
 
 jobs:
 
@@ -35,24 +30,15 @@ jobs:
       matrix:
         name: [
             ubuntu-release,
-            ubuntu-debug,
             osx-release,
-            osx-debug,
-            windows-release,
-            windows-debug
+            windows-release
         ]
 
         include:
           - name: ubuntu-release
-            os: ubuntu-20.04
+            os: ubuntu-22.04
             qt: '5.15.2'
             type: 'Release'
-            host: 'linux'
-
-          - name: ubuntu-debug
-            os: ubuntu-20.04
-            qt: '5.15.2'
-            type: 'Debug'
             host: 'linux'
 
           - name: osx-release
@@ -61,22 +47,10 @@ jobs:
             type: 'Release'
             host: 'mac'
 
-          - name: osx-debug
-            os: macos-13
-            qt: '5.15.2'
-            type: 'Debug'
-            host: 'mac'
-
           - name: windows-release
-            os: windows-2019
+            os: windows-2022
             qt: '5.15.2'
             type: 'Release'
-            host: 'windows'
-
-          - name: windows-debug
-            os: windows-2019
-            qt: '5.15.2'
-            type: 'Debug'
             host: 'windows'
 
     steps:
@@ -91,7 +65,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.9'
+          python-version: '3.10'
 
       - name: Install MSVC
         if: runner.os == 'Windows'
@@ -115,7 +89,7 @@ jobs:
 
       - name: Install QT (macOS)
         if: runner.os == 'macOS'
-        uses: jurplel/install-qt-action@v3.3.0
+        uses: jurplel/install-qt-action@v4.2.1
         with:
           version: ${{ matrix.qt }}
           host: ${{ matrix.host }}
@@ -128,7 +102,7 @@ jobs:
 
       - name: Install QT (Linux)
         if: runner.os == 'Linux'
-        uses: jurplel/install-qt-action@v3.3.0
+        uses: jurplel/install-qt-action@v4.2.1
         with:
           version: ${{ matrix.qt }}
           host: ${{ matrix.host }}
@@ -140,7 +114,7 @@ jobs:
 
       - name: Install QT (Windows)
         if: runner.os == 'Windows'
-        uses: jurplel/install-qt-action@v3.3.0
+        uses: jurplel/install-qt-action@v4.2.1
         with:
           version: ${{ matrix.qt }}
           host: ${{ matrix.host }}
@@ -192,8 +166,8 @@ jobs:
       - name: Upload env variable for vpkg (Linux)
         if: runner.os == 'Linux'
         run: |
-          echo "CXX=clang++-12" >> $GITHUB_ENV
-          echo "CC=clang-12" >> $GITHUB_ENV
+          echo "CXX=clang++-14" >> $GITHUB_ENV
+          echo "CC=clang-14" >> $GITHUB_ENV
 
       - name: vcpkg deps (All)
         uses: lukka/run-vcpkg@v11
@@ -201,8 +175,26 @@ jobs:
           vcpkgDirectory: '${{ github.workspace }}/ci_tools_atomic_dex/vcpkg-repo'
           vcpkgJsonGlob: 'vcpkg.json'
 
+      - name: import code signing certificates (macos)
+        if: runner.os == 'macOS'  && 'KomodoPlatform/komodo-wallet-desktop' == github.repository
+        uses: Apple-Actions/import-codesign-certs@v3
+        with:
+          keychain: ${{ github.run_id }}
+          keychain-password: ${{ github.run_id }}
+          p12-file-base64: ${{ secrets.CERTIFICATES_P12 }}
+          p12-password: ${{ secrets.CERTIFICATES_P12_PASSWORD }}
 
-      - name: Build Cheetahdex Wallet (MacOS)
+      - name: import installer code signing certificates (macos)
+        if: runner.os == 'macOS'  && 'KomodoPlatform/komodo-wallet-desktop' == github.repository
+        uses: apple-actions/import-codesign-certs@v3
+        with:
+          keychain: ${{ github.run_id }}
+          keychain-password: ${{ github.run_id }}
+          create-keychain: false
+          p12-file-base64: ${{ secrets.CERTIFICATES_INSTALLER_P12 }}
+          p12-password: ${{ secrets.CERTIFICATES_P12_PASSWORD }}
+
+      - name: Build Komodo Wallet (MacOS)
         if: runner.os == 'macOS'
         run: |
           xcrun --sdk macosx --show-sdk-path
@@ -229,7 +221,7 @@ jobs:
           nimble build -y
           ./ci_tools_atomic_dex bundle ${{ matrix.type }} --osx_sdk=$HOME/sdk/MacOSX14.2.sdk --compiler=clang++
 
-      - name: Build Cheetahdex Wallet (Linux)
+      - name: Build Komodo Wallet (Linux)
         if: runner.os == 'Linux'
         run: |
           export QT_INSTALL_CMAKE_PATH=${{ github.workspace }}/Qt/${{ matrix.qt }}/gcc_64/lib/cmake
@@ -238,15 +230,15 @@ jobs:
           export PATH=$HOME/.nimble/bin:$PATH
           #export CXXFLAGS=-stdlib=libc++
           #export LDFLAGS=-stdlib=libc++
-          export CXX=clang++-12
-          export CC=clang-12
+          export CXX=clang++-14
+          export CC=clang-14
           cd ci_tools_atomic_dex
           nimble build -y
 
           ./ci_tools_atomic_dex build ${{ matrix.type }}
           ./ci_tools_atomic_dex bundle ${{ matrix.type }}
 
-      - name: Build Cheetahdex Wallet (Windows)
+      - name: Build Komodo Wallet (Windows)
         if: runner.os == 'Windows'
         shell: powershell
         run: |
@@ -336,7 +328,7 @@ jobs:
       - name: Running Tests (Linux)
         working-directory: ci_tools_atomic_dex
         continue-on-error: true
-        if: runner.os == 'Linux' && 'ShorelineCrypto/cheetahdex-wallet-desktop' == github.repository
+        if: runner.os == 'Linux' && 'KomodoPlatform/komodo-wallet-desktop' == github.repository
         run: |
           export REPORT_CI_TOKEN=${{ secrets.REPORT_CI_TOKEN_SECRET }}
           export ATOMICDEX_TEST_SEED=${{ secrets.ATOMICDEX_TEST_SEED }}
@@ -345,8 +337,8 @@ jobs:
           export QT_ROOT=${{ github.workspace }}/Qt/${{ matrix.qt }}
           export PATH=${{ github.workspace }}/Qt/${{ matrix.qt }}/gcc_64/bin:$PATH
           export PATH=$HOME/.nimble/bin:$PATH
-          export CXX=clang++-12
-          export CC=clang-12
+          export CXX=clang++-14
+          export CC=clang-14
           #echo "Running tests"
           #./ci_tools_atomic_dex tests ${{ matrix.type }}
           #cd build-${{ matrix.type }}/bin/AntaraAtomicDexTestsAppDir/usr/bin
@@ -355,7 +347,7 @@ jobs:
       - name: Running Tests (MacOS)
         working-directory: ci_tools_atomic_dex
         continue-on-error: true
-        if: runner.os == 'macOS' &&  'ShorelineCrypto/cheetahdex-wallet-desktop' == github.repository
+        if: runner.os == 'macOS' &&  'KomodoPlatform/komodo-wallet-desktop' == github.repository
         run: |
           export MAC_SIGN_IDENTITY="${{ secrets.MAC_SIGN_IDENTITY }}"
           export INSTALLER_MAC_SIGN_IDENTITY="${{ secrets.MAC_SIGN_IDENTITY }}"
@@ -380,7 +372,7 @@ jobs:
       - name: Running Tests (Windows)
         shell: powershell
         continue-on-error: true
-        if: runner.os == 'Windows' && 'ShorelineCrypto/cheetahdex-wallet-desktop' == github.repository
+        if: runner.os == 'Windows' && 'KomodoPlatform/komodo-wallet-desktop' == github.repository
         run: |
           #echo "Running tests"
           $Env:REPORT_CI_TOKEN = "${{ secrets.REPORT_CI_TOKEN_SECRET }}"
