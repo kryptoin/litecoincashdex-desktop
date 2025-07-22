@@ -53,7 +53,7 @@ jobs:
             host: 'mac'
 
           - name: windows-release
-            os: windows-2022
+            os: windows-2019
             qt: '5.15.2'
             type: 'Release'
             host: 'windows'
@@ -70,7 +70,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: '3.9'
 
       - name: Install MSVC
         if: runner.os == 'Windows'
@@ -94,7 +94,7 @@ jobs:
 
       - name: Install QT (macOS)
         if: runner.os == 'macOS'
-        uses: jurplel/install-qt-action@v4.2.1
+        uses: jurplel/install-qt-action@v3.3.0
         with:
           version: ${{ matrix.qt }}
           host: ${{ matrix.host }}
@@ -107,7 +107,7 @@ jobs:
 
       - name: Install QT (Linux)
         if: runner.os == 'Linux'
-        uses: jurplel/install-qt-action@v4.2.1
+        uses: jurplel/install-qt-action@v3.3.0
         with:
           version: ${{ matrix.qt }}
           host: ${{ matrix.host }}
@@ -119,7 +119,7 @@ jobs:
 
       - name: Install QT (Windows)
         if: runner.os == 'Windows'
-        uses: jurplel/install-qt-action@v4.2.1
+        uses: jurplel/install-qt-action@v3.3.0
         with:
           version: ${{ matrix.qt }}
           host: ${{ matrix.host }}
@@ -171,8 +171,8 @@ jobs:
       - name: Upload env variable for vpkg (Linux)
         if: runner.os == 'Linux'
         run: |
-          echo "CXX=clang++-14" >> $GITHUB_ENV
-          echo "CC=clang-14" >> $GITHUB_ENV
+          echo "CXX=clang++-12" >> $GITHUB_ENV
+          echo "CC=clang-12" >> $GITHUB_ENV
 
       - name: vcpkg deps (All)
         uses: lukka/run-vcpkg@v11
@@ -216,8 +216,8 @@ jobs:
           export PATH=$HOME/.nimble/bin:$PATH
           #export CXXFLAGS=-stdlib=libc++
           #export LDFLAGS=-stdlib=libc++
-          export CXX=clang++-14
-          export CC=clang-14
+          export CXX=clang++-12
+          export CC=clang-12
           cd ci_tools_atomic_dex
           nimble build -y
 
@@ -323,8 +323,8 @@ jobs:
           export QT_ROOT=${{ github.workspace }}/Qt/${{ matrix.qt }}
           export PATH=${{ github.workspace }}/Qt/${{ matrix.qt }}/gcc_64/bin:$PATH
           export PATH=$HOME/.nimble/bin:$PATH
-          export CXX=clang++-14
-          export CC=clang-14
+          export CXX=clang++-12
+          export CC=clang-12
           #echo "Running tests"
           #./ci_tools_atomic_dex tests ${{ matrix.type }}
           #cd build-${{ matrix.type }}/bin/AntaraAtomicDexTestsAppDir/usr/bin
