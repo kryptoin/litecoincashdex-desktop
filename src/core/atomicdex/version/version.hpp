@@ -27,7 +27,7 @@ namespace atomic_dex
     constexpr int
     get_num_version() noexcept
     {
-        return 82;
+        return 90;
     }
 
     constexpr const char*
@@ -39,6 +39,6 @@ namespace atomic_dex
     constexpr const char*
     get_precedent_raw_version()
     {
-        return "0.8.2.1";
+        return "0.8.2";
     }
 } // namespace atomic_dex
