@@ -30,12 +30,13 @@ feedback.
 
 ## Useful links
 
-- :speech_balloon: [Cheetahdex Wallet Discord](https://discord.com/invite/jZMyhKm)
+- :link: [Cheetahdex Wallet Website](https://cheetahdex.shorelinecrypto.com/)
+- :speech_balloon: [ShorelineCrypto Discord](https://discord.com/invite/jZMyhKm)
 - :notebook_with_decorative_cover: [ShorelineCrypto Reddit](https://www.reddit.com/r/shorelinecrypto/)
 - :hammer_and_wrench: [ShorelineCrypto X](https://x.com/shorelinecrypto)
 - :book: [Atomicdex Wallet Documentation](https://developers.komodoplatform.com/basic-docs/atomicdex/atomicdex-tutorials/introduction-to-atomicdex.html)
-- :link: [Komodo Wallet Website](https://atomicdex.io/)
-- :speech_balloon: [Komodo Wallet Discord](https://discord.gg/tvp96Gf)
+- :link: [Komodo Wallet Website](https://komodoplatform.com/en/wallet/)
+- :speech_balloon: [Komodo Wallet Discord](https://komodoplatform.com/discord)
 
 
 ## Self-Hosted Dependencies
