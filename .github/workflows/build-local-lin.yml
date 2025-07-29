@@ -28,7 +28,7 @@ jobs:
 
   ci-flow:
     name: ${{ matrix.name }}
-    runs-on: self-hosted
+    runs-on: self-hosted.Linux
 
     strategy:
       fail-fast: false
