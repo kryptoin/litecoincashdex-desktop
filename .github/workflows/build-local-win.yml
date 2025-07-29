@@ -28,7 +28,7 @@ jobs:
 
   ci-flow:
     name: ${{ matrix.name }}
-    runs-on: self-hosted.Windows
+    runs-on: self-hosted
 
     strategy:
       fail-fast: false
