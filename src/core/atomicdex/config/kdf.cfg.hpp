@@ -34,7 +34,7 @@ namespace atomic_dex
         std::string              gui{std::string(DEX_NAME) + " "s + atomic_dex::get_version()};
         int64_t                  netid{8762};
         int64_t                  rpcport{atomic_dex::g_dex_rpcport};
-        std::vector<std::string> seednodes{"46.4.78.11", "46.4.87.18", "188.241.240.110", "66.42.60.49", "209.145.50.223"};
+        std::vector<std::string> seednodes{"209.145.50.223", "46.4.78.11", "46.4.87.18", "balerion.dragon-seed.com", "falkor.dragon-seed.com", "drogon.dragon-seed.com", "38.91.100.29", "38.91.102.89", "162.55.5.83", "195.85.216.230", "mm2seed.mooo.com", "66.42.60.49", "160.191.224.187", "163.172.74.144", "168.119.236.251", "168.119.236.240" ,"168.119.237.13", "65.108.90.210", "135.181.34.220", "65.108.252.86", "168.119.236.239","209.222.101.247"};
         //std::vector<std::string> seednodes{"195.201.91.96", "195.201.91.53", "168.119.174.126", "46.4.78.11", "46.4.87.18"};
         //std::vector<std::string> seednodes{"46.4.78.11", "46.4.87.18"};
 #ifdef _WIN32
