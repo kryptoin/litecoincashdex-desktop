@@ -16,7 +16,23 @@ Item
     property string loaded_symbol
     property bool pair_supported: false
     property string selected_testcoin
-    onPair_supportedChanged: if (!pair_supported) webEngineViewPlaceHolder.visible = false
+    onPair_supportedChanged: if (!pair_supported) {
+        chartLoadTimeout.stop()
+        webEngineViewPlaceHolder.visible = false
+    }
+
+    Timer {
+        id: chartLoadTimeout
+        interval: 12000
+        repeat: false
+        onTriggered: {
+            if (!webEngineViewPlaceHolder.visible && pair_supported) {
+                console.log("chart load timeout")
+                pair_supported = false
+                selected_testcoin = ""
+            }
+        }
+    }
 
     function loadChart(right_ticker, left_ticker, force = false, source="livecoinwatch")
     {
@@ -59,6 +75,7 @@ Item
                 
                 if (symbol === loaded_symbol && !force)
                 {
+                    chartLoadTimeout.stop()
                     webEngineViewPlaceHolder.visible = true
                     console.log("symbol === loaded_symbol, ok")
                     return
@@ -220,6 +237,7 @@ Item
             {
                 if (webEngineLoadReq.status === WebEngineView.LoadSucceededStatus)
                 {
+                    chartLoadTimeout.stop()
                     webEngineViewPlaceHolder.visible = true
                 }
                 else webEngineViewPlaceHolder.visible = false
