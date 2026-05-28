@@ -113,7 +113,7 @@ Qaterial.Dialog
                 FAQLine
                 {
                     title: qsTr("Where can I see the orderbook or market statistics online?")
-                    text: qsTr('You can view an online orderbook and market statistics at <a href="https://markets.atomicdex.io/">https://markets.atomicdex.io/</a>, or use the Cheetahdex Wallet in your browser at <a href="https://app.komodoplatform.com">https://app.komodoplatform.com</a>!')
+                    text: qsTr('You can follow LitecoinCash Brasil status, pool and community links at <a href="https://litecoincash.com.br/status.php">https://litecoincash.com.br/status.php</a>.')
                 }
 
                 FAQLine
@@ -208,7 +208,7 @@ There is a toggle in settings where you can turn on/off the display of these tra
                 Layout.preferredHeight: column_layout.height
                 hoverEnabled: true
 
-                onClicked: Qt.openUrlExternally("https://github.com/ShorelineCrypto/cheetahdex-wallet-desktop/pull/2388")
+                onClicked: Qt.openUrlExternally("https://litecoincash.com.br/comunidade.php")
 
                 ColumnLayout
                 {
