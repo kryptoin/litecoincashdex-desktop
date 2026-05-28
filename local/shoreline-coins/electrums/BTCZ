@@ -1,0 +1,32 @@
+[
+    {
+        "url": "electrum1.btcz.rocks:50002",
+        "protocol": "SSL",
+        "contact": [
+            {
+                "discord": "517255090633965586"
+            }
+        ],
+        "ws_url": "electrum1.btcz.rocks:50004"
+    },
+    {
+        "url": "electrum2.btcz.rocks:50002",
+        "protocol": "SSL",
+        "contact": [
+            {
+                "discord": "517255090633965586"
+            }
+        ],
+        "ws_url": "electrum2.btcz.rocks:50004"
+    },
+    {
+        "url": "electrum3.btcz.rocks:50002",
+        "protocol": "SSL",
+        "contact": [
+            {
+                "discord": "426842722436120577"
+            }
+        ],
+        "ws_url": "electrum3.btcz.rocks:50004"
+    }
+]

@@ -1,0 +1,62 @@
+[
+  {
+    "url": "electrumx.firo.org:50001",
+    "protocol": "TCP",
+    "contact": [
+      { "github": "https://github.com/firoorg/electrumx-firo/issues" }
+    ]
+  },
+  {
+    "url": "electrumx01.firo.org:50001",
+    "protocol": "TCP",
+    "contact": [
+      { "github": "https://github.com/firoorg/electrumx-firo/issues" }
+    ]
+  },
+  {
+    "url": "electrumx02.firo.org:50001",
+    "protocol": "TCP",
+    "contact": [
+      { "github": "https://github.com/firoorg/electrumx-firo/issues" }
+    ]
+  },
+  {
+    "url": "electrumx03.firo.org:50001",
+    "protocol": "TCP",
+    "contact": [
+      {  "github": "https://github.com/firoorg/electrumx-firo/issues" }
+    ]
+  },
+  {
+    "url": "electrumx.firo.org:50002",
+    "protocol": "SSL",
+    "contact": [
+      { "github": "https://github.com/firoorg/electrumx-firo/issues" }
+    ],
+    "ws_url": "electrumx.firo.org:50004"
+  },
+  {
+    "url": "electrumx01.firo.org:50002",
+    "protocol": "SSL",
+    "contact": [
+      { "github": "https://github.com/firoorg/electrumx-firo/issues" }
+    ],
+    "ws_url": "electrumx01.firo.org:50004"
+  },
+  {
+    "url": "electrumx02.firo.org:50002",
+    "protocol": "SSL",
+    "contact": [
+      { "github": "https://github.com/firoorg/electrumx-firo/issues" }
+    ],
+    "ws_url": "electrumx02.firo.org:50004"
+  },
+  {
+    "url": "electrumx03.firo.org:50002",
+    "protocol": "SSL",
+    "contact": [
+      {  "github": "https://github.com/firoorg/electrumx-firo/issues" }
+    ],
+    "ws_url": "electrumx03.firo.org:50004"
+  }
+]

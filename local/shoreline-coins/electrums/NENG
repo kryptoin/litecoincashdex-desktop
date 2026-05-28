@@ -1,0 +1,50 @@
+[
+  {
+    "url": "electrum.shorelinecrypto.com:10001",
+    "contact": [
+      { "email": "support@shorelinecrypto.com" },
+      { "discord": "honglu69#5911" }
+    ]
+  },
+  {
+    "url": "electrum.shorelinecrypto.com:10002",
+    "protocol": "SSL",
+    "contact": [
+      { "email": "support@shorelinecrypto.com" },
+      { "discord": "honglu69#5911" }
+    ],
+    "ws_url": "electrum.shorelinecrypto.com:10003"
+  },
+  {
+    "url": "electrum.blastinvest.com:10001",
+    "contact": [
+      { "email": "support@shorelinecrypto.com" },
+      { "discord": "honglu69#5911" }
+    ]
+  },
+  {
+    "url": "electrum.blastinvest.com:10002",
+    "protocol": "SSL",
+    "contact": [
+      { "email": "support@shorelinecrypto.com" },
+      { "discord": "honglu69#5911" }
+    ],
+    "ws_url": "electrum.blastinvest.com:10003"
+  },
+  {
+    "url": "electrum2.mooo.com:10001",
+    "contact": [
+      { "email": "support@shorelinecrypto.com" },
+      { "discord": "honglu69#5911" }
+    ]
+  },
+  {
+    "url": "electrum2.mooo.com:10002",
+    "protocol": "SSL",
+    "contact": [
+      { "email": "support@shorelinecrypto.com" },
+      { "discord": "honglu69#5911" }
+    ],
+    "ws_url": "electrum2.mooo.com:10003"
+  }
+]

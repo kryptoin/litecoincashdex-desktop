@@ -1,0 +1,10 @@
+[
+  {
+    "url": "electrum.newyorkcoin.online:50002",
+    "protocol": "SSL",
+    "contact": [
+      { "email": "admin@newyorkcoin.online" }
+    ],
+    "ws_url": "electrum.newyorkcoin.online:50004"
+  }
+]

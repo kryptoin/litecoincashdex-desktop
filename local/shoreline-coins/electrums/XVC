@@ -1,0 +1,33 @@
+[
+  {
+    "url": "xvc-ex-seven.ewmci.online:50001",
+    "protocol": "TCP",
+    "contact": [
+      { "discord": "475820011634819072" }
+    ]
+  },
+  {
+    "url": "xvc-ex-seven.ewmci.online:50002",
+    "protocol": "SSL",
+    "contact": [
+      { "discord": "475820011634819072" }
+    ],
+    "ws_url": "xvc-ex-seven.ewmci.online:50003"
+  },
+  {
+    "url": "electrumx2.vanillacash.info:50011"
+  },
+  {
+    "url": "electrumx1.vanillacash.info:50011"
+  },
+  {
+    "url": "electrumx2.vanillacash.info:50012",
+    "protocol": "SSL",
+    "ws_url": "electrumx2.vanillacash.info:50013"
+  },
+  {
+    "url": "electrumx1.vanillacash.info:50012",
+    "protocol": "SSL",
+    "ws_url": "electrumx1.vanillacash.info:50013"
+  }
+]

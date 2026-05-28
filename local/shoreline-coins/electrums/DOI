@@ -1,0 +1,56 @@
+[
+    {
+        "url": "itchy-jellyfish-89.doi.works:50002",
+        "protocol": "SSL",
+        "contact": [
+            {
+                "github": "https://github.com/doichain/electrum-doi/issues",
+                "twitter": "doichain"
+            }
+        ],
+        "ws_url": "itchy-jellyfish-89.doi.works:50004"
+    },
+    {
+        "url": "big-parrot-60.doi.works:50002",
+        "protocol": "SSL",
+        "contact": [
+            {
+                "github": "https://github.com/doichain/electrum-doi/issues",
+                "twitter": "doichain"
+            }
+        ],
+        "ws_url": "big-parrot-60.doi.works:50004"
+    },
+    {
+        "url": "pink-deer-69.doi.works:50002",
+        "protocol": "SSL",
+        "contact": [
+            {
+                "github": "https://github.com/doichain/electrum-doi/issues",
+                "twitter": "doichain"
+            }
+        ],
+        "ws_url": "pink-deer-69.doi.works:50004"
+    },
+    {
+        "url": "pink-deer-69.doi.works:50001",
+        "protocol": "TCP",
+        "contact": [
+            {
+                "github": "https://github.com/doichain/electrum-doi/issues",
+                "twitter": "doichain"
+            }
+        ]
+    },
+    {
+        "url": "ugly-bird-70.doi.works:50002",
+        "protocol": "SSL",
+        "contact": [
+            {
+                "github": "https://github.com/doichain/electrum-doi/issues",
+                "twitter": "doichain"
+            }
+        ],
+        "ws_url": "ugly-bird-70.doi.works:50004"
+    }
+]

@@ -1,0 +1,15 @@
+[
+    {
+        "url": "nmc2.bitcoins.sk:57001",
+        "protocol": "TCP"
+    },
+    {
+        "url": "nmc2.bitcoins.sk:57002",
+        "protocol": "SSL",
+        "disable_cert_verification": true
+    },
+    {
+        "url": "namecoin.stackwallet.com:57002",
+        "protocol": "SSL"
+    }
+]

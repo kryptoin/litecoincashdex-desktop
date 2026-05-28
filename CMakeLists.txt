@@ -78,7 +78,7 @@ FetchContent_Declare(
 )
 
 FetchContent_Declare(jl777-coins
-        URL https://github.com/ShorelineCrypto/coins/archive/master.zip)
+        SOURCE_DIR ${CMAKE_SOURCE_DIR}/local/shoreline-coins)
 
 #FetchContent_Declare(adex-generics-coins
 #        URL https://github.com/ShorelineCrypto/cheetahdex-wallet-desktop/archive/main.zip)

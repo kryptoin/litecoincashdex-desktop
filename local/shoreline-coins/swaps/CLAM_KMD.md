@@ -1,0 +1,5 @@
+[taker fee (KMD)](https://kmdexplorer.io/tx/688ba0eed0e80986e1c58d87bf087a003bed1637f01245ab03d53d1cebe5e82d)  
+[maker payment (CLAM)](https://chainz.cryptoid.info/clam/tx.dws?eacfc9ace5ded41129b320cb5708a7643840b38dbf4bcaa513022bb6a172a6c4)  
+[taker payment (KMD)](https://kmdexplorer.io/tx/5e03fe81af453b37337b905dd6211e3edab65752d1032631d9f2b2eeb882598a)  
+[taker payment spent (KMD)](https://kmdexplorer.io/tx/2adb1616bf200ce2a697b4b0b082dc754dbb5326706798435f605c6944021334)  
+[maker payment spent (CLAM)](https://chainz.cryptoid.info/clam/tx.dws?9f64924468046a6a678d5f61764b419e26c8b2a529113c5bb2154f9787977ab7)  

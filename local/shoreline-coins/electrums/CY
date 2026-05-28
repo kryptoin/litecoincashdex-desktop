@@ -1,0 +1,22 @@
+[
+    {
+	"url": "electrum02.cyberyen.work:50002",
+	"protocol": "SSL",
+	"ws_url": "electrum02.cyberyen.work:50004",
+	"contact": [
+	    {
+		"support_chat": "https://matrix.to/#/#cyberyen-support:matrix.org"
+	    }
+	]
+    },
+    {
+	"url": "electrum03.cyberyen.work:50002",
+	"protocol": "SSL",
+	"ws_url": "electrum03.cyberyen.work:50004",
+	"contact": [
+	    {
+		"support_chat": "https://matrix.to/#/#cyberyen-support:matrix.org"
+	    }
+	]
+    }
+]

@@ -1,0 +1,17 @@
+[
+  {
+    "url": "electrum.shibacoinshic.org:50003",
+    "ws_url": "electrum.shibacoinshic.org:50002",
+    "protocol": "SSL",
+    "contact": [
+      { "discord": "1157581316175437884" }
+    ]
+  },
+  {
+    "url": "electrum.shibacoinshic.org:50001",
+    "protocol": "TCP",
+    "contact": [
+      { "discord": "1157581316175437884" }
+    ]
+  }
+]

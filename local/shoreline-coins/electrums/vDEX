@@ -1,0 +1,50 @@
+[
+  {
+    "url": "vdex.electrum1.cipig.net:10010",
+    "contact": [
+      { "email": "cipi@komodoplatform.com" },
+      { "discord": "cipi#4502" }
+    ]
+  },
+  {
+    "url": "vdex.electrum2.cipig.net:10010",
+    "contact": [
+      { "email": "cipi@komodoplatform.com" },
+      { "discord": "cipi#4502" }
+    ]
+  },
+  {
+    "url": "vdex.electrum3.cipig.net:10010",
+    "contact": [
+      { "email": "cipi@komodoplatform.com" },
+      { "discord": "cipi#4502" }
+    ]
+  },
+  {
+    "url": "vdex.electrum1.cipig.net:20010",
+    "protocol": "SSL",
+    "contact": [
+      { "email": "cipi@komodoplatform.com" },
+      { "discord": "cipi#4502" }
+    ],
+    "ws_url": "vdex.electrum1.cipig.net:30010"
+  },
+  {
+    "url": "vdex.electrum2.cipig.net:20010",
+    "protocol": "SSL",
+    "contact": [
+      { "email": "cipi@komodoplatform.com" },
+      { "discord": "cipi#4502" }
+    ],
+    "ws_url": "vdex.electrum2.cipig.net:30010"
+  },
+  {
+    "url": "vdex.electrum3.cipig.net:20010",
+    "protocol": "SSL",
+    "contact": [
+      { "email": "cipi@komodoplatform.com" },
+      { "discord": "cipi#4502" }
+    ],
+    "ws_url": "vdex.electrum3.cipig.net:30010"
+  }
+]
