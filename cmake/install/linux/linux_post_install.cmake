@@ -17,6 +17,10 @@ set(PROJECT_QML_DIR ${PROJECT_ROOT_DIR}/atomic_defi_design/Dex)
 set(PROJECT_APP_DIR AntaraAtomicDexAppDir)
 set(PROJECT_APP_PATH ${CMAKE_SOURCE_DIR}/bin/${PROJECT_APP_DIR})
 set(PROJECT_BIN_PATH ${PROJECT_APP_PATH}/usr/bin/${DEX_PROJECT_NAME})
+
+# Remove legacy binary names that may be left by older build metadata.
+file(REMOVE ${PROJECT_APP_PATH}/usr/bin/cheetahdex-wallet)
+file(REMOVE ${PROJECT_APP_PATH}/usr/bin/atomicdex)
 set(PROJECT_LIB_PATH ${PROJECT_APP_PATH}/usr/lib)
 set(TARGET_APP_PATH ${PROJECT_ROOT_DIR}/bundled/linux)
 
