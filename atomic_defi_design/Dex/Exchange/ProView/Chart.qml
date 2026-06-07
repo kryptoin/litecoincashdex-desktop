@@ -43,6 +43,7 @@ Item
             atomic_qt_utilities.retrieve_main_ticker(right_ticker) === "LCC")
         {
             chartLoadTimeout.stop()
+            webEngineViewPlaceHolder.visible = false
             pair_supported = false
             selected_testcoin = ""
             console.log("no external chart for LCC pair", left_ticker, right_ticker)
