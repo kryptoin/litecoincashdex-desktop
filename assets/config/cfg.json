@@ -1,7 +1,7 @@
 {
   "notification_enabled": true,
   "spamfilter_enabled": false,
-  "postorder_enabled": false,  
+  "postorder_enabled": false,
   "use_static_rpcpass": false,
   "current_currency": "USD",
   "current_fiat": "USD",
@@ -49,7 +49,8 @@
     "BTC_ALT": "฿",
     "LTC": "Ł",
     "CHTA": "CHTA",
-    "NENG": "NENG"
+    "NENG": "NENG",
+    "LCC": "LCC"
   },
   "available_fiat": [
     "USD",
@@ -97,10 +98,7 @@
   "possible_currencies": [
     "USD",
     "BTC",
-    "KMD",
     "LTC",
-    "DOGE",
-    "CHTA",
-    "NENG"
+    "LCC"
   ]
-}
+};
