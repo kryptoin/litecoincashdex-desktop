@@ -600,19 +600,49 @@ namespace atomic_dex
         if (bep20_coins.size() > 0)
         {
             SPDLOG_INFO(">>>>>>>>>>>>>>>>>>>>>>>>>>> Enabling {} BEP20 coins <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<", bep20_coins.size());
-            // enable_erc20_coins(bep20_coins, "BNB");
-            enable_erc_family_coins(bep20_coins);
+            enable_erc20_coins(bep20_coins, "BNB");
         }
         if (bep20_testnet_coins.size() > 0)
         {
             SPDLOG_INFO(">>>>>>>>>>>>>>>>>>>>>>>>>>> Enabling {} bep20_testnet_coins <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<", bep20_testnet_coins.size());
-            // enable_erc20_coins(bep20_testnet_coins, "BNBT");
-            enable_erc_family_coins(bep20_testnet_coins);
+            enable_erc20_coins(bep20_testnet_coins, "BNBT");
         }
         if (erc_family_coins.size() > 0)
         {
             SPDLOG_INFO(">>>>>>>>>>>>>>>>>>>>>>>>>>> Enabling {} erc_family_coins <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<", erc_family_coins.size());
-            enable_erc_family_coins(erc_family_coins);
+
+            t_coins eth_coins;
+            t_coins plg20_coins;
+            t_coins avx20_coins;
+
+            for (const auto& coin_cfg : erc_family_coins)
+            {
+                if (coin_cfg.coin_type == CoinType::PLG20)
+                {
+                    plg20_coins.push_back(coin_cfg);
+                }
+                else if (coin_cfg.coin_type == CoinType::AVX20)
+                {
+                    avx20_coins.push_back(coin_cfg);
+                }
+                else
+                {
+                    eth_coins.push_back(coin_cfg);
+                }
+            }
+
+            if (eth_coins.size() > 0)
+            {
+                enable_erc20_coins(eth_coins, "ETH");
+            }
+            if (plg20_coins.size() > 0)
+            {
+                enable_erc20_coins(plg20_coins, "MATIC");
+            }
+            if (avx20_coins.size() > 0)
+            {
+                enable_erc20_coins(avx20_coins, "AVAX");
+            }
         }
         if (slp_coins.size() > 0)
         {
