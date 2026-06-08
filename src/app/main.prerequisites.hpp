@@ -407,6 +407,14 @@ run_app(int argc, char** argv)
     atomic_dex::filesystem qml_filesystem;
 
     //! QT
+#if defined(Q_OS_LINUX)
+    if (qEnvironmentVariableIsEmpty("QTWEBENGINE_CHROMIUM_FLAGS"))
+    {
+        qputenv(
+            "QTWEBENGINE_CHROMIUM_FLAGS",
+            "--no-sandbox --user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/120 Safari/537.36");
+    }
+#endif
     QCoreApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
     QtWebEngine::initialize();
     std::shared_ptr<QApplication> app = std::make_shared<QApplication>(argc, argv);
