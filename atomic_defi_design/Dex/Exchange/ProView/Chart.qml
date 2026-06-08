@@ -147,7 +147,7 @@ Item
             </div>
             <!-- TradingView Widget END -->`
         }
-        dashboard.webEngineView.loadHtml(chart_html, "https://www.livecoinwatch.com/")
+        dashboard.webEngineView.loadHtml(chart_html)
     }
 
     Component.onCompleted:
