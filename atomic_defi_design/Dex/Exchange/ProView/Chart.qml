@@ -37,19 +37,6 @@ Item
     function loadChart(right_ticker, left_ticker, force = false, source="livecoinwatch")
     {
 
-        // LCC pairs do not have reliable third-party chart coverage yet.
-        // Avoid loading external widgets that can leave the UI stuck in a loading state.
-        if (atomic_qt_utilities.retrieve_main_ticker(left_ticker) === "LCC" ||
-            atomic_qt_utilities.retrieve_main_ticker(right_ticker) === "LCC")
-        {
-            chartLoadTimeout.stop()
-            webEngineViewPlaceHolder.visible = false
-            pair_supported = false
-            selected_testcoin = ""
-            console.log("no external chart for LCC pair", left_ticker, right_ticker)
-            return
-        }
-
         let chart_html = ""
         let symbol = ""
         let widget_x = 385
@@ -160,7 +147,7 @@ Item
             </div>
             <!-- TradingView Widget END -->`
         }
-        dashboard.webEngineView.loadHtml(chart_html)
+        dashboard.webEngineView.loadHtml(chart_html, "https://www.livecoinwatch.com/")
     }
 
     Component.onCompleted:
