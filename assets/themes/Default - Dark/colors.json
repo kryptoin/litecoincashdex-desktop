@@ -3,9 +3,9 @@
     "foregroundColor": "#FFFFFFFF",
     "foregroundColor2": "#7A8EA1FF",
     "foregroundColor3": "#ABC0D3FF",
-    "backgroundColor": "#202337FF",
+    "backgroundColor": "#004225FF",
     "secondBackgroundColor": "#24273DFF",
-    "backgroundColorDeep": "#171a2cFF",
+    "backgroundColorDeep": "#004225FF",
 
     "busyIndicatorColor": "#4986EAFF",
 
@@ -84,7 +84,7 @@
     "chartTradingLineBackgroundColor": "#24283dFF",
     "chartTradingLineColor": "#74fbeeFF",
 
-    "innerBackgroundColor": "#1F263FFF",
+    "innerBackgroundColor": "#004225FF",
 
     "floatingBackgroundColor": "#24273DFF",
 
@@ -96,7 +96,7 @@
     "userIconColorStart": "#5A68E6FF",
     "userIconColorEnd": "#4986EAAD",
 
-    "sidebarBgColor": "#202337FF",
+    "sidebarBgColor": "#004225FF",
     "sidebarVersionTextColor": "#2F5688FF",
     "sidebarCursorStartColor": "#31B1F0FF",
     "sidebarCursorEndColor": "#5B69E600",
