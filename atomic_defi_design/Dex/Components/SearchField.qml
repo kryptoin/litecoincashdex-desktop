@@ -33,7 +33,7 @@ Rectangle
         {
             anchors.fill: parent
             source: parent
-            color: Dex.CurrentTheme.textPlaceholderColor
+            color: "#F4FFF8"
         }
     }
 
@@ -47,9 +47,12 @@ Rectangle
         height: parent.height
         background: null
         font.pixelSize: 14
+        color: "#F4FFF8"
+        selectedTextColor: "#00341F"
+        selectionColor: "#33D488"
 
         placeholderText: qsTr("Search")
-        placeholderTextColor: Dex.CurrentTheme.textPlaceholderColor
+        placeholderTextColor: "#F4FFF8"
 
         onTextChanged: Array.isArray(searchModel) ? "" : searchModel.setFilterFixedString(_textField.text)
 
@@ -73,7 +76,7 @@ Rectangle
         {
             anchors.centerIn: parent
             iconSize: 12
-            color: Dex.CurrentTheme.textPlaceholderColor
+            color: "#F4FFF8"
             source: Qaterial.Icons.close
         }
 

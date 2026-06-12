@@ -22,9 +22,9 @@ ClipRRect // Trade Card
     readonly property var fees: Constants.API.app.trading_pg.fees
     readonly property var max_trade_volume: Constants.API.app.trading_pg.max_volume
     readonly property var min_trade_volume: Constants.API.app.trading_pg.min_trade_vol
-    readonly property var sell_ticker_balance: parseFloat(API.app.get_balance_info_qstr(left_ticker))
+    readonly property var sell_ticker_balance: parseFloat(API.app.get_balance_info_qstr(selectedTicker))
     readonly property bool coin_tradable: selectedTicker !== "" && sell_ticker_balance > 0
-    readonly property bool waiting_for_sell_coin_info: (max_trade_volume == 0 || !Constants.General.isZhtlcReady(left_ticker)) && sell_ticker_balance != 0
+    readonly property bool waiting_for_sell_coin_info: !Constants.General.isZhtlcReady(left_ticker) && sell_ticker_balance != 0
 
     property string selectedTicker: left_ticker
     property var    selectedOrder:  undefined
@@ -32,7 +32,25 @@ ClipRRect // Trade Card
     property bool   coinSelection: false
     property bool   has_coins_with_balance: API.app.has_coins_with_balance()
 
-    onSelectedTickerChanged: { selectedOrder = undefined; setPair(true, selectedTicker); _fromValue.text = "" }
+    function getMaxAmountText() {
+        const maxVolume = parseFloat(max_trade_volume)
+        if (!isNaN(maxVolume) && maxVolume > 0) {
+            return max_trade_volume
+        }
+
+        const balance = parseFloat(API.app.get_balance_info_qstr(selectedTicker))
+        if (!isNaN(balance) && balance > 0) {
+            return balance.toFixed(8)
+        }
+
+        return "0"
+    }
+
+    onSelectedTickerChanged: {
+        selectedOrder = undefined
+        setPair(true, selectedTicker)
+        _fromValue.text = ""
+    }
 
     onSelectedOrderChanged:
     {
@@ -44,7 +62,9 @@ ClipRRect // Trade Card
 
     onEnabledChanged: selectedOrder = undefined
     Component.onDestruction: selectedOrder = undefined
-    Component.onCompleted: _fromValue.forceActiveFocus()
+    Component.onCompleted: {
+        _fromValue.forceActiveFocus()
+    }
     onBestChanged: if (best) Constants.API.app.trading_pg.orderbook.refresh_best_orders()
 
     width: bestOrderSimplified.visible ? 720 : coinSelection ? 450 : 380
@@ -445,7 +465,7 @@ ClipRRect // Trade Card
                     text: qsTr("MAX")
                     color: Dex.CurrentTheme.foregroundColor2
                     enabled: !General.privacy_mode
-                    onClicked: _fromValue.text = max_trade_volume
+                    onClicked: _fromValue.text = getMaxAmountText()
                 }
 
                 DefaultBusyIndicator

@@ -472,9 +472,9 @@ QtObject {
         {
             return qsTr("Activating %1 (%2%)").arg(atomic_qt_utilities.retrieve_main_ticker(selectedTicker)).arg(progress)
         }
-        if (API.app.trading_pg.max_volume == 0)
+        if (API.app.trading_pg.max_volume == 0 && typeof selectedOrder !== 'undefined')
         {
-            return qsTr("Loading wallet...")
+            return qsTr("Calculating max...")
         }
         if (typeof selectedOrder !== 'undefined')
         {

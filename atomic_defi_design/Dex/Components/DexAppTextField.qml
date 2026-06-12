@@ -134,6 +134,9 @@ Item
                     id: input_field
                     anchors.fill: parent
                     horizontalAlignment: Qt.AlignLeft
+                    color: "#F4FFF8"
+                    selectedTextColor: "#00341F"
+                    selectionColor: "#33D488"
 
                     font.weight: Font.Medium
                     font.family: 'Lato'
@@ -158,7 +161,8 @@ Item
                     text: control.placeholderText
                     anchors.verticalCenter: parent.verticalCenter
                     leftPadding: input_field.leftPadding
-                    color: Dex.CurrentTheme.inputPlaceholderTextColor
+                    color: "#F4FFF8"
+                    opacity: 1.0
                     font: DexTypo.inputFieldFont
                     elide: DexLabel.ElideRight
                     width: parent.width - 10

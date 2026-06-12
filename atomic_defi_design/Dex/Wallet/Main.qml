@@ -644,7 +644,7 @@ Item
                             icon: Qaterial.Icons.water
                             size: 24
                             anchors.verticalCenter: parent.verticalCenter
-                            color: "royalblue"
+                            color: "#33D488"
                         }
                     }
                 }
@@ -691,7 +691,7 @@ Item
                             icon: Qaterial.Icons.vote
                             size: 24
                             anchors.verticalCenter: parent.verticalCenter
-                            color: "#2c87b9"
+                            color: "#2FD083"
                         }
                     }
                 }
@@ -841,7 +841,7 @@ Item
                             icon: Qaterial.Icons.databaseSearch
                             size: 24
                             anchors.verticalCenter: parent.verticalCenter
-                            color: "steelblue"
+                            color: "#70E0D7"
                         }
                     }
                 }
