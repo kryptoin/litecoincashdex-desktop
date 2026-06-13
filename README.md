@@ -1,61 +1,31 @@
 <p align="center">
-    <a href="https://github.com/ShorelineCrypto/cheetahdex-wallet-desktop" alt="Cheetahdex Wallet">
-	<img width="420" alt="cheetahdex-wallet-logo_dark-theme" src="https://raw.githubusercontent.com/ShorelineCrypto/cheetahdex-wallet-desktop/cheetahdex/assets/logo/dex-logo.png">
-    </a>
+  <img width="420" alt="Litecoin Cash DEX Wallet" src="docs/images/litecoincashdex-wallet.png">
 </p>
 
+## What is Litecoin Cash DEX Wallet?
 
-## What is Cheetahdex Wallet?
+Litecoin Cash DEX Wallet is a secure non-custodial desktop wallet and decentralized exchange focused on Litecoin Cash and peer-to-peer atomic swaps.
 
-Cheetahdex Wallet is a secure wallet and non-custodial decentralized exchange rolled into one application. Store your coins,
-trade peer-to-peer with minimal fees and never give up control over your digital assets.
+Store your assets, manage balances, and trade directly from your own wallet without giving up control of your funds.
 
-Cheetahdex Wallet has been tested on the following platforms:
+## Build and test
 
-- Windows 10
-- Linux (Ubuntu 18.04+)
-- macOS (10.14 - 11.0)
+This branch contains the Litecoin Cash DEX desktop branding and wallet improvements.
 
+Linux builds can be produced from source with the project build scripts. Generated Linux artifacts are placed under `bundled/linux`.
 
-## Get Started
+This is community test software. Always keep your wallet seed backed up and test carefully before using larger amounts.
 
-You can [download](https://github.com/ShorelineCrypto/cheetahdex-wallet-desktop/releases) the pre-built <b>beta</b> binaries on
-our [GitHub release page](https://github.com/ShorelineCrypto/cheetahdex-wallet-desktop/releases).
+## Recent Litecoin Cash DEX updates
 
-Build instructions can be found [here](https://github.com/ShorelineCrypto/cheetahdex-wallet-desktop/tree/cheetahdex/docs)
-
-Please join our [Discord Server](https://discord.com/invite/jZMyhKm) for support, discussions and general UI/UX
-feedback.
-
-
-## Useful links
-
-- :link: [Cheetahdex Wallet Website](https://cheetahdex.shorelinecrypto.com/)
-- :speech_balloon: [ShorelineCrypto Discord](https://discord.com/invite/jZMyhKm)
-- :notebook_with_decorative_cover: [ShorelineCrypto Reddit](https://www.reddit.com/r/shorelinecrypto/)
-- :hammer_and_wrench: [ShorelineCrypto X](https://x.com/shorelinecrypto)
-- :book: [Atomicdex Wallet Documentation](https://developers.komodoplatform.com/basic-docs/atomicdex/atomicdex-tutorials/introduction-to-atomicdex.html)
-- :link: [Komodo Wallet Website](https://komodoplatform.com/en/wallet/)
-- :speech_balloon: [Komodo Wallet Discord](https://komodoplatform.com/discord)
-
-
-## Self-Hosted Dependencies
-
-| Dependencies  | Version    | Description                                                                                                                                     | Categories          |
-|---------------|------------|-------------------------------------------------------------------------------------------------------------------------------------------------|---------------------|
-| boost         | 1.78       | Boost provides free peer-reviewed portable C++ source libraries.                                                                                | General Programming |
-| doctest       | 2.3.8      | The fastest feature-rich C++11/14/17/20 single-header testing framework                                                                         | Testing             |
-| fmt           | 7.1.0      | A modern formatting library                                                                                                                     | Formatting          |
-| nlohmann_json | 3.9.1      | JSON for Modern C++                                                                                                                             | Parsing             |
-| range-v3      | 0.11.0     | Range library for C++14/17/20, basis for C++20's std::ranges                                                                                    | Algorithm           |
-| date          | 2019-11-08 | A date and time library based on the C++11/14/17 <chrono> header                                                                                | Timezone/Calendar   |
-| spdlog        | 1.8.5      | Fast C++ logging library.                                                                                                                       | Logging             |
-| openssl       | 1.1.1h     | TLS/SSL and crypto library                                                                                                                      | Network/Crypto      |
-| entt          | 3.5.1      | Gaming meets modern C++ - a fast and reliable entity component system (ECS) and much more                                                       | Architecture        |
-| cpprestsdk    | 2.10.15-1  | The C++ REST SDK is a Microsoft project for cloud-based client-server  communication in native code using a modern asynchronous C++ API design. | HTTP                |
-| taskflow      | 2.2.0      | Parallel and Heterogeneous Task Programming in Modern C++                                                                                       | Threading           |
-| qt            | 5.15.2     | Qt is a cross-platform application development framework for desktop, embedded and mobile.                                                      | GUI                 |
-
+- Litecoin Cash branding and green UI theme
+- Improved dark and light themes
+- ZEC NU6.2 compatibility update
+- ZEC transaction broadcast compatibility fix
+- Improved Simple Swap loading behavior
+- Improved MAX button behavior
+- Improved asset activation and price refresh
+- Search fields and wallet UI readability improvements
 
 ## Contributors / Thanks
 
