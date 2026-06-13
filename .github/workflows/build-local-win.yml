@@ -1,11 +1,11 @@
-name: cheetahdex-wallet-desktop CI
+name: Litecoin Cash DEX Windows Build
 
 on:
   pull_request:
     types: [ opened, synchronize, reopened ]
   push:
     branches:
-      - cheetahdex
+      - litecoincashdex-branding
   schedule:
     - cron: '0 0 * * 1'
   workflow_dispatch:
@@ -14,15 +14,15 @@ env:
   DEX_API: "mm2_cheetah"
   DEX_RPCPORT: 7862
   DEX_RPC: "http://127.0.0.1:7862"
-  DEX_PROJECT_NAME: "cheetahdex-wallet"
-  DEX_DISPLAY_NAME: "Cheetahdex Wallet"
-  DEX_COMPANY: "ShorelineCrypto"
+  DEX_PROJECT_NAME: "litecoincashdex"
+  DEX_DISPLAY_NAME: "Litecoin Cash DEX"
+  DEX_COMPANY: "Litecoin Cash"
   DEX_VERSION: "0.9.0"
-  DEX_WEBSITE: "https://cheetahdex.shorelinecrypto.com/"
+  DEX_WEBSITE: "https://litecoinca.sh/"
   VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}/b/vcpkg_cache
   VCPKG_BINARY_SOURCES: clear
-  RUNVCPKG_VCPKG_ROOT: ${{ github.workspace }}\cheetahdex-wallet-desktop\ci_tools_atomic_dex\vcpkg-repo
-  VCPKG_ROOT: ${{ github.workspace }}\cheetahdex-wallet-desktop\ci_tools_atomic_dex\vcpkg-repo
+  RUNVCPKG_VCPKG_ROOT: ${{ github.workspace }}\litecoincashdex-desktop\ci_tools_atomic_dex\vcpkg-repo
+  VCPKG_ROOT: ${{ github.workspace }}\litecoincashdex-desktop\ci_tools_atomic_dex\vcpkg-repo
 
 jobs:
 
@@ -47,7 +47,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
           submodules: 'true'
 
       - name: Expose GitHub Runtime Env
@@ -97,7 +96,7 @@ jobs:
           vcpkgDirectory: '${{ github.workspace }}/ci_tools_atomic_dex/vcpkg-repo'
           vcpkgJsonGlob: 'vcpkg.json'
 
-      - name: Build Cheetahdex Wallet (Windows)
+      - name: Build Litecoin Cash DEX (Windows)
         if: runner.os == 'Windows'
         shell: powershell
         run: |
