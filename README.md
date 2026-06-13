@@ -1,5 +1,5 @@
 <p align="center">
-  <img width="320" alt="Litecoin Cash DEX Wallet" src="docs/images/litecoincashdex-wallet.png">
+  <img width="260" alt="Litecoin Cash DEX Wallet" src="docs/images/litecoincashdex-wallet.png">
 </p>
 
 ## What is Litecoin Cash DEX Wallet?
