@@ -28,7 +28,7 @@ jobs:
 
   ci-flow:
     name: ${{ matrix.name }}
-    runs-on: windows-latest
+    runs-on: windows-2022
 
     strategy:
       fail-fast: false
@@ -39,7 +39,7 @@ jobs:
 
         include:
           - name: windows-release
-            os: windows-latest
+            os: windows-2022
             qt: '5.15.2'
             type: 'Release'
             host: 'windows'
