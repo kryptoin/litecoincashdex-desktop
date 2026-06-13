@@ -1,5 +1,5 @@
 <p align="center">
-  <img width="420" alt="Litecoin Cash DEX Wallet" src="docs/images/litecoincashdex-wallet.png">
+  <img width="320" alt="Litecoin Cash DEX Wallet" src="docs/images/litecoincashdex-wallet.png">
 </p>
 
 ## What is Litecoin Cash DEX Wallet?
@@ -12,7 +12,7 @@ Store your assets, manage balances, and trade directly from your own wallet with
 
 This branch contains the Litecoin Cash DEX desktop branding and wallet improvements.
 
-Linux builds can be produced from source with the project build scripts. Generated Linux artifacts are placed under `bundled/linux`.
+Linux builds can be produced from source with the project build scripts. Generated Linux artifacts are placed under `bundled/linux`. Windows builds should be generated separately and distributed with their own filenames.
 
 This is community test software. Always keep your wallet seed backed up and test carefully before using larger amounts.
 
