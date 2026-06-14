@@ -12,8 +12,8 @@ on:
 
 env:
   DEX_API: "mm2_cheetah"
-  DEX_RPCPORT: 7862
-  DEX_RPC: "http://127.0.0.1:7862"
+  DEX_RPCPORT: 7863
+  DEX_RPC: "http://127.0.0.1:7863"
   DEX_PROJECT_NAME: "litecoincashdex"
   DEX_DISPLAY_NAME: "Litecoin Cash DEX"
   DEX_COMPANY: "Litecoin Cash"

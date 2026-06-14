@@ -1,7 +1,7 @@
 # Default project values
 set(DEX_API "mm2_cheetah")
-set(DEX_RPCPORT 7862)
-set(DEX_RPC "http://127.0.0.1:7862")
+set(DEX_RPCPORT 7863)
+set(DEX_RPC "http://127.0.0.1:7863")
 set(DEX_PROJECT_NAME "litecoincashdex")
 set(DEX_DISPLAY_NAME "LitecoinCashDEX")
 set(DEX_MAINTENANCE_TOOL_NAME "LitecoinCashDEX Maintenance Tool")
