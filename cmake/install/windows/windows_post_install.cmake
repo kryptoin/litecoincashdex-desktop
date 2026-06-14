@@ -116,6 +116,33 @@ message(STATUS "===========================================")
 set(IFW_BINDIR ${IFW_ROOT}/${IFW_VERSION}/bin)
 message(STATUS "IFW_BIN PATH IS ${IFW_BINDIR}")
 execute_process(COMMAND ls "${IFW_BINDIR}")
+# Remove stale bundled MSVC runtime DLLs before creating the Windows installer.
+# These old private DLLs can crash the app; Windows should use the installed VC++ runtime.
+set(DEX_STALE_MSVC_RUNTIME_DLLS
+    MSVCP140.dll
+    MSVCP140_1.dll
+    MSVCP140_2.dll
+    MSVCP140_CODECVT_IDS.dll
+    VCRUNTIME140.dll
+    VCRUNTIME140_1.dll
+    CONCRT140.dll
+    vccorlib140.dll
+    msvcp140.dll
+    msvcp140_1.dll
+    msvcp140_2.dll
+    msvcp140_codecvt_ids.dll
+    vcruntime140.dll
+    vcruntime140_1.dll
+    concrt140.dll
+)
+
+foreach(DEX_RUNTIME_DLL ${DEX_STALE_MSVC_RUNTIME_DLLS})
+    if(EXISTS "${PROJECT_APP_PATH}/${DEX_RUNTIME_DLL}")
+        message(STATUS "Removing bundled stale MSVC runtime DLL: ${PROJECT_APP_PATH}/${DEX_RUNTIME_DLL}")
+        file(REMOVE "${PROJECT_APP_PATH}/${DEX_RUNTIME_DLL}")
+    endif()
+endforeach()
+
 if (NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${DEX_PROJECT_NAME}.7z)
 	message(STATUS "Contents of folder: ls ${CMAKE_CURRENT_SOURCE_DIR}")
 	execute_process(COMMAND ls "${CMAKE_CURRENT_SOURCE_DIR}")
