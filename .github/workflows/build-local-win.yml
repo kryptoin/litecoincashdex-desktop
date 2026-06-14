@@ -140,12 +140,6 @@ jobs:
               Remove-Item -Force $path
             }
           }
-          $zip = "./bundled/windows/${{ env.DEX_PROJECT_NAME }}.zip"
-          if (Test-Path $zip) {
-            Write-Host "Removing stale zip: $zip"
-            Remove-Item -Force $zip
-          }
-
       - name: Upload env variable for artifacts (Windows)
         if: runner.os == 'Windows'
         run: |
