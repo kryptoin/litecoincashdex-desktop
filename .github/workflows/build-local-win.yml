@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
 
 env:
-  DEX_API: "mm2_cheetah"
+  DEX_API: "mm2_litecoincashdex"
   DEX_RPCPORT: 7863
   DEX_RPC: "http://127.0.0.1:7863"
   DEX_PROJECT_NAME: "litecoincashdex"

@@ -116,6 +116,18 @@ message(STATUS "===========================================")
 set(IFW_BINDIR ${IFW_ROOT}/${IFW_VERSION}/bin)
 message(STATUS "IFW_BIN PATH IS ${IFW_BINDIR}")
 execute_process(COMMAND ls "${IFW_BINDIR}")
+# LCC_BEGIN_DEDICATED_KDF_NAME
+# Use a dedicated KDF executable name on Windows so other DEX wallets do not
+# stop this wallet's KDF process by matching mm2_cheetah.exe.
+set(DEX_KDF_DIR "${PROJECT_APP_PATH}/bin/assets/tools/kdf")
+if(NOT "${DEX_API}" STREQUAL "mm2_cheetah")
+    if(EXISTS "${DEX_KDF_DIR}/mm2_cheetah.exe")
+        message(STATUS "Creating dedicated KDF executable: ${DEX_KDF_DIR}/${DEX_API}.exe")
+        file(COPY_FILE "${DEX_KDF_DIR}/mm2_cheetah.exe" "${DEX_KDF_DIR}/${DEX_API}.exe" ONLY_IF_DIFFERENT)
+    endif()
+endif()
+# LCC_END_DEDICATED_KDF_NAME
+
 # Remove stale bundled MSVC runtime DLLs before creating the Windows installer.
 # These old private DLLs can crash the app; Windows should use the installed VC++ runtime.
 set(DEX_STALE_MSVC_RUNTIME_DLLS
