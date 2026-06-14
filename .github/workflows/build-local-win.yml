@@ -94,16 +94,21 @@ jobs:
         if: runner.os == 'Windows'
         shell: powershell
         run: |
-          $ports = @(
-            "ci_tools_atomic_dex\vcpkg-repo\ports\brotli\portfile.cmake",
-            "ci_tools_atomic_dex\vcpkg-custom-ports\ports\fmt\portfile.cmake"
+          $roots = @(
+            "ci_tools_atomic_dex\vcpkg-repo\ports",
+            "ci_tools_atomic_dex\vcpkg-custom-ports\ports"
           )
-          foreach ($port in $ports) {
-            if (Test-Path $port) {
-              $text = Get-Content $port -Raw
-              $text = $text -replace "vcpkg_fixup_pkgconfig\(\)", "# Disabled for GitHub Windows build: old vcpkg tries to download removed MSYS pkgconf package.`r`n# vcpkg_fixup_pkgconfig()"
-              Set-Content $port $text -NoNewline
-              Write-Host "Patched $port"
+          foreach ($root in $roots) {
+            if (Test-Path $root) {
+              Get-ChildItem $root -Recurse -Filter portfile.cmake | ForEach-Object {
+                $port = $_.FullName
+                $text = Get-Content $port -Raw
+                if ($text -match "vcpkg_fixup_pkgconfig\(\)") {
+                  $text = $text -replace "vcpkg_fixup_pkgconfig\(\)", "# Disabled for GitHub Windows build: old vcpkg tries to download removed MSYS pkgconf package.`r`n# vcpkg_fixup_pkgconfig()"
+                  Set-Content $port $text -NoNewline
+                  Write-Host "Patched $port"
+                }
+              }
             }
           }
 
