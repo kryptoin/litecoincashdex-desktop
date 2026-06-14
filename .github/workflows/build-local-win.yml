@@ -131,14 +131,20 @@ jobs:
         if: runner.os == 'Windows'
         shell: powershell
         run: |
-          Remove-Item -Force -ErrorAction SilentlyContinue `
-            ./bundled/windows/${{ env.DEX_PROJECT_NAME }}/MSVCP140.dll, `
-            ./bundled/windows/${{ env.DEX_PROJECT_NAME }}/VCRUNTIME140.dll, `
-            ./bundled/windows/${{ env.DEX_PROJECT_NAME }}/VCRUNTIME140_1.dll, `
-            ./bundled/windows/${{ env.DEX_PROJECT_NAME }}/CONCRT140.dll, `
-            ./bundled/windows/${{ env.DEX_PROJECT_NAME }}/vccorlib140.dll
-          Remove-Item -Force -ErrorAction SilentlyContinue `
-            ./bundled/windows/${{ env.DEX_PROJECT_NAME }}.zip
+          $bin = "./bundled/windows/${{ env.DEX_PROJECT_NAME }}"
+          $dlls = @("MSVCP140.dll", "VCRUNTIME140.dll", "VCRUNTIME140_1.dll", "CONCRT140.dll", "vccorlib140.dll")
+          foreach ($dll in $dlls) {
+            $path = Join-Path $bin $dll
+            if (Test-Path $path) {
+              Write-Host "Removing bundled runtime DLL: $path"
+              Remove-Item -Force $path
+            }
+          }
+          $zip = "./bundled/windows/${{ env.DEX_PROJECT_NAME }}.zip"
+          if (Test-Path $zip) {
+            Write-Host "Removing stale zip: $zip"
+            Remove-Item -Force $zip
+          }
 
       - name: Upload env variable for artifacts (Windows)
         if: runner.os == 'Windows'
