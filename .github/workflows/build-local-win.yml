@@ -127,6 +127,19 @@ jobs:
           .\ci_tools_atomic_dex\ci_scripts\windows_script.ps1
 
 
+      - name: Remove bundled MSVC runtime DLLs (Windows)
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          Remove-Item -Force -ErrorAction SilentlyContinue `
+            ./bundled/windows/${{ env.DEX_PROJECT_NAME }}/MSVCP140.dll, `
+            ./bundled/windows/${{ env.DEX_PROJECT_NAME }}/VCRUNTIME140.dll, `
+            ./bundled/windows/${{ env.DEX_PROJECT_NAME }}/VCRUNTIME140_1.dll, `
+            ./bundled/windows/${{ env.DEX_PROJECT_NAME }}/CONCRT140.dll, `
+            ./bundled/windows/${{ env.DEX_PROJECT_NAME }}/vccorlib140.dll
+          Remove-Item -Force -ErrorAction SilentlyContinue `
+            ./bundled/windows/${{ env.DEX_PROJECT_NAME }}.zip
+
       - name: Upload env variable for artifacts (Windows)
         if: runner.os == 'Windows'
         run: |
