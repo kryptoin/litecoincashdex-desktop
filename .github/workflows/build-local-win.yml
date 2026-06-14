@@ -90,6 +90,15 @@ jobs:
           arch: 'win64_msvc2019_64'
           cache: true
 
+      - name: Patch brotli vcpkg port for Windows
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          $port = "ci_tools_atomic_dex\vcpkg-repo\ports\brotli\portfile.cmake"
+          $text = Get-Content $port -Raw
+          $text = $text -replace "vcpkg_fixup_pkgconfig\(\)", "# Disabled for GitHub Windows build: old vcpkg tries to download removed MSYS pkgconf package.`r`n# vcpkg_fixup_pkgconfig()"
+          Set-Content $port $text -NoNewline
+
       - name: vcpkg deps (All)
         uses: lukka/run-vcpkg@v11
         with:
