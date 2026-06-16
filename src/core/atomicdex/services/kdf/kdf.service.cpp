@@ -323,7 +323,7 @@ namespace atomic_dex
                 SPDLOG_DEBUG("{} coins in the activation queue", m_activation_queue.size());
                 t_coins to_enable;
                 
-                for (size_t i = 0; i < 8 && i < m_activation_queue.size(); ++i) {
+                for (size_t i = 0; i < 15 && i < m_activation_queue.size(); ++i) {
                     to_enable.push_back(m_activation_queue[i]);
                 }
                 activate_coins(to_enable);
