@@ -15195,7 +15195,7 @@
     "txversion": 4,
     "overwintered": 1,
     "version_group_id": "0x892f2085",
-    "consensus_branch_id": "0x4dec4df0",
+    "consensus_branch_id": "0x5437f330",
     "txfee": 100000,
     "mm2": 1,
     "required_confirmations": 3,
