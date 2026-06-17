@@ -180,6 +180,26 @@ namespace atomic_dex::kdf
         return resp;
     }
 
+    async::task<web::http::http_response>
+    kdf_client::real_async_rpc_batch_standalone(nlohmann::json batch_array)
+    {
+        return async::spawn([this, batch_array]() {
+            try
+            {
+                web::http::http_request request;
+                request.set_method(web::http::methods::POST);
+                request.set_body(batch_array.dump());
+                auto resp = generate_client().request(request, m_token_source.get_token());
+                return resp.get();
+            }
+            catch (const std::exception& error)
+            {
+                SPDLOG_ERROR("exception in kdf_client::real_async_rpc_batch_standalone: {}", error.what());
+                throw;
+            }
+        });
+    }
+
     template <rpc Rpc>
     void kdf_client::process_rpc_async(const std::function<void(Rpc)>& on_rpc_processed)
     {

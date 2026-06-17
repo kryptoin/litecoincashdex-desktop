@@ -2222,9 +2222,17 @@ namespace atomic_dex
             }
         };
 
-        auto error_functor = [this, batch = batch_array](pplx::task<void> previous_task)
-        { this->handle_exception_pplx_task(previous_task, "fetch_single_balance", batch); };
-        m_kdf_client.async_rpc_batch_standalone(batch_array).then(answer_functor).then(error_functor);
+        m_kdf_client.real_async_rpc_batch_standalone(batch_array)
+            .then([this, batch = batch_array, answer_functor](web::http::http_response resp) {
+                try
+                {
+                    answer_functor(resp);
+                }
+                catch (const std::exception&)
+                {
+                    this->handle_exception_async_task(std::current_exception(), "fetch_single_balance", batch);
+                }
+            });
     }
 
     void
@@ -3086,6 +3094,22 @@ namespace atomic_dex
             m_orders_and_swaps = orders_and_swaps{.current_page = current_page, .limit = limit, .filtering_infos = std::move(filter_infos)};
         }
         this->batch_fetch_orders_and_swap(true);
+    }
+
+    void
+    kdf_service::handle_exception_async_task(std::exception_ptr e, const std::string& from, nlohmann::json request)
+    {
+        try
+        {
+            std::rethrow_exception(e);
+        }
+        catch (const std::exception& ex)
+        {
+            for (auto&& cur: request) cur["userpass"] = "";
+            SPDLOG_ERROR("exception in kdf_service::handle_exception_async_task from {} with request {} and error: {}", from, request.dump(4), ex.what());
+            using namespace std::chrono;
+            std::this_thread::sleep_for(std::chrono::milliseconds(300));
+        }
     }
 
     void
