@@ -60,11 +60,7 @@ MultipageModal {
             DefaultButton {
                 text: qsTr("Exit")
                 Layout.fillWidth: true
-                onClicked:
-                {
-                    API.app.disconnect()
-                    Qt.quit()
-                }
+                onClicked: Qt.quit()
             },
             DefaultButton {
                 text: qsTr("Cancel")

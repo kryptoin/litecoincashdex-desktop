@@ -96,8 +96,7 @@ jobs:
         run: |
           $roots = @(
             "ci_tools_atomic_dex\vcpkg-repo\ports",
-            "ci_tools_atomic_dex\vcpkg-custom-ports\ports",
-            "${{ github.workspace }}\local\vcpkg-custom-ports\ports"
+            "ci_tools_atomic_dex\vcpkg-custom-ports\ports"
           )
           foreach ($root in $roots) {
             if (Test-Path $root) {
