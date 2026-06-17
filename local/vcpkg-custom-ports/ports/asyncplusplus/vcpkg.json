@@ -1,5 +1,6 @@
 {
   "name": "asyncplusplus",
+  "version": "1.2",
   "description": "Async++ is a lightweight concurrency framework for C++11",
   "license": "MIT",
   "supports": "!uwp",
@@ -12,6 +13,5 @@
       "name": "vcpkg-cmake-config",
       "host": true
     }
-  ],
-  "version-string": "1.2.1-lcc"
+  ]
 }
