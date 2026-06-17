@@ -113,6 +113,17 @@ jobs:
             }
           }
 
+      - name: Clear asyncplusplus vcpkg cache (Windows)
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          Remove-Item -Recurse -Force -ErrorAction SilentlyContinue `
+            "${{ github.workspace }}\ci_tools_atomic_dex\vcpkg-repo\buildtrees\asyncplusplus", `
+            "${{ github.workspace }}\ci_tools_atomic_dex\vcpkg-repo\packages\asyncplusplus_x64-windows", `
+            "${{ github.workspace }}\ci_tools_atomic_dex\vcpkg-repo\installed\x64-windows\include\async++", `
+            "${{ github.workspace }}\ci_tools_atomic_dex\vcpkg-repo\installed\x64-windows\include\async++.h", `
+            "${{ github.workspace }}\ci_tools_atomic_dex\vcpkg-repo\installed\x64-windows\share\asyncplusplus"
+
       - name: vcpkg deps (All)
         uses: lukka/run-vcpkg@v11
         with:
