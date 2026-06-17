@@ -31,6 +31,7 @@
 #include "atomicdex/utilities/global.utilities.hpp"
 #include "atomicdex/utilities/qt.utilities.hpp"
 #include "qt.portfolio.model.hpp"
+#include "atomicdex/api/kdf/kdf.error.code.hpp"
 
 namespace atomic_dex
 {
@@ -77,6 +78,11 @@ namespace atomic_dex
             SPDLOG_INFO("Building portfolio for ticker {}", coin.ticker);
             std::error_code ec;
             std::string balance       = kdf_system.get_balance_info(coin.ticker, ec);
+            if (ec == dextop_error::balance_of_a_non_enabled_coin)
+            {
+                SPDLOG_WARN("Portfolio ticker {} is not ready yet, skipping insertion for now", coin.ticker);
+                continue;
+            }
             SPDLOG_INFO("balance for ticker {}: {}", coin.ticker, balance);
             const QString   change_24h = retrieve_change_24h(provider, coin, *m_config, m_system_manager);
             portfolio_data  data{
@@ -103,7 +109,7 @@ namespace atomic_dex
         }
         if (not datas.isEmpty())
         {
-            beginInsertRows(QModelIndex(), this->m_model_data.count(), this->m_model_data.count() + tickers.size() - 1);
+            beginInsertRows(QModelIndex(), this->m_model_data.count(), this->m_model_data.count() + datas.size() - 1);
             this->m_model_data.append(datas);
             endInsertRows();
             SPDLOG_INFO("size of the portfolio after batch inserted: {}", this->get_length());
