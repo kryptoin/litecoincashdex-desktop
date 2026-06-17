@@ -80,8 +80,9 @@ namespace atomic_dex
             std::string balance       = kdf_system.get_balance_info(coin.ticker, ec);
             if (ec == dextop_error::balance_of_a_non_enabled_coin)
             {
-                SPDLOG_WARN("Portfolio ticker {} is not ready yet, skipping insertion for now", coin.ticker);
-                continue;
+                SPDLOG_WARN("Portfolio ticker {} balance is not ready yet, inserting with zero balance", coin.ticker);
+                balance = "0";
+                ec.clear();
             }
             SPDLOG_INFO("balance for ticker {}: {}", coin.ticker, balance);
             const QString   change_24h = retrieve_change_24h(provider, coin, *m_config, m_system_manager);
