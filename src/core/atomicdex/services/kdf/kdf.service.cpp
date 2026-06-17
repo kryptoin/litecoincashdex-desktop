@@ -2222,17 +2222,17 @@ namespace atomic_dex
             }
         };
 
-        auto resp_future = m_kdf_client.real_async_rpc_batch_standalone(batch_array);
-        std::thread([this, batch = batch_array, answer_functor, resp_future = std::move(resp_future)]() mutable {
-            try
-            {
-                answer_functor(resp_future.get());
-            }
-            catch (const std::exception&)
-            {
-                this->handle_exception_async_task(std::current_exception(), "fetch_single_balance", batch);
-            }
-        }).detach();
+        m_kdf_client.real_async_rpc_batch_standalone(batch_array)
+            .then([this, batch = batch_array, answer_functor](web::http::http_response resp) {
+                try
+                {
+                    answer_functor(resp);
+                }
+                catch (const std::exception&)
+                {
+                    this->handle_exception_async_task(std::current_exception(), "fetch_single_balance", batch);
+                }
+            });
     }
 
     void
