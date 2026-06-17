@@ -180,10 +180,10 @@ namespace atomic_dex::kdf
         return resp;
     }
 
-    async::task<web::http::http_response>
+    std::future<web::http::http_response>
     kdf_client::real_async_rpc_batch_standalone(nlohmann::json batch_array)
     {
-        return async::spawn([this, batch_array]() {
+        return std::async(std::launch::async, [this, batch_array]() {
             try
             {
                 web::http::http_request request;

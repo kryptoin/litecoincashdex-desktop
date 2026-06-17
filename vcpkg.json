@@ -32,7 +32,6 @@
     },
     "date",
     "cpprestsdk",
-    "taskflow",
-    "asyncplusplus"
+    "taskflow"
   ]
 }
