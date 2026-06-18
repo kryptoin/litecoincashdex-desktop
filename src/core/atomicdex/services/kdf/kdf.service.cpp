@@ -914,6 +914,7 @@ namespace atomic_dex
                     // LCC: defer balance fetch after activation; fetch_single_balance(get_coin_info(rpc.request.ticker));
                     std::unique_lock lock(m_coin_cfg_mutex);
                     m_coins_informations[rpc.request.ticker].currently_enabled = true;
+                    lock.unlock();
                     dispatcher_.trigger<coin_fully_initialized>(coin_fully_initialized{.tickers = {rpc.request.ticker}});
                     if constexpr (std::is_same_v<RpcRequest, kdf::enable_eth_with_tokens_rpc>)
                     {
@@ -925,6 +926,7 @@ namespace atomic_dex
                             // LCC: defer balance fetch after activation; fetch_single_balance(get_coin_info(erc20_coin_info.ticker));
                             std::unique_lock lock(m_coin_cfg_mutex);
                             m_coins_informations[erc20_coin_info.ticker].currently_enabled = true;
+                            lock.unlock();
                             dispatcher_.trigger<coin_fully_initialized>(coin_fully_initialized{.tickers = {erc20_coin_info.ticker}});
                         }
                     }
@@ -938,6 +940,7 @@ namespace atomic_dex
                     SPDLOG_ERROR("marking {} as inactive: {}", rpc.request.ticker, rpc.error->error_type);
                     std::unique_lock lock(m_coin_cfg_mutex);
                     m_coins_informations[rpc.request.ticker].currently_enabled = false;
+                    lock.unlock();
                     //update_coin_active({rpc.request.ticker}, false);
                     this->dispatcher_.trigger<enabling_coin_failed>(rpc.request.ticker, rpc.error->error);
                 }
@@ -948,6 +951,7 @@ namespace atomic_dex
                 // LCC: defer balance fetch after activation; fetch_single_balance(get_coin_info(rpc.request.ticker));
                 std::unique_lock lock(m_coin_cfg_mutex);
                 m_coins_informations[rpc.request.ticker].currently_enabled = true;
+                lock.unlock();
                 SPDLOG_DEBUG("marking {} as active", rpc.request.ticker);
                 if constexpr (std::is_same_v<RpcRequest, kdf::enable_eth_with_tokens_rpc>)
                 {
@@ -968,6 +972,7 @@ namespace atomic_dex
                                 // LCC: defer balance fetch after activation; fetch_single_balance(get_coin_info(balance.first));
                                 std::unique_lock lock(m_coin_cfg_mutex);
                                 m_coins_informations[balance.first].currently_enabled = true;
+                                lock.unlock();
                             }
                         }
                     }
@@ -1051,6 +1056,7 @@ namespace atomic_dex
                     // LCC: defer balance fetch after activation; fetch_single_balance(get_coin_info(rpc.request.ticker));
                     std::unique_lock lock(m_coin_cfg_mutex);
                     m_coins_informations[rpc.request.ticker].currently_enabled = true;
+                    lock.unlock();
                     dispatcher_.trigger<coin_fully_initialized>(coin_fully_initialized{.tickers = {rpc.request.ticker}});
                     if constexpr (std::is_same_v<RpcRequest, kdf::enable_tendermint_with_assets_rpc>)
                     {
@@ -1058,6 +1064,7 @@ namespace atomic_dex
                         {
                             std::unique_lock lock(m_coin_cfg_mutex);
                             m_coins_informations[tendermint_coin_info.ticker].currently_enabled = true;
+                            lock.unlock();
                             // LCC: defer balance fetch after activation; fetch_single_balance(get_coin_info(tendermint_coin_info.ticker));
                             dispatcher_.trigger<coin_fully_initialized>(coin_fully_initialized{.tickers = {tendermint_coin_info.ticker}});
                         }
@@ -1068,6 +1075,7 @@ namespace atomic_dex
                     SPDLOG_DEBUG("{} failed to activate", rpc.request.ticker);
                     std::unique_lock lock(m_coin_cfg_mutex);
                     m_coins_informations[rpc.request.ticker].currently_enabled = false;
+                    lock.unlock();
                     //update_coin_active({rpc.request.ticker}, false);
                     this->dispatcher_.trigger<enabling_coin_failed>(rpc.request.ticker, rpc.error->error);
                 }
@@ -1078,6 +1086,7 @@ namespace atomic_dex
                 // LCC: defer balance fetch after activation; fetch_single_balance(get_coin_info(rpc.request.ticker));
                 std::unique_lock lock(m_coin_cfg_mutex);
                 m_coins_informations[rpc.request.ticker].currently_enabled = true;
+                lock.unlock();
                 if constexpr (std::is_same_v<RpcRequest, kdf::enable_tendermint_with_assets_rpc>)
                 {
                     for (const auto& tendermint_token_addresses_info : rpc.result->tendermint_token_balances_infos)
@@ -1259,6 +1268,7 @@ namespace atomic_dex
                     // LCC: defer balance fetch after activation; fetch_single_balance(get_coin_info(rpc.request.ticker));
                     std::unique_lock lock(m_coin_cfg_mutex);
                     m_coins_informations[rpc.request.ticker].currently_enabled = true;
+                    lock.unlock();
                     dispatcher_.trigger<coin_fully_initialized>(coin_fully_initialized{.tickers = {rpc.request.ticker}});
                     if constexpr (std::is_same_v<RpcRequest, kdf::enable_bch_with_tokens_rpc>)
                     {
@@ -1268,6 +1278,7 @@ namespace atomic_dex
                             // LCC: defer balance fetch after activation; fetch_single_balance(get_coin_info(slp_coin_info.ticker));
                             std::unique_lock lock(m_coin_cfg_mutex);
                             m_coins_informations[slp_coin_info.ticker].currently_enabled = true;
+                            lock.unlock();
                             dispatcher_.trigger<coin_fully_initialized>(coin_fully_initialized{.tickers = {slp_coin_info.ticker}});
                         }
                     }
@@ -1276,6 +1287,7 @@ namespace atomic_dex
                 {
                     std::unique_lock lock(m_coin_cfg_mutex);
                     m_coins_informations[rpc.request.ticker].currently_enabled = false;
+                    lock.unlock();
                     //update_coin_active({rpc.request.ticker}, false);
                     this->dispatcher_.trigger<enabling_coin_failed>(rpc.request.ticker, rpc.error->error);
                 }
@@ -1286,6 +1298,7 @@ namespace atomic_dex
                 // LCC: defer balance fetch after activation; fetch_single_balance(get_coin_info(rpc.request.ticker));
                 std::unique_lock lock(m_coin_cfg_mutex);
                 m_coins_informations[rpc.request.ticker].currently_enabled = true;
+                lock.unlock();
                 if constexpr (std::is_same_v<RpcRequest, kdf::enable_bch_with_tokens_rpc>)
                 {
                     for (const auto& slp_address_info : rpc.result->slp_addresses_infos)
@@ -1296,6 +1309,7 @@ namespace atomic_dex
                             process_balance_answer(rpc);
                             std::unique_lock lock(m_coin_cfg_mutex);
                             m_coins_informations[balance.first].currently_enabled = true;
+                            lock.unlock();
                         }
                     }
                 }
@@ -1366,6 +1380,7 @@ namespace atomic_dex
                     // LCC: defer balance fetch after activation; fetch_single_balance(get_coin_info(rpc.request.ticker));
                     std::unique_lock lock(m_coin_cfg_mutex);
                     m_coins_informations[rpc.request.ticker].currently_enabled = true;
+                    lock.unlock();
                     dispatcher_.trigger<coin_fully_initialized>(coin_fully_initialized{.tickers = {rpc.request.ticker}});
                     if constexpr (std::is_same_v<RpcRequest, kdf::enable_bch_with_tokens_rpc>)
                     {
@@ -1375,6 +1390,7 @@ namespace atomic_dex
                             // LCC: defer balance fetch after activation; fetch_single_balance(get_coin_info(slp_coin_info.ticker));
                             std::unique_lock lock(m_coin_cfg_mutex);
                             m_coins_informations[slp_coin_info.ticker].currently_enabled = true;
+                            lock.unlock();
                             dispatcher_.trigger<coin_fully_initialized>(coin_fully_initialized{.tickers = {slp_coin_info.ticker}});
                         }
                     }
@@ -1383,6 +1399,7 @@ namespace atomic_dex
                 {
                     std::unique_lock lock(m_coin_cfg_mutex);
                     m_coins_informations[rpc.request.ticker].currently_enabled = false;
+                    lock.unlock();
                     //update_coin_active({rpc.request.ticker}, false);
                     this->dispatcher_.trigger<enabling_coin_failed>(rpc.request.ticker, rpc.error->error);
                 }
@@ -1393,6 +1410,7 @@ namespace atomic_dex
                 // LCC: defer balance fetch after activation; fetch_single_balance(get_coin_info(rpc.request.ticker));
                 std::unique_lock lock(m_coin_cfg_mutex);
                 m_coins_informations[rpc.request.ticker].currently_enabled = true;
+                lock.unlock();
                 if constexpr (std::is_same_v<RpcRequest, kdf::enable_bch_with_tokens_rpc>)
                 {
                     for (const auto& slp_address_info : rpc.result->slp_addresses_infos)
@@ -1403,6 +1421,7 @@ namespace atomic_dex
                             process_balance_answer(rpc);
                             std::unique_lock lock(m_coin_cfg_mutex);
                             m_coins_informations[balance.first].currently_enabled = true;
+                            lock.unlock();
                         }
                     }
                 }
