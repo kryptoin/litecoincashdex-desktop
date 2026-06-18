@@ -317,31 +317,22 @@ namespace atomic_dex
                 update_coin_status(this->m_current_wallet_name, tickers, true, m_coins_informations, m_coin_cfg_mutex);
             }
 
-            t_coins to_enable;
+            if (!m_activation_queue.empty())
             {
                 std::unique_lock lock(m_activation_mutex);
                 SPDLOG_DEBUG("{} coins in the activation queue", m_activation_queue.size());
-
-                const auto count = std::min<size_t>(20, m_activation_queue.size());
-                to_enable.insert(
-                    to_enable.end(),
-                    m_activation_queue.begin(),
-                    m_activation_queue.begin() + count);
-                m_activation_queue.erase(
-                    m_activation_queue.begin(),
-                    m_activation_queue.begin() + count);
-            }
-
-            if (!to_enable.empty())
-            {
+                t_coins to_enable;
+                
+                for (size_t i = 0; i < 20 && i < m_activation_queue.size(); ++i) {
+                    to_enable.push_back(m_activation_queue[i]);
+                }
                 activate_coins(to_enable);
+                m_activation_queue.erase(m_activation_queue.begin(), m_activation_queue.begin() + to_enable.size());
                 m_activation_clock = std::chrono::high_resolution_clock::now();
             }
-            else
-            {
+            else {
                 SPDLOG_DEBUG("Coins activation queue is empty.");
-                m_activation_clock = std::chrono::high_resolution_clock::now()
-                    + std::chrono::seconds(6);
+                m_activation_clock = std::chrono::high_resolution_clock::now() + std::chrono::duration_cast<std::chrono::seconds>(std::chrono::seconds(6));
             }
         }
 
