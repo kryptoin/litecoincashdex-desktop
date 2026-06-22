@@ -2702,7 +2702,7 @@ namespace atomic_dex
         if (this->m_kdf_running)
         {
             // SPDLOG_DEBUG("process_orderbook(true)");
-            process_orderbook(true);
+            process_orderbook(evt.is_a_reset);
         }
     }
 

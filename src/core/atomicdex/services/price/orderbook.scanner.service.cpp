@@ -79,8 +79,8 @@ namespace atomic_dex
                                                 .count();
                         this->m_bestorders_retry_after_ms.store(now_ms + 10000);
                         this->m_bestorders_busy = false;
-                        // SPDLOG_DEBUG("Triggering [process_orderbook_finished]: true");
-                        this->dispatcher_.trigger<process_orderbook_finished>(true);
+                        emit trading_pg.get_orderbook_wrapper()->bestOrdersBusyChanged();
+                        // Keep the existing orderbook visible after a best_orders error.
                     }
                     else
                     {

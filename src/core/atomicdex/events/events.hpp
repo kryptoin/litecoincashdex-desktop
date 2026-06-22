@@ -121,6 +121,7 @@ namespace atomic_dex
     {
         std::string base;
         std::string rel;
+        bool is_a_reset;
     };
 
     struct coin_cfg_parsed
