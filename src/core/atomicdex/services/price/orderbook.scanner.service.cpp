@@ -39,6 +39,16 @@ namespace atomic_dex
     void
     orderbook_scanner_service::process_best_orders() 
     {
+        const auto now_ms = std::chrono::duration_cast<std::chrono::milliseconds>(
+                                std::chrono::steady_clock::now().time_since_epoch())
+                                .count();
+
+        if (now_ms < m_bestorders_retry_after_ms.load())
+        {
+            SPDLOG_DEBUG("best_orders retry cooldown active - skipping");
+            return;
+        }
+
         if (m_bestorders_busy)
         {
             SPDLOG_INFO("process_best_orders is busy - skipping");
@@ -63,13 +73,18 @@ namespace atomic_dex
                     nlohmann::json batch = nlohmann::json::array();
                     if (rpc.error)
                     {
-                        // SPDLOG_DEBUG("error: bad answer json for process_best_orders: {}", rpc.error->error);
+                        // Prevent immediate retries while P2P relays are unavailable.
+                        const auto now_ms = std::chrono::duration_cast<std::chrono::milliseconds>(
+                                                std::chrono::steady_clock::now().time_since_epoch())
+                                                .count();
+                        this->m_bestorders_retry_after_ms.store(now_ms + 10000);
                         this->m_bestorders_busy = false;
                         // SPDLOG_DEBUG("Triggering [process_orderbook_finished]: true");
                         this->dispatcher_.trigger<process_orderbook_finished>(true);
                     }
                     else
                     {
+                        this->m_bestorders_retry_after_ms.store(0);
                         if (rpc.result.has_value())
                         {
                             this->m_best_orders_infos = rpc.result.value();
