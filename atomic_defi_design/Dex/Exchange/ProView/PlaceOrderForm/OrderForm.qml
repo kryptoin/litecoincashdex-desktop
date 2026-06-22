@@ -104,6 +104,7 @@ ColumnLayout
 
             left_text: qsTr("Price")
             right_text: General.coinWithoutSuffix(right_ticker)
+            rightTextColor: Dex.CurrentTheme.foregroundColor
             right_fontsize: 10
             enabled: !(API.app.trading_pg.preferred_order.price !== undefined)
             color: enabled ? Dex.CurrentTheme.foregroundColor : Dex.CurrentTheme.foregroundColor2
@@ -169,6 +170,7 @@ ColumnLayout
             radius: 18
             left_text: sell_mode ? qsTr("Send") : qsTr("Receive") 
             right_text: General.coinWithoutSuffix(left_ticker)
+            rightTextColor: Dex.CurrentTheme.foregroundColor
             right_fontsize: 10
             placeholderText: "0" 
             text: API.app.trading_pg.volume

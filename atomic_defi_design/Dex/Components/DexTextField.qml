@@ -16,6 +16,7 @@ TextField
     property color backgroundColor: Dex.CurrentTheme.textFieldBackgroundColor
     property color backgroundColorActive: Dex.CurrentTheme.textFieldActiveBackgroundColor
     property bool forceFocus: false
+    property color rightTextColor: Dex.CurrentTheme.textFieldSuffixColor
 
     font: DexTypo.body2
     placeholderTextColor: Dex.CurrentTheme.textPlaceholderColor
@@ -74,7 +75,7 @@ TextField
         anchors.right: parent.right
         anchors.rightMargin: 10
         anchors.verticalCenter: parent.verticalCenter
-        color: Dex.CurrentTheme.textFieldSuffixColor
+        color: text_field.rightTextColor
         font.pixelSize: text_field.font.pixelSize
     }
 
