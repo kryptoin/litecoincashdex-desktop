@@ -67,14 +67,9 @@ namespace atomic_dex
             }
             SPDLOG_INFO("initialize_portfolio for ticker: {}", ticker);
             const auto& kdf_system    = this->m_system_manager.get_system<kdf_service>();
-            auto&       price_service = this->m_system_manager.get_system<global_price_service>();
+            const auto& price_service = this->m_system_manager.get_system<global_price_service>();
             const auto& provider      = this->m_system_manager.get_system<komodo_prices_provider>();
             auto        coin          = kdf_system.get_coin_info(ticker);
-            if (!coin.coinpaprika_id.empty())
-            {
-                const bool with_update = kdf_system.is_kdf_running();
-                price_service.refresh_other_coins_rates(coin.coinpaprika_id, coin.ticker, with_update, 0);
-            }
             SPDLOG_INFO("Building portfolio for ticker {}", coin.ticker);
             std::error_code ec;
             std::string balance       = kdf_system.get_balance_info(coin.ticker, ec);
