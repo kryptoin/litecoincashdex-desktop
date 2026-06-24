@@ -132,6 +132,7 @@ namespace atomic_dex
         //! Data holders
         t_portfolio_datas m_model_data;
         t_ticker_registry m_ticker_registry;
+        std::unordered_set<std::string> m_pending_initial_balances;
     };
 
 } // namespace atomic_dex

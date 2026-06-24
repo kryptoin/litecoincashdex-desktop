@@ -10213,7 +10213,7 @@
         "livecoinwatch_id": "DGB",
         "explorer_url": "https://digiexplorer.info/",
         "explorer_tx_url": "tx/",
-        "explorer_address_url": "address/",
+        "explorer_address_url": "search?q=",
         "supported": [],
         "active": false,
         "is_testnet": false,
@@ -10291,7 +10291,7 @@
         "livecoinwatch_id": "DGB",
         "explorer_url": "https://digiexplorer.info/",
         "explorer_tx_url": "tx/",
-        "explorer_address_url": "address/",
+        "explorer_address_url": "search?q=",
         "supported": [],
         "active": false,
         "is_testnet": false,
@@ -22094,15 +22094,6 @@
                 ]
             },
             {
-                "url": "electrum-lcc.cascoin.net:50002",
-                "protocol": "SSL",
-                "contact": [
-                    {
-                        "discord": "635448663543644170"
-                    }
-                ]
-            },
-            {
                 "url": "lcc-ex-one.ewmci.online:50002",
                 "protocol": "SSL",
                 "contact": [
@@ -22159,15 +22150,6 @@
                 "contact": [
                     {
                         "discord": "808803920818208801"
-                    }
-                ]
-            },
-            {
-                "url": "electrum-lcc.cascoin.net:50002",
-                "protocol": "SSL",
-                "contact": [
-                    {
-                        "discord": "635448663543644170"
                     }
                 ]
             },
@@ -44293,9 +44275,9 @@
         "coinpaprika_id": "maza-maza",
         "coingecko_id": "maza",
         "livecoinwatch_id": "MAZA",
-        "explorer_url": "http://mazacha.in/",
-        "explorer_tx_url": "tx/",
-        "explorer_address_url": "address/",
+        "explorer_url": "https://mazacha.in/",
+        "explorer_tx_url": "tx/?txid=",
+        "explorer_address_url": "address/?address=",
         "supported": [],
         "active": false,
         "is_testnet": false,

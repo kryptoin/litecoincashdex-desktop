@@ -77,6 +77,7 @@ namespace atomic_dex
             {
                 SPDLOG_WARN("Portfolio ticker {} balance is not ready yet, inserting with zero balance", coin.ticker);
                 balance = "0";
+                m_pending_initial_balances.emplace(ticker);
                 ec.clear();
             }
             SPDLOG_INFO("balance for ticker {}: {}", coin.ticker, balance);
@@ -180,12 +181,15 @@ namespace atomic_dex
                 update_value(LastPriceTimestamp, last_price_timestamp, idx, *this);
                 QString change24_h = retrieve_change_24h(provider, coin, *m_config, m_system_manager);
                 update_value(Change24H, change24_h, idx, *this);
-                const QString balance                           = QString::fromStdString(kdf_system.get_balance_info(coin.ticker, ec));
+                std::error_code balance_ec;
+                const QString balance = QString::fromStdString(kdf_system.get_balance_info(coin.ticker, balance_ec));
+                const bool initial_balance_loaded =
+                    !balance_ec && m_pending_initial_balances.erase(ticker) > 0;
                 auto&& [prev_balance, new_balance, is_change_b] = update_value(BalanceRole, balance, idx, *this);
                 const QString display                           = QString::fromStdString(coin.ticker) + " (" + balance + ")";
                 update_value(Display, display, idx, *this);
                 // Not a good way to trigger notification, use websocket instead in the future. New was of enabling coins is not compatible.
-                if (is_change_b)
+                if (is_change_b && !initial_balance_loaded)
                 {
                     balance_update_handler(prev_balance.toString(), new_balance.toString(), QString::fromStdString(ticker));
                 }
@@ -229,7 +233,10 @@ namespace atomic_dex
                 const std::string& currency                     = m_config->current_currency;
                 const std::string& fiat                         = m_config->current_fiat;
                 const QModelIndex& idx                          = res.at(0);
-                const QString      balance                      = QString::fromStdString(kdf_system.get_balance_info(ticker, ec));
+                std::error_code balance_ec;
+                const QString balance = QString::fromStdString(kdf_system.get_balance_info(ticker, balance_ec));
+                const bool initial_balance_loaded =
+                    !balance_ec && m_pending_initial_balances.erase(ticker) > 0;
                 auto&& [prev_balance, new_balance, is_change_b] = update_value(BalanceRole, balance, idx, *this);
                 const QString main_currency_balance_value       = QString::fromStdString(price_service.get_price_in_fiat(currency, ticker, ec));
                 auto&& [_1, _2, is_change_mc]                   = update_value(MainCurrencyBalanceRole, main_currency_balance_value, idx, *this);
@@ -245,7 +252,7 @@ namespace atomic_dex
                 update_value(Display, display, idx, *this);
                 QString change24_h = retrieve_change_24h(provider, coin, *m_config, m_system_manager);
                 update_value(Change24H, change24_h, idx, *this);
-                if (is_change_b)
+                if (is_change_b && !initial_balance_loaded)
                 {
                     balance_update_handler(prev_balance.toString(), new_balance.toString(), QString::fromStdString(ticker));
                 }
@@ -536,6 +543,7 @@ namespace atomic_dex
     portfolio_model::reset()
     {
         this->m_ticker_registry.clear();
+        this->m_pending_initial_balances.clear();
         this->beginResetModel();
         this->m_model_data.clear();
         this->endResetModel();

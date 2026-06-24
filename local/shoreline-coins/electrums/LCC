@@ -36,15 +36,5 @@
         "discord": "475820011634819072"
       }
     ]
-  },
-  {
-    "url": "electrum-lcc.cascoin.net:50002",
-    "ws_url": "electrum-lcc.cascoin.net:50003",
-    "protocol": "SSL",
-    "contact": [
-      {
-        "discord": "635448663543644170"
-      }
-    ]
   }
 ]
