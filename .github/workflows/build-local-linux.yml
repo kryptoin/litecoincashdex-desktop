@@ -139,11 +139,10 @@ jobs:
             -e 's/llvm.sh 12/llvm.sh 14/g' \
             -e 's/clang++-12/clang++-14/g' \
             -e 's/clang-12/clang-14/g' \
-            -e 's/libc++abi-11-dev/libc++abi-14-dev/g' \
-            -e 's/libc++-11-dev/libc++-14-dev/g' \
+            -e 's/libc++abi-11-dev libc++-11-dev//g' \
             "$script"
           sudo apt-get update
-          sudo apt-get install -y clang-14 libc++-14-dev libc++abi-14-dev
+          sudo apt-get install -y clang-14
           clang-14 --version
           clang++-14 --version
 
