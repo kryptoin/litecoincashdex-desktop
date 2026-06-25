@@ -130,12 +130,30 @@ jobs:
           export PATH=/Users/runner/.nimble/bin:$PATH
           chmod +x /Users/runner/.choosenim/toolchains/nim-1.6.2/bin/*
 
+      - name: Prepare supported Linux compiler
+        if: runner.os == 'Linux'
+        run: |
+          set -euo pipefail
+          script="ci_tools_atomic_dex/ci_scripts/linux_script.sh"
+          sed -i \
+            -e 's/llvm.sh 12/llvm.sh 14/g' \
+            -e 's/clang++-12/clang++-14/g' \
+            -e 's/clang-12/clang-14/g' \
+            -e 's/libc++abi-11-dev/libc++abi-14-dev/g' \
+            -e 's/libc++-11-dev/libc++-14-dev/g' \
+            "$script"
+          sudo apt-get update
+          sudo apt-get install -y clang-14 libc++-14-dev libc++abi-14-dev
+          clang-14 --version
+          clang++-14 --version
+
       - name: Install deps (Linux)
         if: runner.os == 'Linux'
         run: |
+          set -euo pipefail
           echo "DEBIAN_FRONTEND=noninteractive" >> $GITHUB_ENV
           echo ${{ github.sha }}
-          sudo ./ci_tools_atomic_dex/ci_scripts/linux_script.sh
+          sudo bash -e ./ci_tools_atomic_dex/ci_scripts/linux_script.sh
 
       - name: Install deps (MacOS)
         if: runner.os == 'macOS'
@@ -151,8 +169,8 @@ jobs:
       - name: Upload env variable for vpkg (Linux)
         if: runner.os == 'Linux'
         run: |
-          echo "CXX=clang++-12" >> $GITHUB_ENV
-          echo "CC=clang-12" >> $GITHUB_ENV
+          echo "CXX=clang++-14" >> $GITHUB_ENV
+          echo "CC=clang-14" >> $GITHUB_ENV
 
       - name: vcpkg deps (All)
         uses: lukka/run-vcpkg@v11
@@ -190,14 +208,15 @@ jobs:
       - name: Build Litecoin Cash DEX (Linux)
         if: runner.os == 'Linux'
         run: |
+          set -euo pipefail
           export QT_INSTALL_CMAKE_PATH=${{ github.workspace }}/Qt/${{ matrix.qt }}/gcc_64/lib/cmake
           export QT_ROOT=${{ github.workspace }}/Qt/${{ matrix.qt }}
           export PATH=${{ github.workspace }}/Qt/${{ matrix.qt }}/gcc_64/bin:$PATH
           export PATH=$HOME/.nimble/bin:$PATH
           #export CXXFLAGS=-stdlib=libc++
           #export LDFLAGS=-stdlib=libc++
-          export CXX=clang++-12
-          export CC=clang-12
+          export CXX=clang++-14
+          export CC=clang-14
           cd ci_tools_atomic_dex
           nimble build -y
 
@@ -229,6 +248,7 @@ jobs:
           name: ${{ env.artifact_name_zstd }}
           path: ./bundled/linux/${{ env.target_name_zstd }}
           retention-days: 7
+          if-no-files-found: error
 
       - name: Upload bundle artifact (Linux ZIP)
         if: runner.os == 'Linux'
@@ -237,6 +257,7 @@ jobs:
           name: ${{ env.artifact_name_zip }}
           path: ./bundled/linux/${{ env.target_name_zip }}
           retention-days: 7
+          if-no-files-found: error
 
       - name: Upload bundle artifact (Linux AppImage)
         if: runner.os == 'Linux'
@@ -245,6 +266,7 @@ jobs:
           name: ${{ env.artifact_name_appimage }}
           path: ./bundled/linux/${{ env.target_name_appimage }}
           retention-days: 7
+          if-no-files-found: error
 
       - name: Upload env variable for artifacts (macOS)
         if: runner.os == 'macOS'
@@ -259,6 +281,7 @@ jobs:
           name: ${{ env.artifact_name_dmg }}
           path: ./bundled/osx/${{ env.DEX_PROJECT_NAME }}.dmg
           retention-days: 7
+          if-no-files-found: error
 
       - name: Upload artifacts (MacOS installer)
         if: runner.os == 'macOS'
@@ -267,6 +290,7 @@ jobs:
           name: ${{ env.artifact_name_installer }}
           path: ./bundled/osx/${{ env.DEX_PROJECT_NAME }}_installer.7z
           retention-days: 7
+          if-no-files-found: error
 
       - name: Upload env variable for artifacts (Windows)
         if: runner.os == 'Windows'
@@ -282,6 +306,7 @@ jobs:
           name: ${{ env.artifact_name_zip }}
           path: ./bundled/windows/${{ env.DEX_PROJECT_NAME }}.zip
           retention-days: 7
+          if-no-files-found: error
 
       - name: Upload artifacts (Windows installer)
         if: runner.os == 'Windows'
@@ -290,6 +315,7 @@ jobs:
           name: ${{ env.artifact_name_installer }}
           path: ./bundled/windows/${{ env.DEX_PROJECT_NAME }}_installer.exe
           retention-days: 7
+          if-no-files-found: error
 
       - name: Running Tests (Linux)
         working-directory: ci_tools_atomic_dex
@@ -303,8 +329,8 @@ jobs:
           export QT_ROOT=${{ github.workspace }}/Qt/${{ matrix.qt }}
           export PATH=${{ github.workspace }}/Qt/${{ matrix.qt }}/gcc_64/bin:$PATH
           export PATH=$HOME/.nimble/bin:$PATH
-          export CXX=clang++-12
-          export CC=clang-12
+          export CXX=clang++-14
+          export CC=clang-14
           #echo "Running tests"
           #./ci_tools_atomic_dex tests ${{ matrix.type }}
           #cd build-${{ matrix.type }}/bin/AntaraAtomicDexTestsAppDir/usr/bin
