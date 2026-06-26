@@ -257,30 +257,17 @@ jobs:
           echo "target_name_zip=${{ env.DEX_PROJECT_NAME }}-linux-$(git rev-parse --short HEAD).zip" >> $GITHUB_ENV
           echo "target_name_appimage=${{ env.DEX_PROJECT_NAME }}-linux-$(git rev-parse --short HEAD)-x86_64.AppImage" >> $GITHUB_ENV
 
-      - name: Upload bundle artifact (Linux ZSTD)
+      - name: List Linux bundle files
         if: runner.os == 'Linux'
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ env.artifact_name_zstd }}
-          path: ./bundled/linux/${{ env.target_name_zstd }}
-          retention-days: 7
-          if-no-files-found: error
+        run: |
+          find ./bundled/linux -maxdepth 1 -type f -printf '%s bytes  %f\n' | sort -n
 
-      - name: Upload bundle artifact (Linux ZIP)
+      - name: Upload Linux bundle
         if: runner.os == 'Linux'
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.artifact_name_zip }}
-          path: ./bundled/linux/${{ env.target_name_zip }}
-          retention-days: 7
-          if-no-files-found: error
-
-      - name: Upload bundle artifact (Linux AppImage)
-        if: runner.os == 'Linux'
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ env.artifact_name_appimage }}
-          path: ./bundled/linux/${{ env.target_name_appimage }}
+          name: litecoincashdex-ubuntu-release-${{ github.sha }}
+          path: ./bundled/linux/*
           retention-days: 7
           if-no-files-found: error
 
