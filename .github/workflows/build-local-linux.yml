@@ -136,7 +136,11 @@ jobs:
           set -euo pipefail
           script="ci_tools_atomic_dex/ci_scripts/linux_script.sh"
           sed -i \
-            -e 's/llvm.sh 12/llvm.sh 14/g' \
+            -e '/^wget https:\/\/apt\.llvm\.org\/llvm\.sh$/d' \
+            -e '/^chmod +x llvm\.sh$/d' \
+            -e '/^sudo \.\/llvm\.sh /d' \
+            -e '/update-alternatives --install \/usr\/bin\/g++/d' \
+            -e '/update-alternatives --install \/usr\/bin\/gcc/d' \
             -e 's/clang++-12/clang++-14/g' \
             -e 's/clang-12/clang-14/g' \
             -e 's/libc++abi-11-dev//g' \
