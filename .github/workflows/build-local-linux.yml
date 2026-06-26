@@ -139,8 +139,13 @@ jobs:
             -e 's/llvm.sh 12/llvm.sh 14/g' \
             -e 's/clang++-12/clang++-14/g' \
             -e 's/clang-12/clang-14/g' \
-            -e 's/libc++abi-11-dev libc++-11-dev//g' \
+            -e 's/libc++abi-11-dev//g' \
+            -e 's/libc++-11-dev//g' \
             "$script"
+          if grep -Eq 'libc\+\+abi-11-dev|libc\+\+-11-dev' "$script"; then
+            echo "Unsupported libc++ 11 packages remain in dependency script"
+            exit 1
+          fi
           sudo apt-get update
           sudo apt-get install -y clang-14
           clang-14 --version
