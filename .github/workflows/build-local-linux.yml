@@ -141,6 +141,7 @@ jobs:
             -e '/^sudo \.\/llvm\.sh /d' \
             -e '/update-alternatives --install \/usr\/bin\/g++/d' \
             -e '/update-alternatives --install \/usr\/bin\/gcc/d' \
+            -e '/^## tar$/,/^sudo update-alternatives --install \/usr\/bin\/tar/d' \
             -e 's/clang++-12/clang++-14/g' \
             -e 's/clang-12/clang-14/g' \
             -e 's/libc++abi-11-dev//g' \
@@ -148,6 +149,10 @@ jobs:
             "$script"
           if grep -Eq 'libc\+\+abi-11-dev|libc\+\+-11-dev' "$script"; then
             echo "Unsupported libc++ 11 packages remain in dependency script"
+            exit 1
+          fi
+          if grep -q '^## tar$' "$script"; then
+            echo "Legacy tar build block remains in dependency script"
             exit 1
           fi
           sudo apt-get update
