@@ -257,9 +257,24 @@ jobs:
           echo "target_name_zip=${{ env.DEX_PROJECT_NAME }}-linux-$(git rev-parse --short HEAD).zip" >> $GITHUB_ENV
           echo "target_name_appimage=${{ env.DEX_PROJECT_NAME }}-linux-$(git rev-parse --short HEAD)-x86_64.AppImage" >> $GITHUB_ENV
 
-      - name: List Linux bundle files
+      - name: Package Linux AppDir
         if: runner.os == 'Linux'
         run: |
+          set -euo pipefail
+          mkdir -p ./bundled/linux
+          short_sha="$(git rev-parse --short HEAD)"
+          appdir="./ci_tools_atomic_dex/build-Release/bin/AntaraAtomicDexAppDir"
+
+          if [ ! -d "$appdir" ]; then
+            echo "AppDir not found: $appdir"
+            find ./ci_tools_atomic_dex/build-Release -maxdepth 5 -type d -name '*AppDir*' -print
+            exit 1
+          fi
+
+          tar --zstd -cf "./bundled/linux/litecoincashdex-linux-${short_sha}.tar.zst" \
+            -C "./ci_tools_atomic_dex/build-Release/bin" \
+            AntaraAtomicDexAppDir
+
           find ./bundled/linux -maxdepth 1 -type f -printf '%s bytes  %f\n' | sort -n
 
       - name: Upload Linux bundle
