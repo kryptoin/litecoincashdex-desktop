@@ -151,7 +151,10 @@ jobs:
             exit 1
           fi
           sudo apt-get update
-          sudo apt-get install -y clang-14
+          sudo apt-get remove -y \
+            libunwind-14-dev libc++-14-dev libc++abi-14-dev || true
+          sudo apt-get install -y clang-14 libunwind-dev
+          sudo apt-get -s install libgstreamer-plugins-base1.0-dev >/dev/null
           clang-14 --version
           clang++-14 --version
 
