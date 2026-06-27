@@ -179,11 +179,14 @@ jobs:
       - name: Upload env variable for vpkg (MacOS)
         if: runner.os == 'macOS'
         run: |
-          brew install ninja || true
+          brew install ninja cmake || true
+          echo "/opt/homebrew/bin" >> $GITHUB_PATH
           which ninja
           ninja --version
-          echo "CXX=clang++" >> $GITHUB_ENV
-          echo "CC=clang" >> $GITHUB_ENV
+          which cmake
+          cmake --version
+          echo "CXX=$(xcrun --find clang++)" >> $GITHUB_ENV
+          echo "CC=$(xcrun --find clang)" >> $GITHUB_ENV
 
       - name: Upload env variable for vpkg (Linux)
         if: runner.os == 'Linux'
@@ -217,13 +220,24 @@ jobs:
           export QT_ROOT=${{ github.workspace }}/Qt/${{ matrix.qt }}
           export PATH=/Users/runner/.nimble/bin:$PATH
           export MACOSX_DEPLOYMENT_TARGET=14.2
-          export CC=clang
-          export CXX=clang++
+          export PATH="/opt/homebrew/bin:$PATH"
+          export CC="$(xcrun --find clang)"
+          export CXX="$(xcrun --find clang++)"
+          export CMAKE_MAKE_PROGRAM="$(which ninja)"
           export CXXFLAGS=-stdlib=libc++
           export LDFLAGS=-stdlib=libc++
           cd ci_tools_atomic_dex
           nimble build -y
-          ./ci_tools_atomic_dex bundle ${{ matrix.type }} --osx_sdk=$HOME/sdk/MacOSX14.2.sdk --compiler=clang++
+          ./ci_tools_atomic_dex bundle ${{ matrix.type }} --osx_sdk=$HOME/sdk/MacOSX14.2.sdk --compiler="$CXX"
+
+          echo "Checking macOS generated files..."
+          find . -maxdepth 6 -type f \( -name '*.dmg' -o -name '*.7z' -o -name '*.zip' \) -print || true
+          find . -maxdepth 6 -type d -name '*.app' -print || true
+
+          if [ ! -d ./bundled/osx ] || ! find ./bundled/osx -maxdepth 1 -type f | grep -q .; then
+            echo "No macOS bundle was generated in ./bundled/osx"
+            exit 1
+          fi
 
       - name: Build Litecoin Cash DEX (Linux)
         if: runner.os == 'Linux'
@@ -370,8 +384,10 @@ jobs:
           export QT_INSTALL_CMAKE_PATH=${{ github.workspace }}/Qt/${{ matrix.qt }}/clang_64/lib/cmake
           export QT_ROOT=${{ github.workspace }}/Qt/${{ matrix.qt }}
           export PATH=/Users/runner/.nimble/bin:$PATH
-          export CC=clang
-          export CXX=clang++
+          export PATH="/opt/homebrew/bin:$PATH"
+          export CC="$(xcrun --find clang)"
+          export CXX="$(xcrun --find clang++)"
+          export CMAKE_MAKE_PROGRAM="$(which ninja)"
           #echo "Running tests"
           #nimble build -y
           #./ci_tools_atomic_dex tests ${{ matrix.type }}
