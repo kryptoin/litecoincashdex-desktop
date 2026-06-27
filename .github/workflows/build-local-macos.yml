@@ -179,8 +179,11 @@ jobs:
       - name: Upload env variable for vpkg (MacOS)
         if: runner.os == 'macOS'
         run: |
-          echo "CXX=/usr/local/opt/llvm/bin/clang++" >> $GITHUB_ENV
-          echo "CC=/usr/local/opt/llvm/bin/clang" >> $GITHUB_ENV
+          brew install ninja || true
+          which ninja
+          ninja --version
+          echo "CXX=clang++" >> $GITHUB_ENV
+          echo "CC=clang" >> $GITHUB_ENV
 
       - name: Upload env variable for vpkg (Linux)
         if: runner.os == 'Linux'
@@ -197,6 +200,7 @@ jobs:
       - name: Build Litecoin Cash DEX (macOS)
         if: runner.os == 'macOS'
         run: |
+          set -euo pipefail
           xcrun --sdk macosx --show-sdk-path
           export SDK_PATH=$(xcrun --sdk macosx --show-sdk-path)
           echo $SDK_PATH
@@ -289,7 +293,12 @@ jobs:
       - name: List macOS bundle files
         if: runner.os == 'macOS'
         run: |
-          find ./bundled/osx -maxdepth 1 -type f -printf '%s bytes  %f\n' | sort -n
+          if [ -d ./bundled/osx ]; then
+            find ./bundled/osx -maxdepth 1 -type f -exec ls -lh {} \;
+          else
+            echo "No bundled/osx directory found"
+            find . -maxdepth 4 -type f \( -name '*.dmg' -o -name '*.7z' -o -name '*.app' \) -print
+          fi
 
       - name: Upload macOS bundle
         if: runner.os == 'macOS'
