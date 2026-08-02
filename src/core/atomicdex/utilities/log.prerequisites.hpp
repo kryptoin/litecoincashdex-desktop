@@ -32,6 +32,7 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/stopwatch.h>
 #include <spdlog/spdlog.h>
+#include <fmt/ranges.h>
 
 #if defined(_WIN32) || defined(WIN32)
 #include <spdlog/sinks/msvc_sink.h>

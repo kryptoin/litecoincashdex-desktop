@@ -5,7 +5,6 @@
 #include <vector>
 
 //! Deps
-#include <entt/core/attribute.h>
 
 //! Project Headers
 #include "atomicdex/config/coins.cfg.hpp"

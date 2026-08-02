@@ -24,18 +24,18 @@
 
 namespace atomic_dex
 {
-    using kdf_started               = entt::tag<"kdf_started"_hs>;
-    using post_login                = entt::tag<"post_login"_hs>;
-    using gui_enter_trading         = entt::tag<"gui_enter_trading"_hs>;
-    using gui_leave_trading         = entt::tag<"gui_leave_trading"_hs>;
-    using kdf_initialized           = entt::tag<"kdf_running_and_enabling"_hs>;
-    using default_coins_enabled     = entt::tag<"default_coins_enabled"_hs>;
-    using current_currency_changed  = entt::tag<"update_orders_and_swap_values"_hs>;
-    using force_update_providers    = entt::tag<"force_update_providers"_hs>;
-    using force_update_defi_stats   = entt::tag<"force_update_defi_stats"_hs>;
-    using download_started          = entt::tag<"download_started"_hs>;
-    using download_complete         = entt::tag<"download_complete"_hs>;
-    using download_failed           = entt::tag<"download_failed"_hs>;
+    using kdf_started               = entt::tag<entt::hashed_string{"kdf_started"}>;
+    using post_login                = entt::tag<entt::hashed_string{"post_login"}>;
+    using gui_enter_trading         = entt::tag<entt::hashed_string{"gui_enter_trading"}>;
+    using gui_leave_trading         = entt::tag<entt::hashed_string{"gui_leave_trading"}>;
+    using kdf_initialized           = entt::tag<entt::hashed_string{"kdf_running_and_enabling"}>;
+    using default_coins_enabled     = entt::tag<entt::hashed_string{"default_coins_enabled"}>;
+    using current_currency_changed  = entt::tag<entt::hashed_string{"update_orders_and_swap_values"}>;
+    using force_update_providers    = entt::tag<entt::hashed_string{"force_update_providers"}>;
+    using force_update_defi_stats   = entt::tag<entt::hashed_string{"force_update_defi_stats"}>;
+    using download_started          = entt::tag<entt::hashed_string{"download_started"}>;
+    using download_complete         = entt::tag<entt::hashed_string{"download_complete"}>;
+    using download_failed           = entt::tag<entt::hashed_string{"download_failed"}>;
 
     struct tx_fetch_finished
     {
@@ -121,7 +121,6 @@ namespace atomic_dex
     {
         std::string base;
         std::string rel;
-        bool is_a_reset;
     };
 
     struct coin_cfg_parsed

@@ -102,7 +102,7 @@ namespace antara::gaming::ecs::tests
             };
 
             entt::registry registry{};
-            registry.set<entt::dispatcher>();
+            registry.ctx().emplace<entt::dispatcher>();
             concrete_system dummy_system{registry};
             SUBCASE("get system type rtti from a system")
             {
@@ -153,7 +153,7 @@ namespace antara::gaming::ecs::tests
         TEST_CASE("system tests")
         {
             entt::registry registry;
-            registry.set<entt::dispatcher>();
+            registry.ctx().emplace<entt::dispatcher>();
             logic_concrete_system dummy_system{registry};
             pre_concrete_system   pre_dummy_system{registry};
             post_concrete_system  post_dummy_system{registry};
@@ -227,7 +227,7 @@ namespace antara::gaming::ecs::tests
     TEST_CASE("virtual input")
     {
         entt::registry registry;
-        registry.set<entt::dispatcher>();
+        registry.ctx().emplace<entt::dispatcher>();
         ecs::virtual_input_system system{registry};
         system.update();
     }
@@ -235,7 +235,7 @@ namespace antara::gaming::ecs::tests
     TEST_CASE("lambda_system")
     {
         entt::registry registry;
-        registry.set<entt::dispatcher>();
+        registry.ctx().emplace<entt::dispatcher>();
         ecs::lambda_logic_system system{registry, ecs::ftor{.on_post_update =
                                                                 []() {
                                                                 },

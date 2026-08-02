@@ -51,7 +51,7 @@ namespace atomic_dex
     coingecko_provider::on_coin_enabled(const coin_enabled& evt)
     {
         SPDLOG_INFO("coin_enabled: {}", fmt::join(evt.tickers, ", "));
-        dispatcher_.trigger<coin_fully_initialized>(evt.tickers);
+        dispatcher_.trigger(coin_fully_initialized{evt.tickers});
         if (evt.tickers.size() > 1)
         {
             SPDLOG_INFO("on_coin_enabled size() > 1");
@@ -171,11 +171,11 @@ namespace atomic_dex
                     if (!tickers.empty())
                     {
                         ///< it's on enabled coins
-                        dispatcher_.trigger<coin_fully_initialized>(tickers);
+                        dispatcher_.trigger(coin_fully_initialized{tickers});
                     }
                     else
                     {
-                        dispatcher_.trigger<fiat_rate_updated>("");
+                        dispatcher_.trigger(fiat_rate_updated{""});
                     }
                     SPDLOG_INFO("Coingecko rates successfully updated after nb_try: {}", nb_try.load());
                     nb_try = 0;
@@ -190,7 +190,7 @@ namespace atomic_dex
         else
         {
             //! If it's only test coin
-            dispatcher_.trigger<coin_fully_initialized>(tickers);
+            dispatcher_.trigger(coin_fully_initialized{tickers});
             nb_try = 0;
         }
     }

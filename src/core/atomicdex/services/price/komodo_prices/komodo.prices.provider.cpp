@@ -55,7 +55,7 @@ namespace atomic_dex
                     process_update(true);
                 }
             }
-            dispatcher_.trigger<fiat_rate_updated>("");
+            dispatcher_.trigger(fiat_rate_updated{""});
         };
 
         auto error_functor = [this, fallback](pplx::task<void> previous_task)
@@ -66,7 +66,7 @@ namespace atomic_dex
             }
             catch (const std::exception& e)
             {
-                dispatcher_.trigger<fiat_rate_updated>("");
+                dispatcher_.trigger(fiat_rate_updated{""});
                 SPDLOG_ERROR("error occured when fetching price: {}", e.what());
                 if (!fallback)
                 {

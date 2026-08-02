@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include <entt/core/attribute.h>                //> ENTT_API
+                //> ENTT_API
 #include <antara/gaming/ecs/system.manager.hpp> //> ag::ecs::system_manager
 
 #include "qt.addressbook.contact.proxy.filter.model.hpp"

@@ -25,13 +25,16 @@
 #include <QDebug>
 #include <QDesktopWidget>
 #include <QQmlApplicationEngine>
+#include <QQuickWindow>
 #include <QScreen>
 #include <QSettings>
 #include <QWindow>
 #include <QtGlobal>
 #include <QtQml>
 #include <QFontDatabase>
+#if QT5WEBENGINE_FOUND
 #include <QtWebEngine>
+#endif
 
 //! Qaterial
 #include <Qaterial/Qaterial.hpp>
@@ -170,21 +173,31 @@ static void init_logging()
     constexpr size_t spdlog_max_file_rotation = 3;
 
     std::filesystem::path path = atomic_dex::utils::get_atomic_dex_current_log_file();
+    if (!atomic_dex::utils::ensure_directory_exists(path.parent_path()))
+    {
+        SPDLOG_WARN("Unable to create log directory {}, continuing with stdout logging", path.parent_path().string());
+    }
+
     spdlog::init_thread_pool(qsize_spdlog, spdlog_thread_count);
     auto tp = spdlog::thread_pool();
     auto stdout_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
 
-#if defined(_WIN32) || defined(WIN32)
-    auto rotating_sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(path.wstring(), spdlog_max_file_size, spdlog_max_file_rotation);
-#else
-    auto rotating_sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(path.string(), spdlog_max_file_size, spdlog_max_file_rotation);
-#endif
+    std::vector<spdlog::sink_ptr> sinks{stdout_sink};
 
-#if defined(DEBUG) || defined(_WIN32) || defined(WIN32)
-    std::vector<spdlog::sink_ptr> sinks{stdout_sink, rotating_sink};
+    try
+    {
+#if defined(_WIN32) || defined(WIN32)
+        auto rotating_sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(path.wstring(), spdlog_max_file_size, spdlog_max_file_rotation);
 #else
-    std::vector<spdlog::sink_ptr> sinks{rotating_sink};
+        auto rotating_sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(path.string(), spdlog_max_file_size, spdlog_max_file_rotation);
 #endif
+        sinks.emplace_back(std::move(rotating_sink));
+    }
+    catch (const std::exception& error)
+    {
+        SPDLOG_WARN("Unable to initialize file logger at {}: {}", path.string(), error.what());
+    }
+
     auto logger = std::make_shared<spdlog::async_logger>("log_mt", sinks.begin(), sinks.end(), tp, spdlog::async_overflow_policy::block);
     spdlog::register_logger(logger);
     spdlog::set_default_logger(logger);
@@ -367,6 +380,18 @@ run_app(int argc, char** argv)
     // https://bugreports.qt.io/browse/QTBUG-89379
     qputenv("QT_ENABLE_GLYPH_CACHE_WORKAROUND", "1");
     qputenv("QML_USE_GLYPHCACHE_WORKAROUND", "1");
+    if (std::getenv("QT_PLUGIN_PATH") == nullptr)
+    {
+        qputenv("QT_PLUGIN_PATH", "/opt/homebrew/opt/qt@5/lib/QtCore.framework/Versions/5/QtCore");
+    }
+    if (std::getenv("QT_QPA_PLATFORM_PLUGIN_PATH") == nullptr)
+    {
+        qputenv("QT_QPA_PLATFORM_PLUGIN_PATH", "/opt/homebrew/opt/qt@5/plugins/platforms");
+    }
+    if (std::getenv("QT_QPA_PLATFORM") == nullptr)
+    {
+        qputenv("QT_QPA_PLATFORM", "cocoa");
+    }
 
     std::filesystem::path old_path    = std::filesystem::path(std::getenv("HOME")) / ".atomic_qt";
     std::filesystem::path target_path = atomic_dex::utils::get_atomic_dex_data_folder();
@@ -396,7 +421,7 @@ run_app(int argc, char** argv)
 
     //! App declaration
     atomic_dex::application atomic_app;
-    QSettings&              settings = atomic_app.get_registry().ctx<QSettings>();
+    QSettings&              settings = atomic_app.get_registry().ctx().get<QSettings>();
     handle_settings(settings);
     atomic_app.post_handle_settings();
 
@@ -416,7 +441,9 @@ run_app(int argc, char** argv)
     }
 #endif
     QCoreApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
+#if QT5WEBENGINE_FOUND
     QtWebEngine::initialize();
+#endif
     std::shared_ptr<QApplication> app = std::make_shared<QApplication>(argc, argv);
 
     app->setWindowIcon(QIcon(":/assets/images/logo/dex-logo.png"));

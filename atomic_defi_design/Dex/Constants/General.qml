@@ -655,7 +655,7 @@ QtObject {
         let r = "0";
         let suffix = "";
 
-        if (num === null || num === undefined || num === "") {
+        if (isNaN(num) || num === null) {
             return r;
         }
 
@@ -663,26 +663,16 @@ QtObject {
             num = parseFloat(num)
         }
 
-        if (!isFinite(num) || isNaN(num)) {
-            return r;
-        }
-
         const suffixes = ['', 'K', 'M', 'B', 'T']; // Add more as needed for larger numbers
-        const abs_num = Math.abs(num)
+        const tier = Math.floor(Math.log10(Math.abs(num)) / 3); // Determine the tier (e.g., thousands, millions)
 
-        if (abs_num === 0) {
-            return r;
+        if ([-1, 0].includes(tier)) {
+            r = num.toFixed(decimals);
+            return r
         }
-
-        const tier = Math.floor(Math.log10(abs_num) / 3); // Determine the tier (e.g., thousands, millions)
-
-        if (tier <= 0) {
-            return num.toFixed(decimals);
-        }
-
         if (tier <= suffixes.length - 1) {
-            suffix = suffixes[tier] || ""
-            if (suffix != '')
+            suffix = suffixes[tier]
+            if (suffix != '') 
             {
                 num = (num / Math.pow(10, tier * 3));
             }
@@ -691,7 +681,7 @@ QtObject {
             suffix = "e" + tier * 3
             num = (num / Math.pow(10, tier * 3));
         }
-        r = num.toFixed(decimals) + suffix;
+        r = num.toFixed(decimals) + "" + suffix;
         return r;
     }
 

@@ -4,7 +4,6 @@
 #include <functional>
 
 // Deps Headers
-#include <entt/core/attribute.h>
 
 // Project Headers
 #include "atomicdex/utilities/cpprestsdk.utilities.hpp"

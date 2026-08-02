@@ -938,10 +938,7 @@ MultipageModal
             title: qsTr("Fees")
             text:
             {
-                let answer = send_result && send_result.withdraw_answer
-                let amount = answer && answer.fee_details
-                             ? answer.fee_details.amount
-                             : ""
+                let amount = send_result.withdraw_answer.fee_details.amount
                 !amount ? "" : General.formatCrypto(
                     '',
                     amount,
@@ -956,9 +953,8 @@ MultipageModal
         TextEditWithTitle
         {
             title: qsTr("Date")
-            text: empty_data || !send_result || !send_result.withdraw_answer
-                  ? ""
-                  : send_result.withdraw_answer.date || ""
+            text: empty_data ? "" :
+                  send_result.withdraw_answer.date
         }
 
         DefaultBusyIndicator

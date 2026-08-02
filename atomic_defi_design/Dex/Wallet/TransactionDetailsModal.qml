@@ -18,8 +18,6 @@ MultipageModal
     function reset() { }
 
     property var details
-    readonly property string transaction_ticker:
-        details && details.coin ? details.coin : api_wallet_page.ticker
     property bool is_spam: !details ? false : details.amount == 0
 
     onClosed:
@@ -72,8 +70,8 @@ MultipageModal
             align_left: true
             text_box_width: 600
             text_value: !details ? "" : details.tx_hash
-            linkURL: !details ? "" :General.getTxExplorerURL(transaction_ticker, details.tx_hash, false)
-            onCopyNotificationTitle:  qsTr("%1 txid", "TICKER").arg(transaction_ticker)
+            linkURL: !details ? "" :General.getTxExplorerURL(api_wallet_page.ticker, details.tx_hash, false)
+            onCopyNotificationTitle:  qsTr("%1 txid", "TICKER").arg(api_wallet_page.ticker)
             onCopyNotificationMsg: qsTr("copied to clipboard.")
             privacy: true
         }
@@ -82,7 +80,7 @@ MultipageModal
         TextEditWithTitle
         {
             title: qsTr("Amount")
-            text: !details ? "" : General.formatCrypto(!details.am_i_sender, details.amount, transaction_ticker, details.amount_fiat, API.app.settings_pg.current_currency)
+            text: !details ? "" : General.formatCrypto(!details.am_i_sender, details.amount, api_wallet_page.ticker, details.amount_fiat, API.app.settings_pg.current_currency)
             value_color: !details ? "white" : details.am_i_sender ?  Dex.CurrentTheme.warningColor : Dex.CurrentTheme.okColor
             privacy: true
             label.font.pixelSize: 13
@@ -104,7 +102,7 @@ MultipageModal
             title: qsTr("From")
             model: !details ? [] :
                     details.from
-            linkURL: !details ? "" :General.getAddressExplorerURL(transaction_ticker, details.from)
+            linkURL: !details ? "" :General.getAddressExplorerURL(api_wallet_page.ticker, details.from)
             onCopyNotificationTitle: is_spam ? "" : qsTr("From address")
         }
 
@@ -117,8 +115,8 @@ MultipageModal
                    General.arrayExclude(details.to, details.from[0]) : details.to
             linkURL: !details ? ""
                     :  details.to.length > 1
-                    ? General.getAddressExplorerURL(transaction_ticker, General.arrayExclude(details.to, details.from[0]))
-                    : General.getAddressExplorerURL(transaction_ticker, details.to)
+                    ? General.getAddressExplorerURL(api_wallet_page.ticker, General.arrayExclude(details.to, details.from[0]))
+                    : General.getAddressExplorerURL(api_wallet_page.ticker, details.to)
             onCopyNotificationTitle: is_spam ? "" : qsTr("To address")
         }
 
@@ -191,7 +189,7 @@ MultipageModal
                 leftPadding: 40
                 rightPadding: 40
                 radius: 18
-                onClicked: General.viewTxAtExplorer(transaction_ticker, details.tx_hash, false)
+                onClicked: General.viewTxAtExplorer(api_wallet_page.ticker, details.tx_hash, false)
             }
         ]
     }

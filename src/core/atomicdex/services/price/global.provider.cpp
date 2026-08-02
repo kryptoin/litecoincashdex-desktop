@@ -99,7 +99,7 @@ namespace atomic_dex
     global_price_service::refresh_other_coins_rates(
         const std::string& quote_id, const std::string& ticker, bool with_update_providers, std::atomic_uint16_t nb_try)
     {
-        SPDLOG_DEBUG("refresh_other_coins_rates: {} - {} - {} - {}", quote_id, ticker, with_update_providers, nb_try);
+        SPDLOG_DEBUG("refresh_other_coins_rates: {} - {} - {} - {}", quote_id, ticker, with_update_providers, nb_try.load());
         if (nb_try > 3)
         {
             SPDLOG_ERROR("Failed to fetch rates for ticker after 3 tries: {}", ticker);
@@ -394,7 +394,7 @@ namespace atomic_dex
             }
             catch (const std::exception& e)
             {
-                SPDLOG_ERROR("pplx task error from async_fetch_fiat_rates: {} - nb_try {}", e.what(), nb_try);
+                SPDLOG_ERROR("pplx task error from async_fetch_fiat_rates: {} - nb_try {}", e.what(), nb_try.load());
                 using namespace std::chrono_literals;
                 std::this_thread::sleep_for(1s);
                 this->on_force_update_providers(evt);
@@ -432,7 +432,7 @@ namespace atomic_dex
                             );
                         }
                     }
-                    SPDLOG_INFO("Successfully retrieving rate after {} try", nb_try);
+                    SPDLOG_INFO("Successfully retrieving rate after {} try", nb_try.load());
                     nb_try = 0;
                 })
             .then(error_functor);

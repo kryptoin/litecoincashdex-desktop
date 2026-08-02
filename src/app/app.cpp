@@ -66,7 +66,7 @@ namespace atomic_dex
 
     bool atomic_dex::application::enable_coins(const QStringList& coins)
     {
-        auto enableable_coins_count = entity_registry_.template ctx<QSettings>().value("MaximumNbCoinsEnabled").toULongLong();
+        auto enableable_coins_count = entity_registry_.ctx().get<QSettings>().value("MaximumNbCoinsEnabled").toULongLong();
         if (enableable_coins_count < coins.size() + get_portfolio_page()->get_global_cfg()->get_enabled_coins().size())
         {
             return false;
@@ -124,7 +124,7 @@ namespace atomic_dex
             {
                 if (!get_kdf().is_zhtlc_coin_ready(coin.toStdString()))
                 {
-                    this->dispatcher_.trigger<disabling_coin_failed>(coin.toStdString(), "Can't disable until fully activated.");
+                    this->dispatcher_.trigger(disabling_coin_failed{coin.toStdString(), "Can't disable until fully activated."});
                 }
                 else
                 {
@@ -155,7 +155,7 @@ namespace atomic_dex
                 coins_std.push_back(coin.toStdString());
             }
             get_kdf().disable_multiple_coins(coins_std);
-            this->dispatcher_.trigger<update_portfolio_values>(false);
+            this->dispatcher_.trigger(update_portfolio_values{false});
         }
 
         return true;
@@ -386,12 +386,12 @@ namespace atomic_dex
                     if (std::find(to_init.begin(), to_init.end(), g_primary_dex_coin) != to_init.end())
                     {
                         get_wallet_page()->get_transactions_mdl()->reset();
-                        this->dispatcher_.trigger<tx_fetch_finished>();
+                        this->dispatcher_.trigger(tx_fetch_finished{});
                     }
                     get_wallet_page()->refresh_ticker_infos();
                     system_manager_.get_system<qt_wallet_manager>().set_status("complete");
                 }
-                this->dispatcher_.trigger<update_portfolio_values>();
+                this->dispatcher_.trigger(update_portfolio_values{});
                 if (system_manager_.has_system<coingecko_wallet_charts_service>())
                 {
                     system_manager_.get_system<coingecko_wallet_charts_service>().manual_refresh("tick");
@@ -448,7 +448,7 @@ namespace atomic_dex
 
     void application::post_handle_settings()
     {
-        QSettings& settings = get_registry().ctx<QSettings>();
+        QSettings& settings = get_registry().ctx().get<QSettings>();
         if (settings.value("AutomaticUpdateOrderBot", false).toBool())
         {
             SPDLOG_INFO("AutomaticUpdateOrderBot is true, activating the service");
@@ -466,9 +466,9 @@ namespace atomic_dex
     {
         std::filesystem::path settings_path = (atomic_dex::utils::get_current_configs_path() / "cfg.ini");
         #if defined(_WIN32) || defined(WIN32)
-            this->entity_registry_.set<QSettings>(QString::fromStdWString(settings_path.wstring()), QSettings::IniFormat);
+            this->entity_registry_.ctx().emplace<QSettings>(QString::fromStdWString(settings_path.wstring()), QSettings::IniFormat);
         #else
-            this->entity_registry_.set<QSettings>(QString::fromStdString(settings_path.string()), QSettings::IniFormat);
+            this->entity_registry_.ctx().emplace<QSettings>(QString::fromStdString(settings_path.string()), QSettings::IniFormat);
         #endif
 
         //! Creates managers
@@ -720,8 +720,8 @@ namespace atomic_dex
     application::on_fiat_rate_updated(const fiat_rate_updated&)
     {
         SPDLOG_DEBUG("on_fiat_rate_updated");
-        this->dispatcher_.trigger<update_portfolio_values>();
-        // this->dispatcher_.trigger<current_currency_changed>();
+        this->dispatcher_.trigger(update_portfolio_values{});
+        // this->dispatcher_.trigger(current_currency_changed{});
     }
 
     void
@@ -738,7 +738,7 @@ namespace atomic_dex
         }
         else if (get_portfolio_page()->get_portfolio()->update_balance_values(evt.tickers))
         {
-            this->dispatcher_.trigger<update_portfolio_values>(false);
+            this->dispatcher_.trigger(update_portfolio_values{false});
             SPDLOG_DEBUG("Ticker balance updated.");
         }
         else

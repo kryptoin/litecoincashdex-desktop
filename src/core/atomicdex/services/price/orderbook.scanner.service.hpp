@@ -40,7 +40,6 @@ namespace atomic_dex
         t_best_orders_synchronized m_best_orders_infos;
         t_update_time_point        m_update_clock;
         std::atomic_bool           m_bestorders_busy{false};
-        std::atomic_int64_t        m_bestorders_retry_after_ms{0};
 
       public:
         //! Constructor

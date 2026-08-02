@@ -60,7 +60,7 @@ namespace antara::gaming::ecs::tests
     TEST_CASE("add system")
     {
         entt::registry    registry;
-        entt::dispatcher& dispatcher{registry.set<entt::dispatcher>()};
+        entt::dispatcher& dispatcher{registry.ctx().emplace<entt::dispatcher>()};
         static_cast<void>(dispatcher);
         system_manager        manager{registry};
         const system_manager& c_mgr = manager;

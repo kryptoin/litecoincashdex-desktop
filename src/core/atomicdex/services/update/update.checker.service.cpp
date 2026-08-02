@@ -48,7 +48,7 @@ namespace
         std::string    resp_str = TO_STD_STR(resp_http.extract_string(true).get());
         if (resp_http.status_code() != 200)
         {
-            SPDLOG_ERROR("Cannot reach the endpoint [{}]: {}", g_komodolive_endpoint);
+            SPDLOG_ERROR("Cannot reach the endpoint [{}]", g_komodolive_endpoint);
             result["status"] = (QObject::tr("Cannot reach the endpoint: ") + g_komodolive_endpoint).toStdString();
         }
         else

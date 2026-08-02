@@ -2,10 +2,14 @@ include(DEX_NEW_LIB)
 include(dex_generate_qrc)
 
 # Core target
+set(CORE_QT_DEPS cpprestsdk::cpprest Qt::Core Qt::Quick Qt::Svg Qt::Charts Qt::Widgets)
+if (Qt5WebEngine_FOUND AND Qt5WebEngineCore_FOUND AND Qt5WebEngineWidgets_FOUND)
+    list(APPEND CORE_QT_DEPS Qt::WebEngine Qt::WebEngineCore Qt::WebEngineWidgets)
+endif ()
 DEX_NEW_LIB(core INTERFACE
         INTERFACE_DEPS
-            cpprestsdk::cpprest Qt::Core Qt::Quick Qt::Svg Qt::Charts Qt::WebEngine Qt::WebEngineCore Qt::WebEngineWidgets
-            Qt::Widgets nlohmann_json::nlohmann_json antara_qrcode spdlog::spdlog antara::world
+            ${CORE_QT_DEPS}
+            nlohmann_json::nlohmann_json antara_qrcode spdlog::spdlog antara::world
             unofficial-btc::bitcoin komodo-date::date komodo-taskflow::taskflow
             Boost::random Boost::filesystem komodo-sodium::sodium antara::app::net
         INTERFACE_DEFS

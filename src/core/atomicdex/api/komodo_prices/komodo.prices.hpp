@@ -1,6 +1,5 @@
 #pragma once
 
-#include <entt/core/attribute.h>
 #include <nlohmann/json.hpp>
 
 #include "atomicdex/utilities/cpprestsdk.utilities.hpp"

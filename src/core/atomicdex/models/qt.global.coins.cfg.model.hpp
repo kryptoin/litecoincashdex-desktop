@@ -25,7 +25,6 @@
 //#include <absl/container/flat_hash_map.h>
 
 //! Deps
-#include <entt/core/attribute.h>
 #include <entt/entity/registry.hpp>
 
 //! Project Headers

@@ -1,7 +1,0 @@
-{
-  "rpc_nodes": [
-    {
-      "url": "https://rpc.cosmos.directory/cosmoshub"
-    }
-  ]
-}

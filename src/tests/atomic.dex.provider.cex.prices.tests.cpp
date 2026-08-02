@@ -39,18 +39,18 @@ TEST_CASE("atomic dex cex prices provider constructor")
     GIVEN("A basic environment")
     {
         entt::registry registry;
-        registry.set<entt::dispatcher>();
+        registry.ctx().emplace<entt::dispatcher>();
         antara::gaming::ecs::system_manager system_manager_{registry};
         auto&                               kdf_s      = system_manager_.create_system<atomic_dex::kdf>();
         auto&                               cex_system = system_manager_.create_system<atomic_dex::ohlc_provider>(kdf_s);
 
         THEN("I start kdf")
         {
-            registry.ctx<entt::dispatcher>().trigger<atomic_dex::kdf_started>();
+            registry.ctx().get<entt::dispatcher>().trigger(atomic_dex::kdf_started{});
 
             AND_WHEN("i set the current orderbook pair to a valid supported pair (kmd-btc)")
             {
-                registry.ctx<entt::dispatcher>().trigger<atomic_dex::refresh_orderbook_model_data>("kmd", "btc");
+                registry.ctx().get<entt::dispatcher>().trigger(atomic_dex::refresh_orderbook_model_data{"kmd", "btc"});
                 using namespace std::chrono_literals;
                 cex_system.consume_pending_tasks();
 

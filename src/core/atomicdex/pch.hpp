@@ -20,6 +20,10 @@
 
 constexpr std::size_t operator"" _sz(unsigned long long n) { return n; }
 
+#ifndef ENTT_API
+#define ENTT_API
+#endif
+
 //! Boost Headers
 #include <boost/algorithm/string/trim.hpp>
 

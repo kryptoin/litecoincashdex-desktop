@@ -65,9 +65,7 @@ MultipageModalContent
 
         text:
         {
-            let answer = result && result.withdraw_answer
-            let amount = custom_amount !== "" ? custom_amount :
-                         answer ? answer.my_balance_change : ""
+            let amount = custom_amount !== "" ? custom_amount : result.withdraw_answer.my_balance_change
             !amount ? "" : General.formatCrypto(
                 '',
                 amount,
@@ -82,11 +80,12 @@ MultipageModalContent
     TextEditWithTitle
     {
         title: qsTr("Memo")
-        visible: !!(result && result.withdraw_answer && result.withdraw_answer.memo)
+        visible: result.withdraw_answer.memo
 
-        text: result && result.withdraw_answer
-              ? result.withdraw_answer.memo || ""
-              : ""
+        text:
+        {
+            result.withdraw_answer.memo
+        }
     }
 
     // Fees
@@ -96,10 +95,7 @@ MultipageModalContent
 
         text:
         {
-            let answer = result && result.withdraw_answer
-            let amount = answer && answer.fee_details
-                         ? answer.fee_details.amount
-                         : ""
+            let amount = result.withdraw_answer.fee_details.amount
             !amount ? "" : General.formatCrypto(
                 '',
                 amount,
@@ -114,7 +110,7 @@ MultipageModalContent
     TextEditWithTitle
     {
         title: qsTr("Date")
-        text: result && result.withdraw_answer ? result.withdraw_answer.date || "" : ""
+        text: result.withdraw_answer.date
     }
 
 

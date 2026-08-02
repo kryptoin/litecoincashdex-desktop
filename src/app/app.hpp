@@ -29,7 +29,6 @@
 
 //! Deps
 #include <antara/gaming/world/world.app.hpp>
-#include <entt/core/attribute.h>
 
 //! Project Headers
 #include "atomicdex/config/app.cfg.hpp"

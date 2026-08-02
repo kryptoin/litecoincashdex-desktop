@@ -85,24 +85,6 @@ FetchContent_Declare(jl777-coins
 
 FetchContent_MakeAvailable(kdf jl777-coins qmaterial)
 
-if (WIN32)
-    # LCC: upstream KDF v2.4.0-beta contains seed01.kmdefi.net, which no longer resolves.
-    # Patch the downloaded Windows KDF before packaging so startup does not depend on seed01 DNS.
-    set(LCC_KDF_EXE "${kdf_SOURCE_DIR}/mm2.exe")
-    if (EXISTS "${LCC_KDF_EXE}")
-        execute_process(
-            COMMAND powershell -NoProfile -ExecutionPolicy Bypass
-                -File "${CMAKE_CURRENT_SOURCE_DIR}/cmake/patch_windows_kdf_seed.ps1"
-                "${LCC_KDF_EXE}"
-            RESULT_VARIABLE LCC_KDF_PATCH_RESULT
-        )
-        if (NOT LCC_KDF_PATCH_RESULT EQUAL 0)
-            message(FATAL_ERROR "Failed to patch Windows KDF seed node")
-        endif ()
-    endif ()
-endif ()
-
-
 ##! Configure our needs.
 if (UNIX)
     configure_file(${jl777-coins_SOURCE_DIR}/utils/coins_config_tcp.json ${CMAKE_CURRENT_SOURCE_DIR}/assets/config/${PROJECT_VERSION}-coins.json COPYONLY)

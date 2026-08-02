@@ -21,7 +21,6 @@
 #include <string>
 
 //! Deps
-#include <entt/core/attribute.h>
 #include <nlohmann/json.hpp>
 
 //! Project Headers

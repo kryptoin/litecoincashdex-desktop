@@ -4,7 +4,6 @@
 #include <QObject>
 
 //! Deps
-#include <entt/core/attribute.h>
 
 namespace atomic_dex
 {

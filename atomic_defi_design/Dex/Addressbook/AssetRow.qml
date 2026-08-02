@@ -1,7 +1,6 @@
 import QtQuick 2.12
 
 import Dex.Components 1.0 as Dex
-import Dex.Themes 1.0 as Dex
 import "../Constants" as Dex
 
 Row
@@ -24,15 +23,6 @@ Row
     {
         anchors.verticalCenter: parent.verticalCenter
         text: name
-    }
-
-    Dex.Text
-    {
-        anchors.verticalCenter: parent.verticalCenter
-        text: ticker
-        visible: ticker !== "" && ticker !== name && ticker !== type
-        color: Dex.CurrentTheme.textSecondaryColor
-        font: Dex.DexTypo.overLine
     }
 
     Dex.Text

@@ -57,7 +57,7 @@ namespace antara::gaming::event
          *          {
          *              entt::registry entity_registry;
          *              entt::dispatcher& dispatcher{registry.set<entt::dispatcher>()};
-         *              dispatcher.trigger<quit_game>(0);
+         *              dispatcher.trigger(quit_game{0});
          *          }
          * @endcode
          */

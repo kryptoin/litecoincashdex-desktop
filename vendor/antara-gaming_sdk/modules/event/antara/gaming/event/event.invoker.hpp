@@ -33,7 +33,7 @@ namespace antara::gaming::event
         void
         operator()(entt::dispatcher& self, Arguments&&... args)
         {
-            self.trigger<Event>(std::forward<Arguments>(args)...);
+            self.trigger(Event{std::forward<Arguments>(args)...});
         }
     };
 } // namespace antara::gaming::event

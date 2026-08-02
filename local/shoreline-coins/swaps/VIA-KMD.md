@@ -1,5 +1,0 @@
-[taker fee (KMD)](https://kmdexplorer.io/tx/f4668a64c32e019c0a8815691556bc56edd72f41ea27de4d6fa67ace86e6f189)  
-[maker payment (VIA)](https://explorer.viacoin.org/tx/c9ea8bc2a75ba3f1d4de6565ae94a650477abfd2ed5719b1db38a097daf5ce26)  
-[taker payment (KMD)](https://kmdexplorer.io/tx/24a85142381d91a42aafa502d9ec345861b984ad1c44ce00a776f85a5009a1aa)  
-[taker payment spent (KMD)](https://kmdexplorer.io/tx/e1c700b737085a805dd6cf7d1cb770c0d04817a7795a8e3d3b7caa8162610ee7)  
-[maker payment spent (VIA)](https://explorer.viacoin.org/tx/c37925ec576c947d097149f83ff692ff3dd7b596a9bf051cb574bda7dbb84df1)  

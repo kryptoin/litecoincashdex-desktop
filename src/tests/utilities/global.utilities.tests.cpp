@@ -62,6 +62,15 @@ TEST_CASE("atomic_dex::utils::create_if_doesnt_exist()")
     CHECK_FALSE(std::filesystem::exists(tmp_path));
 }
 
+TEST_CASE("atomic_dex::utils::ensure_directory_exists()")
+{
+    std::filesystem::path tmp_path = std::filesystem::temp_directory_path() / "atomic_dex_test_dir" / "nested" / "logs";
+    std::filesystem::remove_all(tmp_path.parent_path().parent_path());
+    CHECK(ensure_directory_exists(tmp_path));
+    CHECK(std::filesystem::exists(tmp_path));
+    std::filesystem::remove_all(tmp_path.parent_path().parent_path());
+}
+
 TEST_CASE("atomic_dex::utils::determine_balance_factor()")
 {
     CHECK_EQ(doctest::Approx(1.0), determine_balance_factor(false));
