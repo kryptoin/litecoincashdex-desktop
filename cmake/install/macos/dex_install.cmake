@@ -2,13 +2,16 @@ if (APPLE)
     message(STATUS "ICON ->>>> ${ICON}")
     message(STATUS "PROJECT_NAME ->>>> ${PROJECT_NAME}")
     message(STATUS "DEX_VERSION ->>>> ${DEX_VERSION}")
-    set_target_properties(${PROJECT_NAME} PROPERTIES
+        set_target_properties(${PROJECT_NAME} PROPERTIES
             MACOSX_BUNDLE_BUNDLE_NAME "${PROJECT_NAME}"
-            RESOURCE ${ICON}
-            MACOSX_BUNDLE_ICON_FILE dex-logo
             MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION}
             MACOSX_BUNDLE_LONG_VERSION_STRING ${PROJECT_VERSION}
             MACOSX_BUNDLE_INFO_PLIST "${PROJECT_SOURCE_DIR}/cmake/MacOSXBundleInfo.plist.in")
+        if (ICON)
+        set_target_properties(${PROJECT_NAME} PROPERTIES
+            RESOURCE "${ICON}"
+            MACOSX_BUNDLE_ICON_FILE dex-logo)
+        endif()
     add_custom_command(TARGET ${PROJECT_NAME}
             POST_BUILD COMMAND
             ${CMAKE_INSTALL_NAME_TOOL} -add_rpath "@executable_path/../Frameworks/"

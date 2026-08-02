@@ -78,6 +78,13 @@ dex_generate_qrc(${CMAKE_SOURCE_DIR}/atomic_defi_design/assets assets_qrc
     FILES "languages/atomic_defi_en.qm;languages/atomic_defi_es.qm;languages/atomic_defi_de.qm;languages/atomic_defi_fr.qm;languages/atomic_defi_ru.qm;languages/atomic_defi_tr.qm")
 
 # Main executable
+if (EXISTS ${CMAKE_SOURCE_DIR}/cmake/install/macos/dex-logo.icns)
+    set(ICON ${CMAKE_SOURCE_DIR}/cmake/install/macos/dex-logo.icns)
+else()
+    set(ICON "")
+    message(STATUS "macOS icon not found; building without bundle icon")
+endif()
+
 add_executable(${PROJECT_NAME}
         MACOSX_BUNDLE
         ${ICON}
@@ -106,55 +113,21 @@ if (APPLE)
     set_property(SOURCE core/atomicdex/platform/osx/manager.mm PROPERTY SKIP_UNITY_BUILD_INCLUSION ON)
 endif ()
 
-# Testing executable
-add_executable(${PROJECT_NAME}_tests MACOSX_BUNDLE ${ICON}
-        tests/atomic.dex.qt.utilities.tests.cpp
-        tests/atomic.dex.provider.cex.prices.api.tests.cpp
-        tests/atomic.dex.provider.cex.prices.tests.cpp
-        tests/atomic.dex.tests.cpp
-        tests/atomic.dex.wallet.config.tests.cpp
-
-        ##! API
-        tests/api/coingecko/coingecko.tests.cpp
-        tests/api/komodo_prices/komodo.prices.tests.cpp
-        tests/api/kdf/kdf.api.address_format.tests.cpp
-        tests/api/kdf/kdf.api.utxo_merge_params.tests.cpp
-        tests/api/kdf/kdf.api.balance_infos.tests.cpp
-        tests/api/kdf/kdf.fraction.tests.cpp
-        tests/api/kdf/kdf.rpc2.trade_preimage.tests.cpp
-
-        ##! CFG
-        tests/config/coins.cfg.tests.cpp
-        
-        ##! API
-        tests/api/coingecko/coingecko.tests.cpp
-        tests/api/komodo_prices/komodo.prices.tests.cpp
-        tests/api/kdf/kdf.rpc2.trade_preimage.tests.cpp
-        tests/api/kdf/kdf.fraction.tests.cpp
-        tests/api/kdf/enable_bch_with_tokens_rpc_tests.cpp
-
-        ##! Utilities
-        tests/utilities/qt.utilities.tests.cpp
-        tests/utilities/global.utilities.tests.cpp
-
-        ##! Managers
-        tests/managers/addressbook.manager.tests.cpp
-
-        ##! Models
-        tests/models/qt.addressbook.contact.model.tests.cpp
-
-        ##! Utilities
-        tests/utilities/qt.utilities.tests.cpp
-        tests/utilities/global.utilities.tests.cpp)
-
-target_link_libraries(${PROJECT_NAME}_tests
+# Testing executable - include all existing .cpp test sources under tests/
+file(GLOB_RECURSE TEST_SOURCES RELATIVE ${CMAKE_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/tests/*.cpp)
+if (TEST_SOURCES)
+    add_executable(${PROJECT_NAME}_tests MACOSX_BUNDLE ${ICON} ${TEST_SOURCES})
+    target_link_libraries(${PROJECT_NAME}_tests
         PUBLIC
         ${PROJECT_NAME}::core
         doctest::doctest)
-set_target_properties(${PROJECT_NAME}_tests
+    set_target_properties(${PROJECT_NAME}_tests
         PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/")
-set_target_properties(${PROJECT_NAME}_tests PROPERTIES UNITY_BUILD ON)
+    set_target_properties(${PROJECT_NAME}_tests PROPERTIES UNITY_BUILD ON)
+else()
+    message(STATUS "No test sources found under tests/; skipping test executable")
+endif()
 
 # Main executable installation related
 if (LINUX)

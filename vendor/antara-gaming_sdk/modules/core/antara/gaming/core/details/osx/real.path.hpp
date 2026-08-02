@@ -57,6 +57,25 @@ namespace antara::gaming::core::details
     fs::path
     assets_real_path() 
     {
-        return binary_real_path().parent_path().parent_path() / "Resources/assets";
+        auto bin = binary_real_path();
+        std::vector<fs::path> candidates{
+            // Typical app bundle location
+            bin.parent_path().parent_path() / "Resources/assets",
+            // assets next to the binary
+            bin.parent_path() / "assets",
+            // assets one level up from the binary
+            bin.parent_path().parent_path() / "assets",
+            // older layouts
+            bin.parent_path().parent_path().parent_path() / "Resources/assets",
+        };
+        for (const auto& p : candidates)
+        {
+            if (fs::exists(p))
+            {
+                return p;
+            }
+        }
+        // Fallback to the original expected path
+        return bin.parent_path().parent_path() / "Resources/assets";
     }
 } // namespace antara::gaming::core::details

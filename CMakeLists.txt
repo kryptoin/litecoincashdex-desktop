@@ -20,22 +20,17 @@ include(ipo_prerequisites)
 ##! Options
 option(WITH_HOTRELOAD "Enable to use qml Hot reload" OFF)
 
+# Option to skip external FetchContent downloads (mm2, deps) for local builds
+option(AD_SKIP_FETCHCONTENT "Skip FetchContent downloads and use local stubs" ON)
+
 if (NOT WITH_HOTRELOAD)
-    message(STATUS "Hot Reload is not active download SortFilterProxyModel")
-    include(FetchContent)
-
-    set(SFPM_REPOSITORY "https://github.com/OlivierLDff/SortFilterProxyModel.git" CACHE STRING "SortFilterProxyModel repository url")
-    set(SFPM_TAG master CACHE STRING "SortFilterProxyModel git tag")
-
-    FetchContent_Declare(
-            SortFilterProxyModel
-            GIT_REPOSITORY ${SFPM_REPOSITORY}
-            GIT_TAG        ${SFPM_TAG}
-            GIT_SHALLOW    1
-    )
-
-    set(SFPM_FOLDER_PREFIX "Dependencies" CACHE STRING "Prefix folder for all SortFilterProxyModel generated targets in generated project (only decorative)")
-    FetchContent_MakeAvailable(SortFilterProxyModel)
+    message(STATUS "Hot Reload is not active; using local SortFilterProxyModel stub (no remote fetch)")
+    # Provide a local INTERFACE target for SortFilterProxyModel to avoid FetchContent and remote git operations.
+    # This keeps local development builds simple. Replace with FetchContent when network/external deps are desired.
+    if (NOT TARGET SortFilterProxyModel)
+        add_library(SortFilterProxyModel INTERFACE)
+        target_compile_definitions(SortFilterProxyModel INTERFACE SFPM_FALLBACK=1)
+    endif()
 endif()
 
 ##! Antara
@@ -59,8 +54,12 @@ endif ()
 
 ##! We fetch our dependencies
 if (APPLE)
-    FetchContent_Declare(kdf
-            URL https://github.com/KomodoPlatform/komodo-defi-framework/releases/download/v2.4.0-beta/mm2-c800ea03f-Darwin-Release.zip)
+    if (NOT AD_SKIP_FETCHCONTENT)
+        FetchContent_Declare(kdf
+                URL https://github.com/KomodoPlatform/komodo-defi-framework/releases/download/v2.4.0-beta/mm2-c800ea03f-Darwin-Release.zip)
+    else()
+        message(STATUS "AD_SKIP_FETCHCONTENT=ON: skipping kdf/mm2 FetchContent; ensure assets/tools/kdf/ contains mm2 if required")
+    endif()
 elseif (UNIX AND NOT APPLE)
     FetchContent_Declare(kdf
             URL https://github.com/KomodoPlatform/komodo-defi-framework/releases/download/v2.4.0-beta/mm2-c800ea03f-Linux-Release.zip)
@@ -83,14 +82,45 @@ FetchContent_Declare(jl777-coins
 #FetchContent_Declare(adex-generics-coins
 #        URL https://github.com/ShorelineCrypto/cheetahdex-wallet-desktop/archive/main.zip)
 
-FetchContent_MakeAvailable(kdf jl777-coins qmaterial)
+if (NOT AD_SKIP_FETCHCONTENT)
+    FetchContent_MakeAvailable(kdf jl777-coins qmaterial)
+else()
+    message(STATUS "AD_SKIP_FETCHCONTENT=ON: skipping FetchContent_MakeAvailable for kdf, jl777-coins, qmaterial")
+    if (NOT TARGET qmaterial)
+        add_library(qmaterial INTERFACE)
+    endif()
+    if (NOT TARGET jl777-coins)
+        add_library(jl777-coins INTERFACE)
+    endif()
+    # kdf is intentionally skipped; expect mm2 to be provided in assets/tools/kdf
+endif()
 
 ##! Configure our needs.
 if (UNIX)
-    configure_file(${jl777-coins_SOURCE_DIR}/utils/coins_config_tcp.json ${CMAKE_CURRENT_SOURCE_DIR}/assets/config/${PROJECT_VERSION}-coins.json COPYONLY)
-    configure_file(${jl777-coins_SOURCE_DIR}/coins ${CMAKE_CURRENT_SOURCE_DIR}/assets/tools/kdf/coins COPYONLY)
-    configure_file(${kdf_SOURCE_DIR}/mm2 ${CMAKE_CURRENT_SOURCE_DIR}/assets/tools/kdf/${DEX_API} COPYONLY)
-    file(COPY ${jl777-coins_SOURCE_DIR}/icons/ DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/atomic_defi_design/assets/images/coins/)
+    if (EXISTS ${jl777-coins_SOURCE_DIR}/utils/coins_config_tcp.json)
+        configure_file(${jl777-coins_SOURCE_DIR}/utils/coins_config_tcp.json ${CMAKE_CURRENT_SOURCE_DIR}/assets/config/${PROJECT_VERSION}-coins.json COPYONLY)
+    else()
+        message(STATUS "AD_SKIP_FETCHCONTENT=ON: shoreline-coins utils/coins_config_tcp.json not found; skipping coins_config generation")
+    endif()
+    if (EXISTS ${jl777-coins_SOURCE_DIR}/coins)
+        configure_file(${jl777-coins_SOURCE_DIR}/coins ${CMAKE_CURRENT_SOURCE_DIR}/assets/tools/kdf/coins COPYONLY)
+    else()
+        message(STATUS "AD_SKIP_FETCHCONTENT=ON: shoreline-coins coins file not found; skipping coins copy")
+    endif()
+    if (NOT AD_SKIP_FETCHCONTENT)
+        configure_file(${kdf_SOURCE_DIR}/mm2 ${CMAKE_CURRENT_SOURCE_DIR}/assets/tools/kdf/${DEX_API} COPYONLY)
+    else()
+        # If skipping fetch, do not attempt to copy mm2 from kdf_SOURCE_DIR; rely on local assets/tools/kdf
+        if (NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/assets/tools/kdf)
+            file(MAKE_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/assets/tools/kdf)
+        endif()
+        message(STATUS "AD_SKIP_FETCHCONTENT=ON: expecting mm2 in ${CMAKE_CURRENT_SOURCE_DIR}/assets/tools/kdf/${DEX_API}")
+    endif()
+    if (EXISTS ${jl777-coins_SOURCE_DIR}/icons)
+        file(COPY ${jl777-coins_SOURCE_DIR}/icons/ DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/atomic_defi_design/assets/images/coins/)
+    else()
+        message(STATUS "AD_SKIP_FETCHCONTENT=ON: shoreline-coins icons not found; skipping coin icons copy")
+    endif()
 else ()
     configure_file(${jl777-coins_SOURCE_DIR}/utils/coins_config_tcp.json ${CMAKE_BINARY_DIR}/bin/assets/config/${PROJECT_VERSION}-coins.json COPYONLY)
     configure_file(${jl777-coins_SOURCE_DIR}/coins ${CMAKE_BINARY_DIR}/bin/assets/tools/kdf/coins COPYONLY)
