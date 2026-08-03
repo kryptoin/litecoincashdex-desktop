@@ -4,6 +4,7 @@
 /build-macos-homebrew
 /build-macos-homebrew-test
 /build-macos-analysis
+/libwally-core-install
 
 # ---------------------------------------------------------
 # Manually downloaded dependency (KEEP)
@@ -64,3 +65,8 @@ __pycache__/
 .DS_Store
 .idea/
 .vscode/
+
+# ---------------------------------------------------------
+# Documentation
+# ---------------------------------------------------------
+/docs

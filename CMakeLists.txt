@@ -55,17 +55,17 @@ endif ()
 ##! We fetch our dependencies
 if (APPLE)
     if (NOT AD_SKIP_FETCHCONTENT)
-        FetchContent_Declare(kdf
-                URL https://github.com/KomodoPlatform/komodo-defi-framework/releases/download/v2.4.0-beta/mm2-c800ea03f-Darwin-Release.zip)
+        # KDF v3.0 is now a library, not a binary. Skip FetchContent for now.
+        message(STATUS "KDF v3.0 is library-only; skipping FetchContent")
     else()
         message(STATUS "AD_SKIP_FETCHCONTENT=ON: skipping kdf/mm2 FetchContent; ensure assets/tools/kdf/ contains mm2 if required")
     endif()
 elseif (UNIX AND NOT APPLE)
-    FetchContent_Declare(kdf
-            URL https://github.com/KomodoPlatform/komodo-defi-framework/releases/download/v2.4.0-beta/mm2-c800ea03f-Linux-Release.zip)
+    # KDF v3.0 is now a library, not a binary. Skip FetchContent for now.
+    message(STATUS "KDF v3.0 is library-only; skipping FetchContent")
 else ()
-    FetchContent_Declare(kdf
-            URL https://github.com/KomodoPlatform/komodo-defi-framework/releases/download/v2.4.0-beta/mm2-c800ea03f-Win64.zip)
+    # KDF v3.0 is now a library, not a binary. Skip FetchContent for now.
+    message(STATUS "KDF v3.0 is library-only; skipping FetchContent")
 endif ()
 
 #FetchContent_Declare(qmaterial URL https://github.com/KomodoPlatform/Qaterial/archive/last-clang-working-2.zip)
@@ -79,11 +79,9 @@ FetchContent_Declare(
 FetchContent_Declare(jl777-coins
         SOURCE_DIR ${CMAKE_SOURCE_DIR}/local/shoreline-coins)
 
-#FetchContent_Declare(adex-generics-coins
-#        URL https://github.com/ShorelineCrypto/cheetahdex-wallet-desktop/archive/main.zip)
-
 if (NOT AD_SKIP_FETCHCONTENT)
-    FetchContent_MakeAvailable(kdf jl777-coins qmaterial)
+    FetchContent_MakeAvailable(qmaterial)
+    message(STATUS "KDF v3.0 is library-only; skipping FetchContent_MakeAvailable for kdf")
 else()
     message(STATUS "AD_SKIP_FETCHCONTENT=ON: skipping FetchContent_MakeAvailable for kdf, jl777-coins, qmaterial")
     if (NOT TARGET qmaterial)
@@ -108,7 +106,14 @@ if (UNIX)
         message(STATUS "AD_SKIP_FETCHCONTENT=ON: shoreline-coins coins file not found; skipping coins copy")
     endif()
     if (NOT AD_SKIP_FETCHCONTENT)
-        configure_file(${kdf_SOURCE_DIR}/mm2 ${CMAKE_CURRENT_SOURCE_DIR}/assets/tools/kdf/${DEX_API} COPYONLY)
+        if (EXISTS ${kdf_SOURCE_DIR}/mm2)
+            configure_file(${kdf_SOURCE_DIR}/mm2 ${CMAKE_CURRENT_SOURCE_DIR}/assets/tools/kdf/${DEX_API} COPYONLY)
+        else()
+            message(STATUS "KDF mm2 binary not found in kdf_SOURCE_DIR; skipping mm2 copy")
+            if (NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/assets/tools/kdf)
+                file(MAKE_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/assets/tools/kdf)
+            endif()
+        endif()
     else()
         # If skipping fetch, do not attempt to copy mm2 from kdf_SOURCE_DIR; rely on local assets/tools/kdf
         if (NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/assets/tools/kdf)
@@ -160,3 +165,14 @@ add_library(antara_qrcode STATIC)
 target_sources(antara_qrcode PRIVATE vendor/qrcode/QrCode.cpp)
 target_include_directories(antara_qrcode PUBLIC vendor/qrcode)
 target_link_libraries(antara_qrcode PUBLIC antara::default_settings)
+
+# Link against libwally-core
+set(WALLY_ROOT ${CMAKE_SOURCE_DIR}/libwally-core-install)
+if (EXISTS ${WALLY_ROOT})
+    message(STATUS "Using libwally-core from ${WALLY_ROOT}")
+    target_include_directories(${PROJECT_NAME} PRIVATE ${WALLY_ROOT}/include)
+    target_link_directories(${PROJECT_NAME} PRIVATE ${WALLY_ROOT}/lib)
+    target_link_libraries(${PROJECT_NAME} PRIVATE wallycore)
+else()
+    message(WARNING "libwally-core not found at ${WALLY_ROOT}")
+endif()

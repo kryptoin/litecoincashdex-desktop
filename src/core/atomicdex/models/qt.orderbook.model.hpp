@@ -25,6 +25,7 @@
 
 //! Deps
 #include <antara/gaming/ecs/system.manager.hpp>
+#include <fmt/core.h>
 
 //! Project
 #include "atomicdex/api/kdf/rpc_v2/rpc2.orderbook.hpp"
@@ -116,3 +117,20 @@ namespace atomic_dex
     };
 
 } // namespace atomic_dex
+
+template <>
+struct fmt::formatter<atomic_dex::orderbook_model::kind> : fmt::formatter<std::string>
+{
+    auto format(atomic_dex::orderbook_model::kind k, fmt::format_context& ctx) const
+    {
+        std::string name;
+        switch (k)
+        {
+            case atomic_dex::orderbook_model::kind::asks: name = "asks"; break;
+            case atomic_dex::orderbook_model::kind::bids: name = "bids"; break;
+            case atomic_dex::orderbook_model::kind::best_orders: name = "best_orders"; break;
+            default: name = "unknown"; break;
+        }
+        return fmt::formatter<std::string>::format(name, ctx);
+    }
+};
