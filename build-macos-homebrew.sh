@@ -75,6 +75,8 @@ cmake -S "${ROOT_DIR}" -B "${BUILD_DIR}" \
   -DQt5_DIR="${QT_CMAKE_DIR}" \
   -Dfmt_DIR="${HOMEBREW_PREFIX}/lib/cmake/fmt" \
   -Dspdlog_DIR="${HOMEBREW_PREFIX}/lib/cmake/spdlog" \
+  -DAD_SKIP_FETCHCONTENT=OFF
+
 echo
 echo "Configured build directory: ${BUILD_DIR}"
 echo "Binary should be at: ${BUILD_DIR}/bin/litecoincashdex"

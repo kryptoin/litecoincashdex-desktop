@@ -2,8 +2,6 @@ import QtQuick 2.15
 import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15
 
-import QtWebEngine 1.8
-
 import QtGraphicalEffects 1.0
 import QtCharts 2.3
 import Qaterial 1.0 as Qaterial
@@ -132,11 +130,13 @@ Item {
                                      anchors.centerIn: parent
                                  }
 
-                                 WebEngineView {
+                                 Item {
                                      id: chart
                                      anchors.fill: parent
                                      anchors.margins: -1
                                      visible: !is_fetching && ticker_supported
+                                     readonly property real loadProgress: 100
+                                     function loadHtml(_html) { }
                                  }
                              }
                         }

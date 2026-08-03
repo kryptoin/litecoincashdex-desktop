@@ -1,7 +1,6 @@
 import QtQuick 2.15
 import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15
-import QtWebEngine 1.8
 
 import "../../Components"
 import "../../Constants"
@@ -216,13 +215,9 @@ Item
         {
             target: dashboard.webEngineView
 
-            function onLoadingChanged(webEngineLoadReq)
+            function onVisibleChanged()
             {
-                if (webEngineLoadReq.status === WebEngineView.LoadSucceededStatus)
-                {
-                    webEngineViewPlaceHolder.visible = true
-                }
-                else webEngineViewPlaceHolder.visible = false
+                webEngineViewPlaceHolder.visible = dashboard.webEngineView.visible
             }
         }
     }

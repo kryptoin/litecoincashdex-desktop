@@ -45,8 +45,9 @@ Item {
                     defaultHeight: 200
                     expandedVert: true
                     contentItem: Component {
-                        WebEngineView {
-                            url: "https://fr.tradingview.com/chart/?symbol=KMD/BTC&theme=dark"
+                        Item {
+                            anchors.fill: parent
+                            visible: true
                         }
                     }
                 }

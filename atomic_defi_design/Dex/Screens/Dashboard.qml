@@ -166,12 +166,12 @@ Item
             Addressbook.Main { }
         }
 
-        WebEngineView
+        Item
         {
             id: webEngineView
-            backgroundColor: "transparent"
-            profile.httpUserAgent: "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/120 Safari/537.36"
-            settings.localContentCanAccessRemoteUrls: true
+            readonly property real loadProgress: 100
+            function loadHtml(_html) { /* WebEngineView is unavailable in this runtime; chart HTML is intentionally not rendered. */ }
+            function stop() { }
         }
 
         DefaultLoader
