@@ -16,20 +16,16 @@ unset DYLD_INSERT_LIBRARIES
 
 if command -v brew >/dev/null 2>&1; then
   HOMEBREW_PREFIX="$(brew --prefix)"
-  QT_PREFIX="/opt/anaconda3"
+  QT_PREFIX="$(brew --prefix qt@5)"
   QT_QMAKE="${QT_PREFIX}/bin/qmake"
   QT_CMAKE_DIR="${QT_PREFIX}/lib/cmake/Qt5"
 
-  if [ -x "${QT_QMAKE}" ]; then
-    echo "Using Anaconda Qt from ${QT_PREFIX}"
-  else
-    echo "Anaconda Qt qmake not found; falling back to Homebrew Qt" >&2
-    QT_PREFIX="$(brew --prefix qt@5)"
-    QT_QMAKE="${QT_PREFIX}/bin/qmake"
-    QT_CMAKE_DIR="${QT_PREFIX}/lib/cmake/Qt5"
+  if [ ! -x "${QT_QMAKE}" ] || [ ! -d "${QT_CMAKE_DIR}" ]; then
+    echo "Homebrew Qt5 qmake not found at ${QT_PREFIX}; please install qt@5 with Homebrew" >&2
+    exit 1
   fi
 
-  export PATH="$(echo "$PATH" | tr ':' '\n' | grep -vE '(/opt/homebrew/opt/qt@5($|/)|/opt/homebrew/Cellar/qt@5($|/))' | tr '\n' ':')"
+  export PATH="$(echo "$PATH" | tr ':' '\n' | grep -vE "(^${HOME}/miniconda3/envs/magenta_env($|/)|^${HOME}/Qt($|/)|^${QT_PREFIX}($|/)|^${HOMEBREW_PREFIX}/Cellar/qt@5($|/))" | tr '\n' ':')"
   export PATH="${QT_PREFIX}/bin:${HOMEBREW_PREFIX}/bin:${PATH}"
 
   export Qt5_DIR="${QT_CMAKE_DIR}"
@@ -40,7 +36,7 @@ if command -v brew >/dev/null 2>&1; then
   export QT_QPA_PLATFORM_PLUGIN_PATH="${QT_PREFIX}/plugins/platforms"
   export QMAKE="${QT_QMAKE}"
 
-  export CMAKE_PREFIX_PATH="${HOMEBREW_PREFIX}:${HOMEBREW_PREFIX}/opt/boost@1.85:${HOMEBREW_PREFIX}/opt/boost@1.85/lib/cmake:${HOMEBREW_PREFIX}/Cellar/entt/3.16.0/lib/EnTT/cmake:${QT_PREFIX}:${ROOT_DIR}/wally-install/lib/pkgconfig"
+  export CMAKE_PREFIX_PATH="${HOMEBREW_PREFIX}:${QT_PREFIX}:${HOMEBREW_PREFIX}/opt/boost@1.85:${HOMEBREW_PREFIX}/opt/boost@1.85/lib/cmake:${HOMEBREW_PREFIX}/Cellar/entt/3.16.0/lib/EnTT/cmake:${ROOT_DIR}/wally-install/lib/pkgconfig"
   export PKG_CONFIG_PATH="${HOMEBREW_PREFIX}/lib/pkgconfig:${ROOT_DIR}/wally-install/lib/pkgconfig:${PKG_CONFIG_PATH:-}"
   export LDFLAGS="-L${HOMEBREW_PREFIX}/lib -L${ROOT_DIR}/wally-install/lib ${LDFLAGS:-}"
   export CPPFLAGS="-I${HOMEBREW_PREFIX}/include -I${HOMEBREW_PREFIX}/Cellar/entt/3.16.0/include -I${ROOT_DIR}/wally-install/include ${CPPFLAGS:-}"

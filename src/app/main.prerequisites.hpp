@@ -382,7 +382,7 @@ run_app(int argc, char** argv)
     qputenv("QML_USE_GLYPHCACHE_WORKAROUND", "1");
     if (std::getenv("QT_PLUGIN_PATH") == nullptr)
     {
-        qputenv("QT_PLUGIN_PATH", "/opt/homebrew/opt/qt@5/lib/QtCore.framework/Versions/5/QtCore");
+        qputenv("QT_PLUGIN_PATH", "/opt/homebrew/opt/qt@5/plugins");
     }
     if (std::getenv("QT_QPA_PLATFORM_PLUGIN_PATH") == nullptr)
     {

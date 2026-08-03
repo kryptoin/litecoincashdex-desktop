@@ -77,10 +77,12 @@ FetchContent_Declare(
 )
 
 FetchContent_Declare(jl777-coins
+        GIT_REPOSITORY https://github.com/jl777/coins
+        GIT_TAG master
         SOURCE_DIR ${CMAKE_SOURCE_DIR}/local/shoreline-coins)
 
 if (NOT AD_SKIP_FETCHCONTENT)
-    FetchContent_MakeAvailable(qmaterial)
+    FetchContent_MakeAvailable(qmaterial jl777-coins)
     message(STATUS "KDF v3.0 is library-only; skipping FetchContent_MakeAvailable for kdf")
 else()
     message(STATUS "AD_SKIP_FETCHCONTENT=ON: skipping FetchContent_MakeAvailable for kdf, jl777-coins, qmaterial")
