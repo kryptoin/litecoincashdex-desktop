@@ -32,6 +32,7 @@
 #include <QtGlobal>
 #include <QtQml>
 #include <QFontDatabase>
+#include <QLibraryInfo>
 #if QT5WEBENGINE_FOUND
 #include <QtWebEngine>
 #endif
@@ -382,11 +383,20 @@ run_app(int argc, char** argv)
     qputenv("QML_USE_GLYPHCACHE_WORKAROUND", "1");
     if (std::getenv("QT_PLUGIN_PATH") == nullptr)
     {
-        qputenv("QT_PLUGIN_PATH", "/opt/homebrew/opt/qt@5/plugins");
+        const QByteArray plugins_path = QLibraryInfo::location(QLibraryInfo::PluginsPath).toUtf8();
+        if (!plugins_path.isEmpty())
+        {
+            qputenv("QT_PLUGIN_PATH", plugins_path.constData());
+        }
     }
     if (std::getenv("QT_QPA_PLATFORM_PLUGIN_PATH") == nullptr)
     {
-        qputenv("QT_QPA_PLATFORM_PLUGIN_PATH", "/opt/homebrew/opt/qt@5/plugins/platforms");
+        const QByteArray platform_path =
+            (QLibraryInfo::location(QLibraryInfo::PluginsPath) + QStringLiteral("/platforms")).toUtf8();
+        if (!platform_path.isEmpty())
+        {
+            qputenv("QT_QPA_PLATFORM_PLUGIN_PATH", platform_path.constData());
+        }
     }
     if (std::getenv("QT_QPA_PLATFORM") == nullptr)
     {
