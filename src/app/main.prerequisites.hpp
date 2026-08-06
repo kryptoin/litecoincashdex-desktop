@@ -402,6 +402,10 @@ run_app(int argc, char** argv)
     {
         qputenv("QT_QPA_PLATFORM", "cocoa");
     }
+    if (std::getenv("SSL_CERT_FILE") == nullptr)
+    {
+        qputenv("SSL_CERT_FILE", "/opt/anaconda3/ssl/cert.pem");
+    }
 
     std::filesystem::path old_path    = std::filesystem::path(std::getenv("HOME")) / ".atomic_qt";
     std::filesystem::path target_path = atomic_dex::utils::get_atomic_dex_data_folder();

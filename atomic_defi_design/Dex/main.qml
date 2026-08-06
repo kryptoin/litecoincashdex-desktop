@@ -143,7 +143,7 @@ DexWindow
         DexLabel
         {
             text: atomic_app_name
-            font.family: 'Montserrat'
+            font.family: 'Ubuntu'
             font.weight: Font.Medium
             opacity: .5
             leftPadding: 5
@@ -211,7 +211,7 @@ DexWindow
                     {
                         id: _label
                         text: API.app.wallet_mgr.wallet_default_name ?? ""
-                        font.family: 'Montserrat'
+                        font.family: 'Ubuntu'
                         font.weight: Font.Medium
                         visible: window.logged
                         color: Dex.CurrentTheme.foregroundColor
@@ -262,7 +262,7 @@ DexWindow
                 {
                     leftPadding: 2
                     text: qsTr("Balance")
-                    font.family: 'Montserrat'
+                    font.family: 'Ubuntu'
                     font.weight: Font.Medium
                     visible: _label.visible
                     anchors.verticalCenter: parent.verticalCenter

@@ -8,24 +8,57 @@ Litecoin Cash DEX Wallet is a secure non-custodial desktop wallet and decentrali
 
 Store your assets, manage balances, and trade directly from your own wallet without giving up control of your funds.
 
-## Build and test
+## Building on macOS (Apple Silicon)
 
-This branch contains the Litecoin Cash DEX desktop branding and wallet improvements.
+> Status — 2026-08-05: The app compiles and the Qt/QML UI loads cleanly on arm64.
+> The KDF daemon now ships as a Universal2 binary (arm64 + x86_64). A diagnostics run
+> is pending to confirm end-to-end wallet operation.
 
-Linux builds can be produced from source with the project build scripts. Generated Linux artifacts are placed under `bundled/linux`. Windows builds should be generated separately and distributed with their own filenames.
+The recommended build path on Apple Silicon uses the Anaconda3 Qt build and Homebrew
+for native libraries.
 
-This is community test software. Always keep your wallet seed backed up and test carefully before using larger amounts.
+### Prerequisites
 
-## Recent Litecoin Cash DEX updates
+- Anaconda3 at `/opt/anaconda3` with Qt 5.15 installed:
+  ```bash
+  conda install -p /opt/anaconda3 qt=5.15.9 cmake ninja
+  ```
+- Homebrew packages (installed automatically by the script):
+  `boost`, `fmt`, `spdlog`, `cpprestsdk`, `libsodium`, `secp256k1`, `openssl`,
+  `howard-hinnant-date`, `entt`, `taskflow`
 
-- Litecoin Cash branding and green UI theme
-- Improved dark and light themes
-- ZEC NU6.2 compatibility update
-- ZEC transaction broadcast compatibility fix
-- Improved Simple Swap loading behavior
-- Improved MAX button behavior
-- Improved asset activation and price refresh
-- Search fields and wallet UI readability improvements
+### Build
+
+```bash
+./build-macos-anaconda.sh
+```
+
+The script wipes and recreates `build-macos-anaconda3/`, configures with CMake + Ninja,
+and places the finished app bundle at:
+
+```
+build-macos-anaconda3/bin/litecoincashdex.app
+```
+
+> Note: After every build the KDF daemon must be copied into the bundle manually
+> because the build script wipes the output directory:
+> ```bash
+> cp assets/tools/kdf/mm2_cheetah \
+>    build-macos-anaconda3/bin/litecoincashdex.app/Contents/Resources/assets/tools/kdf/mm2_cheetah
+> chmod +x build-macos-anaconda3/bin/litecoincashdex.app/Contents/Resources/assets/tools/kdf/mm2_cheetah
+> ```
+
+### Known issues
+
+| # | Description | Blocking? |
+|---|---|---|
+| 1 | SSL price-feed errors at startup (cpprestsdk Boost.ASIO SSL context) | No |
+| 2 | `coins.json` missing `protocol` field — coin UI metadata incomplete | No |
+
+See [`docs/agent-handoff.md`](docs/agent-handoff.md) and [`docs/qt.md`](docs/qt.md)
+for full diagnostics and source locations.
+
+---
 
 ## Contributors / Thanks
 

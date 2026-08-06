@@ -225,7 +225,7 @@ Item
                     height: parent.height
                     bar_width_pct: 0
                     label.text: "Zcash params downloading:"
-                    label.font.family: 'Montserrat'
+                    label.font.family: 'Ubuntu'
                     label.font.pixelSize: 11
                     label_width: 180
                     pct_value.text: "0.00 %"

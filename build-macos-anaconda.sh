@@ -88,6 +88,7 @@ export CMAKE_FIND_PACKAGE_PREFER_CONFIG=ON
 
 # Make sure a stray conda env activation doesn't fight with the base anaconda3 paths above
 unset CONDA_PREFIX CONDA_DEFAULT_ENV CONDA_SHLVL
+export SSL_CERT_FILE="${ANACONDA_PREFIX}/ssl/cert.pem"
 
 for pkg in boost fmt nlohmann-json spdlog range-v3 cpprestsdk doctest entt libsodium openssl howard-hinnant-date secp256k1 taskflow pkg-config; do
   if brew info "$pkg" >/dev/null 2>&1; then

@@ -22,15 +22,11 @@ extern "C" {
 #endif
 #endif
 
-#define WALLY_OK 0
-
-#define WALLY_ERROR -1
-
-#define WALLY_EINVAL -2
-
-#define WALLY_ENOMEM -3
-
 #define FINGERPRINT_LEN 4
+#define WALLY_EINVAL -2
+#define WALLY_ENOMEM -3
+#define WALLY_ERROR -1
+#define WALLY_OK 0
 
 WALLY_CORE_API int wally_init(uint32_t flags);
 

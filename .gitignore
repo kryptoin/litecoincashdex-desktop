@@ -69,4 +69,10 @@ __pycache__/
 # ---------------------------------------------------------
 # Documentation
 # ---------------------------------------------------------
-/docs
+
+# Ignore all markdown files inside /docs
+/docs/**/*.md
+/docs/*.md
+
+# But allow the images folder
+!/docs/images/

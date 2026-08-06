@@ -14,16 +14,11 @@ WALLY_CORE_API int wally_scrypt(const unsigned char *pass, size_t pass_len,
                                 size_t len);
 
 #define AES_BLOCK_LEN 16
-
-#define AES_KEY_LEN_128 16
-
-#define AES_KEY_LEN_192 24
-
-#define AES_KEY_LEN_256 32
-
-#define AES_FLAG_ENCRYPT 1
-
 #define AES_FLAG_DECRYPT 2
+#define AES_FLAG_ENCRYPT 1
+#define AES_KEY_LEN_128 16
+#define AES_KEY_LEN_192 24
+#define AES_KEY_LEN_256 32
 
 WALLY_CORE_API int wally_aes(const unsigned char *key, size_t key_len,
                              const unsigned char *bytes, size_t bytes_len,

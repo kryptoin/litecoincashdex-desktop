@@ -9,15 +9,11 @@ extern "C" {
 
 #ifdef BUILD_ELEMENTS
 
-#define ASSET_TAG_LEN 32
-
-#define BLINDING_FACTOR_LEN 32
-
-#define ASSET_GENERATOR_LEN 33
-
 #define ASSET_COMMITMENT_LEN 33
-
+#define ASSET_GENERATOR_LEN 33
 #define ASSET_RANGEPROOF_MAX_LEN 5134
+#define ASSET_TAG_LEN 32
+#define BLINDING_FACTOR_LEN 32
 
 WALLY_CORE_API int
 wally_asset_generator_from_bytes(const unsigned char *asset, size_t asset_len,
