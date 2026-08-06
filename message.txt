@@ -1,7 +1,0 @@
-Fix and restore the litecoincashdex test suite
-
-- Fix the test source glob so litecoincashdex_tests is actually built
-- Link wallycore into the tests target
-- Update trade_preimage test requests to the mmrpc 2.0 wire format
-- Skip the checksum and coins.cfg tests (dead placeholder endpoints)
-- Add a dedicated run-tests.sh test runner script

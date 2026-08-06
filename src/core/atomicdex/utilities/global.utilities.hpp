@@ -82,6 +82,13 @@ namespace atomic_dex::utils
 
     std::filesystem::path get_atomic_dex_config_folder();
 
+    /// \brief Ensures a per-wallet coins config exists at the given path.
+    ///        Copies the bundled default coins config (<version>-coins.json) when
+    ///        available; otherwise writes a minimal schema-valid fallback containing
+    ///        only the default coins so wallet creation never crashes on a missing asset.
+    /// \return true if the target file exists (or was successfully created).
+    bool ensure_wallet_coins_config(const std::filesystem::path& wallet_cfg_path);
+
     nlohmann::json read_json_file(std::filesystem::path filepath);
 
     //std::string minimal_trade_amount_str();

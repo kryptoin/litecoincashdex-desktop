@@ -164,7 +164,7 @@ namespace atomic_dex
         x.consensus_branch_id    = atomic_dex::get_optional<std::string>(j, "consensus_branch_id");
         x.dust                   = atomic_dex::get_optional<int64_t>(j, "dust");
         x.avg_blocktime          = atomic_dex::get_optional<double>(j, "avg_blocktime");
-        x.protocol               = j.at("protocol");
+        x.protocol               = atomic_dex::get_untyped(j, "protocol");
     }
 
     inline void
@@ -226,7 +226,14 @@ namespace atomic_dex
             //! Copy our json to current version
             LOG_PATH_CMP("Copying kdf coins cfg: {} to {}", original_kdf_coins_path, file_path);
 
-            std::filesystem::copy_file(original_kdf_coins_path, file_path, std::filesystem::copy_options::overwrite_existing);
+            try
+            {
+                std::filesystem::copy_file(original_kdf_coins_path, file_path, std::filesystem::copy_options::overwrite_existing);
+            }
+            catch (const std::exception& error)
+            {
+                SPDLOG_ERROR("Cannot copy kdf coins cfg {}: {}", original_kdf_coins_path.string(), error.what());
+            }
         }
 
         QFile file;

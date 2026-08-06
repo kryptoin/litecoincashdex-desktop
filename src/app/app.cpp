@@ -255,10 +255,8 @@ namespace atomic_dex
             // remove old coins file
             functor_remove(std::move(wallet_cfg_path));
 
-            //! Copy default coins file
-            const auto  cfg_path = ag::core::assets_real_path() / "config";
-            std::string filename = std::string(atomic_dex::get_raw_version()) + "-coins.json";
-            fs::copy(cfg_path / filename, wallet_cfg_path);
+            //! Copy default coins file (with fallback if the bundled asset is missing)
+            atomic_dex::utils::ensure_wallet_coins_config(wallet_cfg_path);
             QFile          default_coins_file;
 
             //! Open coins file

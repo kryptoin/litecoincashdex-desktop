@@ -100,7 +100,27 @@ if (UNIX)
     if (EXISTS ${jl777-coins_SOURCE_DIR}/utils/coins_config_tcp.json)
         configure_file(${jl777-coins_SOURCE_DIR}/utils/coins_config_tcp.json ${CMAKE_CURRENT_SOURCE_DIR}/assets/config/${PROJECT_VERSION}-coins.json COPYONLY)
     else()
-        message(STATUS "AD_SKIP_FETCHCONTENT=ON: shoreline-coins utils/coins_config_tcp.json not found; skipping coins_config generation")
+        message(STATUS "AD_SKIP_FETCHCONTENT=ON: shoreline-coins utils/coins_config_tcp.json not found; generating minimal default coins_config")
+        #! Generate a minimal, schema-valid coins config (dict format consumed by
+        #! coin_config_t) so wallet creation does not crash on a missing asset.
+        file(WRITE "${CMAKE_CURRENT_SOURCE_DIR}/assets/config/${PROJECT_VERSION}-coins.json"
+"{
+  \"${DEX_PRIMARY_COIN}\": {
+    \"coin\": \"${DEX_PRIMARY_COIN}\",
+    \"name\": \"${DEX_PRIMARY_COIN}\",
+    \"type\": \"UTXO\",
+    \"active\": true,
+    \"explorer_url\": \"\"
+  },
+  \"${DEX_SECOND_PRIMARY_COIN}\": {
+    \"coin\": \"${DEX_SECOND_PRIMARY_COIN}\",
+    \"name\": \"${DEX_SECOND_PRIMARY_COIN}\",
+    \"type\": \"UTXO\",
+    \"active\": true,
+    \"explorer_url\": \"\"
+  }
+}
+")
     endif()
     if (EXISTS ${jl777-coins_SOURCE_DIR}/coins)
         configure_file(${jl777-coins_SOURCE_DIR}/coins ${CMAKE_CURRENT_SOURCE_DIR}/assets/tools/kdf/coins COPYONLY)

@@ -80,9 +80,7 @@ namespace atomic_dex
 
             if (not std::filesystem::exists(wallet_cfg_path))
             {
-                const auto  cfg_path = ag::core::assets_real_path() / "config";
-                std::string filename = std::string(atomic_dex::get_raw_version()) + "-coins.json";
-                std::filesystem::copy(cfg_path / filename, wallet_cfg_path);
+                atomic_dex::utils::ensure_wallet_coins_config(wallet_cfg_path);
             }
 
             // Encrypt seed
@@ -320,9 +318,7 @@ namespace atomic_dex
 
             if (!valid_json)
             {
-                const auto  cfg_path = ag::core::assets_real_path() / "config";
-                std::string filename = std::string(atomic_dex::get_raw_version()) + "-coins.json";
-                std::filesystem::copy(cfg_path / filename, wallet_cfg_path, std::filesystem::copy_options::overwrite_existing);
+                atomic_dex::utils::ensure_wallet_coins_config(wallet_cfg_path);
             }
 
             const std::filesystem::path seed_path = utils::get_atomic_dex_config_folder() / (wallet_name.toStdString() + ".seed"s);

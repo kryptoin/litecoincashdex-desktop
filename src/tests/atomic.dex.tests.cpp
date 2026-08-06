@@ -43,7 +43,14 @@ main(int argc, char** argv)
 
     if (args.filter("-tc").empty())
     {
-        g_context = std::make_unique<tests_context>(argv);
+        try
+        {
+            g_context = std::make_unique<tests_context>(argv);
+        }
+        catch (const std::exception& error)
+        {
+            SPDLOG_ERROR("Exception caught while initializing test context: {}", error.what());
+        }
     }
 
     int res = context.run();

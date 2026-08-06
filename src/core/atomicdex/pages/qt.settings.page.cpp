@@ -47,9 +47,16 @@ namespace
         if (not icon_filepath.isEmpty())
         {
             const std::filesystem::path& suffix = std::filesystem::path(icon_filepath.toStdString()).extension();
-            std::filesystem::copy_file(
-                icon_filepath.toStdString(), std::filesystem::path(icons_path_directory.toStdString()) / (boost::algorithm::to_lower_copy(ticker) + suffix.string()),
-                std::filesystem::copy_options::overwrite_existing);
+            try
+            {
+                std::filesystem::copy_file(
+                    icon_filepath.toStdString(), std::filesystem::path(icons_path_directory.toStdString()) / (boost::algorithm::to_lower_copy(ticker) + suffix.string()),
+                    std::filesystem::copy_options::overwrite_existing);
+            }
+            catch (const std::exception& error)
+            {
+                SPDLOG_ERROR("Cannot copy icon {} for {}: {}", icon_filepath.toStdString(), ticker, error.what());
+            }
         }
     }
 } // anonymous namespace

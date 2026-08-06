@@ -16,6 +16,9 @@
 //! Project Headers
 #include "atomicdex/utilities/global.utilities.hpp"
 #include "atomicdex/version/version.hpp"
+#include "atomicdex/utilities/qt.utilities.hpp"
+
+#include <antara/gaming/core/real.path.hpp>
 
 namespace
 {
@@ -184,6 +187,61 @@ namespace atomic_dex::utils
         const auto fs_cfg_path = get_atomic_dex_data_folder() / "config";
         create_if_doesnt_exist(fs_cfg_path);
         return fs_cfg_path;
+    }
+
+    bool
+    ensure_wallet_coins_config(const std::filesystem::path& wallet_cfg_path)
+    {
+        if (std::filesystem::exists(wallet_cfg_path))
+        {
+            return true;
+        }
+
+        const std::filesystem::path cfg_path = ag::core::assets_real_path() / "config";
+        const std::string           filename = std::string(atomic_dex::get_raw_version()) + "-coins.json";
+        const std::filesystem::path source   = cfg_path / filename;
+
+        try
+        {
+            if (std::filesystem::exists(source))
+            {
+                std::filesystem::copy(source, wallet_cfg_path);
+                SPDLOG_INFO("Successfully copied default coins config: {} -> {}", source.string(), wallet_cfg_path.string());
+                return true;
+            }
+
+            SPDLOG_WARN("Default coins config {} not found, writing minimal fallback to {}", source.string(), wallet_cfg_path.string());
+
+            //! Minimal schema-valid dict consumed by coin_config_t. Contains only the
+            //! default coins; a full list is normally generated from the jl777-coins
+            //! utils/coins_config_tcp.json asset.
+            const nlohmann::json fallback = nlohmann::json::object(
+                {{atomic_dex::g_primary_dex_coin,
+                  {{"coin", atomic_dex::g_primary_dex_coin}, {"name", atomic_dex::g_primary_dex_coin}, {"type", "UTXO"}, {"active", true}, {"explorer_url", ""}}},
+                 {atomic_dex::g_second_primary_dex_coin,
+                  {{"coin", atomic_dex::g_second_primary_dex_coin},
+                   {"name", atomic_dex::g_second_primary_dex_coin},
+                   {"type", "UTXO"},
+                   {"active", true},
+                   {"explorer_url", ""}}}});
+
+            QFile file;
+            file.setFileName(std_path_to_qstring(wallet_cfg_path));
+            if (file.open(QIODevice::WriteOnly | QIODevice::Text))
+            {
+                file.write(QString::fromStdString(fallback.dump(4)).toUtf8());
+                file.close();
+                SPDLOG_INFO("Successfully wrote fallback coins config: {}", wallet_cfg_path.string());
+                return true;
+            }
+            SPDLOG_ERROR("Cannot write fallback coins config to {}", wallet_cfg_path.string());
+            return false;
+        }
+        catch (const std::exception& error)
+        {
+            SPDLOG_ERROR("Cannot prepare coins config {}: {}", wallet_cfg_path.string(), error.what());
+            return false;
+        }
     }
 
     std::filesystem::path

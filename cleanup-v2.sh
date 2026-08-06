@@ -52,20 +52,24 @@ done < <(find . -path ./.git -prune -o -type f -name "*.log" -print0)
 #      build-macos-lwc-r1.5.6      — dependency source build
 #      libwally-core-build         — wally autotools build tree
 #      libwally-core-install       — wally installed headers + libs
+#      local/shoreline-coins       — jl777-coins FetchContent source (CMakeLists.txt
+#                                    uses it as SOURCE_DIR; deleting it breaks the
+#                                    build and the coins-config generation)
 # -----------------------------------------------------------------------
 for d in build-macos-anaconda3-test \
           build-macos-homebrew-test \
           build-macos-analysis \
-          local \
           wally-install; do
   [ -d "$d" ] && do_rm "$d"
 done
 
 # -----------------------------------------------------------------------
 # 4. CMake/Ninja metadata — scoped to INSIDE the disposable build dirs
-#    (not a repo-wide sweep, which would hit libwally-core-build etc.)
+#    (not a repo-wide sweep, which would hit libwally-core-build etc.).
+#    Active build dirs (build-macos-anaconda3 / build-macos-homebrew) are
+#    preserved as-is so an existing build stays usable.
 # -----------------------------------------------------------------------
-for build_dir in build-macos-anaconda3 build-macos-homebrew; do
+for build_dir in build-macos-anaconda3-test build-macos-homebrew-test build-macos-analysis; do
   [ -d "$build_dir" ] || continue
   while IFS= read -r -d '' f; do
     do_rm "$f"
@@ -83,11 +87,12 @@ for build_dir in build-macos-anaconda3 build-macos-homebrew; do
 done
 
 # -----------------------------------------------------------------------
-# 5. Compiled objects — scoped to INSIDE build dirs only
-#    Skipping the repo root and vendor/libwally trees prevents deleting
-#    libwally-core-install/lib/*.dylib and vendored static libs.
+# 5. Compiled objects — scoped to INSIDE the disposable build dirs only
+#    Active build dirs are preserved. Skipping the repo root and
+#    vendor/libwally trees prevents deleting libwally-core-install/lib/*.dylib
+#    and vendored static libs.
 # -----------------------------------------------------------------------
-for build_dir in build-macos-anaconda3 build-macos-homebrew; do
+for build_dir in build-macos-anaconda3-test build-macos-homebrew-test build-macos-analysis; do
   [ -d "$build_dir" ] || continue
   while IFS= read -r -d '' f; do
     do_rm "$f"
