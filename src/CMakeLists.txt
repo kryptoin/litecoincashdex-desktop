@@ -114,7 +114,7 @@ if (APPLE)
 endif ()
 
 # Testing executable - include all existing .cpp test sources under tests/
-file(GLOB_RECURSE TEST_SOURCES RELATIVE ${CMAKE_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/tests/*.cpp)
+file(GLOB_RECURSE TEST_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/tests/*.cpp)
 if (TEST_SOURCES)
     add_executable(${PROJECT_NAME}_tests MACOSX_BUNDLE ${ICON} ${TEST_SOURCES})
     target_link_libraries(${PROJECT_NAME}_tests

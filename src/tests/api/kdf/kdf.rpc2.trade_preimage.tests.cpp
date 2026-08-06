@@ -23,10 +23,12 @@ namespace
 {
     const nlohmann::json g_preimage_request_buy_kmd_btc = R"(
                                     {
-                                        "base": "KMD",
-                                        "rel": "BTC",
-                                        "swap_method": "buy",
-                                        "volume": "10"
+                                        "params": {
+                                            "base": "KMD",
+                                            "rel": "BTC",
+                                            "swap_method": "buy",
+                                            "volume": "10"
+                                        }
                                     }
                                     )"_json;
     const nlohmann::json g_coin_fee_answer              = R"(
@@ -215,22 +217,30 @@ namespace
                                     })"_json;
     const nlohmann::json g_preimage_request_buy_DOC_MARTY_real       = R"(
                                     {
-                                      "base": "DOC",
                                       "method": "trade_preimage",
-                                      "rel": "MARTY",
-                                      "swap_method": "buy",
                                       "userpass": "",
-                                      "volume": "1",
-                                      "price": "1"
+                                      "mmrpc": "2.0",
+                                      "id": 42,
+                                      "params": {
+                                        "base": "DOC",
+                                        "rel": "MARTY",
+                                        "swap_method": "buy",
+                                        "volume": "1",
+                                        "price": "1"
+                                      }
                                     })"_json;
     const nlohmann::json g_preimage_request_buy_DOC_nonexistent_real = R"(
                                     {
-                                      "base": "DOC",
                                       "method": "trade_preimage",
-                                      "rel": "NONEXISTENT",
-                                      "swap_method": "buy",
                                       "userpass": "",
-                                      "volume": "1"
+                                      "mmrpc": "2.0",
+                                      "id": 42,
+                                      "params": {
+                                        "base": "DOC",
+                                        "rel": "NONEXISTENT",
+                                        "swap_method": "buy",
+                                        "volume": "1"
+                                      }
                                     })"_json;
 } // namespace
 
