@@ -52,9 +52,8 @@ done < <(find . -path ./.git -prune -o -type f -name "*.log" -print0)
 #      build-macos-lwc-r1.5.6      — dependency source build
 #      libwally-core-build         — wally autotools build tree
 #      libwally-core-install       — wally installed headers + libs
-#      local/shoreline-coins       — jl777-coins FetchContent source (CMakeLists.txt
-#                                    uses it as SOURCE_DIR; deleting it breaks the
-#                                    build and the coins-config generation)
+#      vendor/coins                — git submodule (GLEECBTC/coins); not a build
+#                                    artifact, never touched by this script
 # -----------------------------------------------------------------------
 for d in build-macos-anaconda3-test \
           build-macos-homebrew-test \

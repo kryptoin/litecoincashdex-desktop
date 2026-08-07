@@ -4640,7 +4640,7 @@ This might take a few minutes...</source>
 <context>
     <name>atomic_dex::settings_page</name>
     <message>
-        <location filename="../../../src/core/atomicdex/pages/qt.settings.page.cpp" line="819"/>
+        <location filename="../../../src/core/atomicdex/pages/qt.settings.page.cpp" line="826"/>
         <source>An error has occurred.</source>
         <translation type="unfinished"></translation>
     </message>

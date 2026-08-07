@@ -76,57 +76,34 @@ FetchContent_Declare(
         GIT_TAG 53669824261ae07bc0e8c2abb4b55431f65b2055
 )
 
-FetchContent_Declare(jl777-coins
-        GIT_REPOSITORY https://github.com/jl777/coins
-        GIT_TAG master
-        SOURCE_DIR ${CMAKE_SOURCE_DIR}/local/shoreline-coins)
+# Coin metadata comes from the vendor/coins git submodule (GLEECBTC/coins, a fork
+# of jl777/coins that is actively maintained and ships utils/coins_config_tcp.json).
+# This is checked out via `git submodule update --init --recursive`, not FetchContent.
+set(jl777-coins_SOURCE_DIR ${CMAKE_SOURCE_DIR}/vendor/coins)
+if (NOT EXISTS ${jl777-coins_SOURCE_DIR}/utils/coins_config_tcp.json)
+    message(FATAL_ERROR "vendor/coins submodule is missing or not initialized. Run: git submodule update --init --recursive")
+endif()
+if (NOT TARGET jl777-coins)
+    add_library(jl777-coins INTERFACE)
+endif()
 
 if (NOT AD_SKIP_FETCHCONTENT)
-    FetchContent_MakeAvailable(qmaterial jl777-coins)
+    FetchContent_MakeAvailable(qmaterial)
     message(STATUS "KDF v3.0 is library-only; skipping FetchContent_MakeAvailable for kdf")
 else()
-    message(STATUS "AD_SKIP_FETCHCONTENT=ON: skipping FetchContent_MakeAvailable for kdf, jl777-coins, qmaterial")
+    message(STATUS "AD_SKIP_FETCHCONTENT=ON: skipping FetchContent_MakeAvailable for kdf, qmaterial")
     if (NOT TARGET qmaterial)
         add_library(qmaterial INTERFACE)
-    endif()
-    if (NOT TARGET jl777-coins)
-        add_library(jl777-coins INTERFACE)
     endif()
     # kdf is intentionally skipped; expect mm2 to be provided in assets/tools/kdf
 endif()
 
 ##! Configure our needs.
 if (UNIX)
-    if (EXISTS ${jl777-coins_SOURCE_DIR}/utils/coins_config_tcp.json)
-        configure_file(${jl777-coins_SOURCE_DIR}/utils/coins_config_tcp.json ${CMAKE_CURRENT_SOURCE_DIR}/assets/config/${PROJECT_VERSION}-coins.json COPYONLY)
-    else()
-        message(STATUS "AD_SKIP_FETCHCONTENT=ON: shoreline-coins utils/coins_config_tcp.json not found; generating minimal default coins_config")
-        #! Generate a minimal, schema-valid coins config (dict format consumed by
-        #! coin_config_t) so wallet creation does not crash on a missing asset.
-        file(WRITE "${CMAKE_CURRENT_SOURCE_DIR}/assets/config/${PROJECT_VERSION}-coins.json"
-"{
-  \"${DEX_PRIMARY_COIN}\": {
-    \"coin\": \"${DEX_PRIMARY_COIN}\",
-    \"name\": \"${DEX_PRIMARY_COIN}\",
-    \"type\": \"UTXO\",
-    \"active\": true,
-    \"explorer_url\": \"\"
-  },
-  \"${DEX_SECOND_PRIMARY_COIN}\": {
-    \"coin\": \"${DEX_SECOND_PRIMARY_COIN}\",
-    \"name\": \"${DEX_SECOND_PRIMARY_COIN}\",
-    \"type\": \"UTXO\",
-    \"active\": true,
-    \"explorer_url\": \"\"
-  }
-}
-")
-    endif()
-    if (EXISTS ${jl777-coins_SOURCE_DIR}/coins)
-        configure_file(${jl777-coins_SOURCE_DIR}/coins ${CMAKE_CURRENT_SOURCE_DIR}/assets/tools/kdf/coins COPYONLY)
-    else()
-        message(STATUS "AD_SKIP_FETCHCONTENT=ON: shoreline-coins coins file not found; skipping coins copy")
-    endif()
+    # vendor/coins is a required submodule (see FATAL_ERROR check above); no placeholder
+    # fallback here by design (plan.md Phase 6: build fails on invalid/missing metadata).
+    configure_file(${jl777-coins_SOURCE_DIR}/utils/coins_config_tcp.json ${CMAKE_CURRENT_SOURCE_DIR}/assets/config/${PROJECT_VERSION}-coins.json COPYONLY)
+    configure_file(${jl777-coins_SOURCE_DIR}/coins ${CMAKE_CURRENT_SOURCE_DIR}/assets/tools/kdf/coins COPYONLY)
     if (NOT AD_SKIP_FETCHCONTENT)
         if (EXISTS ${kdf_SOURCE_DIR}/mm2)
             configure_file(${kdf_SOURCE_DIR}/mm2 ${CMAKE_CURRENT_SOURCE_DIR}/assets/tools/kdf/${DEX_API} COPYONLY)
@@ -146,7 +123,7 @@ if (UNIX)
     if (EXISTS ${jl777-coins_SOURCE_DIR}/icons)
         file(COPY ${jl777-coins_SOURCE_DIR}/icons/ DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/atomic_defi_design/assets/images/coins/)
     else()
-        message(STATUS "AD_SKIP_FETCHCONTENT=ON: shoreline-coins icons not found; skipping coin icons copy")
+        message(STATUS "vendor/coins: icons directory not found; skipping coin icons copy")
     endif()
 else ()
     configure_file(${jl777-coins_SOURCE_DIR}/utils/coins_config_tcp.json ${CMAKE_BINARY_DIR}/bin/assets/config/${PROJECT_VERSION}-coins.json COPYONLY)
