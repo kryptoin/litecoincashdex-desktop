@@ -37,13 +37,21 @@ namespace
     pplx::task<web::http::http_response>
     async_check_retrieve(t_http_client_ptr& client, const std::string& uri)
     {
-        web::http::http_request req;
-        req.set_method(web::http::methods::GET);
-        if (not uri.empty())
+        try
         {
-            req.set_request_uri(FROM_STD_STR(uri));
+            web::http::http_request req;
+            req.set_method(web::http::methods::GET);
+            if (not uri.empty())
+            {
+                req.set_request_uri(FROM_STD_STR(uri));
+            }
+            return client->request(req);
         }
-        return client->request(req);
+        catch (const std::exception& e)
+        {
+            SPDLOG_ERROR("Invalid URI in internet checker (uri='{}'): {}", uri, e.what());
+            return pplx::task_from_exception<web::http::http_response>(std::runtime_error(e.what()));
+        }
     }
 } // namespace
 

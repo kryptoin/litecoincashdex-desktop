@@ -709,13 +709,21 @@ namespace atomic_dex::kdf
     {
         SPDLOG_INFO("Processing rpc call: {}, url: {}, endpoint: {}", rpc_command, url, TO_STD_STR(client->base_uri().to_string()));
 
-        web::http::http_request req;
-        req.set_method(web::http::methods::GET);
-        if (not url.empty())
+        try
         {
-            req.set_request_uri(FROM_STD_STR(url));
+            web::http::http_request req;
+            req.set_method(web::http::methods::GET);
+            if (not url.empty())
+            {
+                req.set_request_uri(FROM_STD_STR(url));
+            }
+            return client->request(req);
         }
-        return client->request(req);
+        catch (const std::exception& e)
+        {
+            SPDLOG_ERROR("Invalid URI for rpc call '{}' (url='{}'): {}", rpc_command, url, e.what());
+            return pplx::task_from_exception<web::http::http_response>(std::runtime_error(e.what()));
+        }
     }
 
     template <typename RpcReturnType>

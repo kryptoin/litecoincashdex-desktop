@@ -44,7 +44,13 @@ namespace
         }()
     };
 
-    t_http_client_ptr g_defi_stats_client = std::make_unique<web::http::client::http_client>(FROM_STD_STR("https://defi-stats.komodo.earth/"), g_defi_stats_cfg);
+    t_http_client_ptr&
+    defi_stats_client()
+    {
+        // Build client lazily so SSL/TLS context is initialized after app prerequisites.
+        static t_http_client_ptr client = std::make_unique<web::http::client::http_client>(FROM_STD_STR("https://defi-stats.komodo.earth/"), g_defi_stats_cfg);
+        return client;
+    }
     pplx::cancellation_token_source d_token_source;
 
     pplx::task<web::http::http_response>
@@ -54,7 +60,7 @@ namespace
         req.set_method(web::http::methods::GET);
         req.set_request_uri(FROM_STD_STR("api/v3/pairs/volumes_24hr"));
         SPDLOG_INFO("defi_stats req: {}", TO_STD_STR(req.to_string()));
-        return g_defi_stats_client->request(req, d_token_source.get_token());
+        return defi_stats_client()->request(req, d_token_source.get_token());
     }
 
     nlohmann::json
