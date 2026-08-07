@@ -50,14 +50,6 @@ build-macos-anaconda3/bin/litecoincashdex.app
 
 ### Known issues
 
-| # | Description | Blocking? |
-|---|---|---|
-| 1 | SSL price-feed errors at startup (cpprestsdk Boost.ASIO SSL context) | No |
-| 2 | `coins.json` missing `protocol` field — coin UI metadata incomplete | No |
-
-See [`docs/agent-handoff.md`](docs/agent-handoff.md) and [`docs/qt.md`](docs/qt.md)
-for full diagnostics and source locations.
-
 ---
 
 ## Contributors / Thanks
