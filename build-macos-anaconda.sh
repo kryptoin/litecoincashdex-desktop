@@ -124,6 +124,7 @@ echo
 echo "Build complete. App bundle should be at: ${BUILD_DIR}/bin/litecoincashdex.app"
 
 # copy kdf each build
+sleep 2
 cp assets/tools/kdf/mm2_cheetah \
    build-macos-anaconda3/bin/litecoincashdex.app/Contents/Resources/assets/tools/kdf/mm2_cheetah
 chmod +x build-macos-anaconda3/bin/litecoincashdex.app/Contents/Resources/assets/tools/kdf/mm2_cheetah

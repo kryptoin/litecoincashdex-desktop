@@ -10,9 +10,9 @@ Store your assets, manage balances, and trade directly from your own wallet with
 
 ## Building on macOS (Apple Silicon)
 
-> Status — 2026-08-05: The app compiles and the Qt/QML UI loads cleanly on arm64.
+> Status — 2026-08-08: The app compiles and the Qt/QML UI loads cleanly on arm64.
 > The KDF daemon now ships as a Universal2 binary (arm64 + x86_64). A diagnostics run
-> is pending to confirm end-to-end wallet operation.
+> confirms end-to-end wallet operation.
 
 The recommended build path on Apple Silicon uses the Anaconda3 Qt build and Homebrew
 for native libraries.

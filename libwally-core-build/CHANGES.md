@@ -267,7 +267,7 @@ This release contains ABI changes; it is not ABI compatibile with prior versions
 - Python wheels are now available through pip for musl-based x86 platforms
   such as Apline Linux.
 
-## Version 0.9.0
+## Version 0.9.5
 - ABI: wally_descriptor_to_script_get_maximum_length has changed its arguments
   to match wally_descriptor_to_script.
 - ABI: The vars_in variable substitution map argument to wally_descriptor_parse
