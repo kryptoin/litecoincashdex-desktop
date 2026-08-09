@@ -317,6 +317,7 @@ InnerBackground {
         radius: parent.radius
         opacity: 0.7
         color: "black"
+        visible: false
         Column {
             anchors.centerIn: parent
             spacing: 20

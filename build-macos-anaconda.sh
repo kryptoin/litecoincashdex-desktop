@@ -13,7 +13,9 @@ mkdir -p "${BUILD_DIR}"
 unset DYLD_INSERT_LIBRARIES
 
 # --- Anaconda3 (Qt5 + cmake/ninja) ---
-# Note: Qt5 is installed in /opt/anaconda3 via `conda install qt=5.15.9`
+# Note: Qt5 is installed in /opt/anaconda3 via conda-forge.
+# All Qt5 packages MUST be the same version (e.g. 5.15.15) for Qt5WebEngine to resolve.
+# Install with: conda install -p /opt/anaconda3 -c conda-forge "qt-main=5.15.15" "qt-webengine=5.15.15"
 # See docs/python-version.md for details on the dual conda environment setup.
 ANACONDA_PREFIX="/opt/anaconda3"
 QT_PREFIX="${ANACONDA_PREFIX}"
@@ -128,3 +130,66 @@ sleep 2
 cp assets/tools/kdf/mm2_cheetah \
    build-macos-anaconda3/bin/litecoincashdex.app/Contents/Resources/assets/tools/kdf/mm2_cheetah
 chmod +x build-macos-anaconda3/bin/litecoincashdex.app/Contents/Resources/assets/tools/kdf/mm2_cheetah
+
+# Bundle QtWebEngineProcess helper and QML imports
+APP_BUNDLE="build-macos-anaconda3/bin/litecoincashdex.app"
+FRAMEWORK_DIR="${APP_BUNDLE}/Contents/Frameworks/QtWebEngineCore.framework"
+
+if [ -f "${ANACONDA_PREFIX}/libexec/QtWebEngineProcess" ]; then
+  echo "Bundling QtWebEngineProcess..."
+  mkdir -p "${FRAMEWORK_DIR}/Versions/A/Helpers/QtWebEngineProcess.app/Contents/MacOS"
+  mkdir -p "${FRAMEWORK_DIR}/Versions/A/Resources"
+
+  cp "${ANACONDA_PREFIX}/libexec/QtWebEngineProcess" \
+     "${FRAMEWORK_DIR}/Versions/A/Helpers/QtWebEngineProcess.app/Contents/MacOS/QtWebEngineProcess"
+  chmod +x "${FRAMEWORK_DIR}/Versions/A/Helpers/QtWebEngineProcess.app/Contents/MacOS/QtWebEngineProcess"
+
+  ln -sf "A" "${FRAMEWORK_DIR}/Versions/Current"
+  ln -sf "Versions/Current/Resources" "${FRAMEWORK_DIR}/Resources"
+  ln -sf "Versions/Current/Helpers" "${FRAMEWORK_DIR}/Helpers"
+
+  /opt/anaconda3/bin/install_name_tool -add_rpath "@executable_path/../../../../../../Frameworks" \
+     "${FRAMEWORK_DIR}/Versions/A/Helpers/QtWebEngineProcess.app/Contents/MacOS/QtWebEngineProcess" 2>/dev/null || true
+
+  cat > "${FRAMEWORK_DIR}/Versions/A/Resources/Info.plist" << 'PLISTEOF'
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleExecutable</key><string>QtWebEngineCore</string>
+    <key>CFBundleIdentifier</key><string>org.qt-project.QtWebEngineCore</string>
+    <key>CFBundlePackageType</key><string>FMWK</string>
+    <key>CFBundleShortVersionString</key><string>5.15.15</string>
+    <key>CFBundleVersion</key><string>5.15.15</string>
+    <key>MinimumOSVersion</key><string>11.0</string>
+</dict>
+</plist>
+PLISTEOF
+
+  cat > "${FRAMEWORK_DIR}/Versions/A/Helpers/QtWebEngineProcess.app/Contents/Info.plist" << 'PLISTEOF'
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleExecutable</key><string>QtWebEngineProcess</string>
+    <key>CFBundleIdentifier</key><string>org.qt-project.QtWebEngineProcess</string>
+    <key>CFBundlePackageType</key><string>APPL</string>
+    <key>CFBundleShortVersionString</key><string>5.15.15</string>
+    <key>CFBundleVersion</key><string>5.15.15</string>
+    <key>LSMinimumSystemVersion</key><string>11.0</string>
+</dict>
+</plist>
+PLISTEOF
+fi
+
+# Copy QtWebEngine QML imports so the QML engine can find them
+if [ -d "${ANACONDA_PREFIX}/qml/QtWebEngine" ]; then
+  echo "Bundling QtWebEngine QML imports..."
+  mkdir -p "${APP_BUNDLE}/Contents/Resources/qml"
+  cp -r "${ANACONDA_PREFIX}/qml/QtWebEngine" "${APP_BUNDLE}/Contents/Resources/qml/"
+  cp -r "${ANACONDA_PREFIX}/qml/QtWebChannel" "${APP_BUNDLE}/Contents/Resources/qml/" 2>/dev/null || true
+fi
+
+# Re-sign the app bundle (adhoc) to ensure it launches from Finder
+echo "Re-signing app bundle..."
+codesign --force --deep --sign - "${APP_BUNDLE}" 2>&1

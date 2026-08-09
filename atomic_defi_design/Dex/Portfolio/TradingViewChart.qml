@@ -1,6 +1,7 @@
 import QtQuick 2.15
 import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15
+import QtWebEngine 1.10
 
 import QtGraphicalEffects 1.0
 import QtCharts 2.3
@@ -130,14 +131,16 @@ Item {
                                      anchors.centerIn: parent
                                  }
 
-                                 Item {
-                                     id: chart
-                                     anchors.fill: parent
-                                     anchors.margins: -1
-                                     visible: !is_fetching && ticker_supported
-                                     readonly property real loadProgress: 100
-                                     function loadHtml(_html) { }
-                                 }
+                                  WebEngineView {
+                                      id: chart
+                                      anchors.fill: parent
+                                      anchors.margins: -1
+                                      visible: !is_fetching && ticker_supported
+                                      backgroundColor: "transparent"
+                                      profile.httpUserAgent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+                                      settings.localContentCanAccessRemoteUrls: true
+                                      settings.allowRunningInsecureContent: true
+                                  }
                              }
                         }
                     }

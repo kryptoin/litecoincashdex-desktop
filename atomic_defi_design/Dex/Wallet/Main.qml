@@ -3,6 +3,7 @@ import QtQuick 2.15
 import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15
 import QtCharts 2.3
+import QtWebEngine 1.10
 import QtGraphicalEffects 1.0
 
 import Qaterial 1.0 as Qaterial
@@ -851,11 +852,11 @@ Item
         // Price Graph
         InnerBackground
         {
-            visible: false
             id: price_graph_bg
 
             property bool ticker_supported: false
-            readonly property bool is_fetching: webEngineView.loadProgress < 100
+            readonly property bool is_fetching: chart_loader.loadProgress < 100
+            readonly property string chartTheme: Dex.CurrentTheme.getColorMode() === Dex.CurrentTheme.ColorMode.Dark ? "dark" : "light"
             property var ticker: api_wallet_page.ticker
 
             Layout.fillWidth: true
@@ -867,11 +868,16 @@ Item
 
             radius: 18
 
-            // Chart disabled
-            // onTickerChanged: loadChart()
+            onTickerChanged: loadChart()
+
+            Component.onCompleted: {
+                console.log("Chart: ticker =", ticker)
+                if (ticker && ticker !== "") loadChart()
+            }
 
             function loadChart()
             {
+                console.log("loadChart() called, ticker=", ticker, "ticker_supported=", ticker_supported)
                 const pair = atomic_qt_utilities.retrieve_main_ticker(ticker) + "/" + atomic_qt_utilities.retrieve_main_ticker(API.app.settings_pg.current_currency)
                 const pair_reversed = atomic_qt_utilities.retrieve_main_ticker(API.app.settings_pg.current_currency) + "/" + atomic_qt_utilities.retrieve_main_ticker(ticker)
                 const pair_usd = atomic_qt_utilities.retrieve_main_ticker(ticker) + "/" + "USD"
@@ -920,10 +926,13 @@ Item
 
                 ticker_supported = true
 
-                console.debug("Wallet: Loading chart for %1".arg(symbol))
+                console.log("Wallet: Loading chart for %1, chart_loader visible=%2, width=%3, height=%4".arg(symbol).arg(chart_loader.visible).arg(chart_loader.width).arg(chart_loader.height))
 
-                webEngineView.loadHtml(`<style>
-                                        body { margin: 0; background: %1 }
+                chart_loader_show_force = false
+                chart_loader_force_timer.restart()
+                chart_loader.loadHtml(`<style>
+                                        html, body { margin: 0; width: 100%; height: 100%; background: %1; overflow: hidden }
+                                        .tradingview-widget-container, .tradingview-widget-container__widget { width: 100%; height: 100% }
                                         </style>
                                         <!-- TradingView Widget BEGIN -->
                                         <div class="tradingview-widget-container">
@@ -931,44 +940,45 @@ Item
                                           <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
                                           {
                                               "symbol": "${symbol}",
-                                              "width": "100%",
-                                              "height": "100%",
                                               "locale": "en",
-                                              "dateRange": "1D",
-                                              "colorTheme": "dark",
+                                              "dateRange": "12M",
+                                              "colorTheme": "${chartTheme}",
                                               "trendLineColor": "%2",
                                               "isTransparent": true,
-                                              "autosize": false,
+                                              "autosize": true,
                                               "largeChartUrl": ""
                                           }
                                           </script>
                                         </div>
-                                        <!-- TradingView Widget END -->`.arg(Dex.CurrentTheme.floatingBackgroundColor).arg(Dex.CurrentTheme.textSelectionColor))
+                                        <!-- TradingView Widget END -->`.arg(Dex.CurrentTheme.floatingBackgroundColor).arg(Dex.CurrentTheme.textSelectionColor), "https://www.tradingview.com/")
             }
 
-            Item
+            WebEngineView
             {
-                id: webEngineView
+                id: chart_loader
                 anchors.fill: parent
-                visible: parent.ticker_supported && !loading
-                readonly property real loadProgress: 100
-                function loadHtml(_html) { }
-                function stop() { }
+                visible: parent.ticker_supported && (chart_loader.loadProgress >= 100 || parent.chart_loader_show_force)
+                backgroundColor: "transparent"
+                profile.httpUserAgent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+                settings.localContentCanAccessRemoteUrls: true
+                settings.allowRunningInsecureContent: true
             }
 
-            Connections
-            {
-                target: Dex.CurrentTheme
-                function onThemeChanged()
-                {
-                    // Chart disabled
-                    // loadChart();
+            property bool chart_loader_show_force: false
+
+            Timer {
+                id: chart_loader_force_timer
+                interval: 4000
+                onTriggered: {
+                    if (chart_loader.loadProgress > 0 && chart_loader.loadProgress < 100) {
+                        parent.chart_loader_show_force = true
+                    }
                 }
             }
 
             RowLayout
             {
-                visible: !webEngineView.visible && parent.ticker_supported
+                visible: parent.ticker_supported && chart_loader.loadProgress < 100 && !parent.chart_loader_show_force
                 anchors.centerIn: parent
 
                 DefaultBusyIndicator
@@ -990,6 +1000,15 @@ Item
                 visible: !parent.ticker_supported
                 text_value: qsTr("There is no chart data for this ticker yet")
                 anchors.centerIn: parent
+            }
+
+            Connections
+            {
+                target: Dex.CurrentTheme
+                function onThemeChanged()
+                {
+                    loadChart();
+                }
             }
         }
 

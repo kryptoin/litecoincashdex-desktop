@@ -5,6 +5,7 @@ include(dex_generate_qrc)
 set(CORE_QT_DEPS cpprestsdk::cpprest Qt::Core Qt::Quick Qt::Svg Qt::Charts Qt::Widgets)
 if (Qt5WebEngine_FOUND AND Qt5WebEngineCore_FOUND AND Qt5WebEngineWidgets_FOUND)
     list(APPEND CORE_QT_DEPS Qt::WebEngine Qt::WebEngineCore Qt::WebEngineWidgets)
+    list(APPEND CORE_QT_DEFS QT5WEBENGINE_FOUND=1)
 endif ()
 DEX_NEW_LIB(core INTERFACE
         INTERFACE_DEPS
@@ -13,6 +14,7 @@ DEX_NEW_LIB(core INTERFACE
             unofficial-btc::bitcoin komodo-date::date komodo-taskflow::taskflow
             Boost::random Boost::filesystem komodo-sodium::sodium antara::app::net
         INTERFACE_DEFS
+            ${CORE_QT_DEFS}
             $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG> $<$<PLATFORM_ID:Windows>:HAS_REMOTE_API>
             $<$<PLATFORM_ID:Windows>:AUTO_DOWNLOAD>
             $<$<PLATFORM_ID:Windows>:NOMINMAX>

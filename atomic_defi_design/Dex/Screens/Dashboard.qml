@@ -1,6 +1,7 @@
 import QtQuick 2.15
 import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15
+import QtWebEngine 1.10
 import QtGraphicalEffects 1.0
 
 import "../Components"
@@ -166,12 +167,16 @@ Item
             Addressbook.Main { }
         }
 
-        Item
+        WebEngineView
         {
             id: webEngineView
-            readonly property real loadProgress: 100
-            function loadHtml(_html) { /* WebEngineView is unavailable in this runtime; chart HTML is intentionally not rendered. */ }
-            function stop() { }
+            anchors.fill: parent
+            visible: false
+            backgroundColor: "transparent"
+            profile.httpUserAgent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+            settings.localContentCanAccessRemoteUrls: true
+            settings.javascriptCanAccessClipboard: true
+            settings.allowRunningInsecureContent: true
         }
 
         DefaultLoader

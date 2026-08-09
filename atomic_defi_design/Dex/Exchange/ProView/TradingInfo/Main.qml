@@ -71,6 +71,7 @@ ColumnLayout
 
             ColumnLayout
             {
+                visible: SwipeView.isCurrentItem
                 Layout.fillHeight: true
                 Layout.fillWidth: true
                 Layout.topMargin: 8
@@ -115,12 +116,13 @@ ColumnLayout
                 swipeView.currentItem.update();
             }
 
-            OrdersPage { clip: true }
+            OrdersPage { clip: true; visible: SwipeView.isCurrentItem }
 
             OrdersPage
             {
                 is_history: true
                 clip: true
+                visible: SwipeView.isCurrentItem
             }
         }
     }
