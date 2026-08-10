@@ -2304,16 +2304,37 @@ namespace atomic_dex
         env.insert("MM_CONF_PATH", std_path_to_qstring(kdf_cfg_path));
         env.insert("MM_LOG", std_path_to_qstring(utils::get_kdf_atomic_dex_current_log_file()));
         env.insert("MM_COINS_PATH", std_path_to_qstring((utils::get_current_configs_path() / "coins.json")));
+        std::filesystem::path kdf_binary_path = (tools_path / atomic_dex::g_dex_api);
+
+        if (!std::filesystem::exists(kdf_binary_path))
+        {
+            SPDLOG_ERROR("KDF daemon binary not found at: {}", kdf_binary_path.string());
+            dispatcher_.trigger(fatal_notification{
+                fmt::format(
+                    "KDF (mm2_cheetah) daemon binary not found.\n\n"
+                    "Expected path: {}\n\n"
+                    "Please ensure the binary exists and is executable.\n"
+                    "On macOS, run the build script which downloads the Universal2 KDF binary automatically.",
+                    kdf_binary_path.string())});
+            return;
+        }
+
         QProcess kdf_instance;
-        kdf_instance.setProgram(std_path_to_qstring((tools_path / atomic_dex::g_dex_api)));
+        kdf_instance.setProgram(std_path_to_qstring(kdf_binary_path));
         kdf_instance.setWorkingDirectory(std_path_to_qstring(tools_path));
         kdf_instance.setProcessEnvironment(env);
         bool started = kdf_instance.startDetached();
 
         if (!started)
         {
-            SPDLOG_ERROR("Couldn't start kdf");
-            std::exit(EXIT_FAILURE);
+            SPDLOG_ERROR("Couldn't start kdf: binary exists but could not be launched");
+            dispatcher_.trigger(fatal_notification{
+                fmt::format(
+                    "Failed to launch the KDF (mm2_cheetah) daemon.\n\n"
+                    "Binary path: {}\n\n"
+                    "Check that the binary is not corrupted and that you have execute permissions.",
+                    kdf_binary_path.string())});
+            return;
         }
 
         m_kdf_init_thread = std::thread(
@@ -2330,7 +2351,10 @@ namespace atomic_dex
                     if (nb_try == 30)
                     {
                         SPDLOG_ERROR("KDF not started correctly");
-                        //! TODO: emit kdf_failed_initialization
+                        dispatcher_.trigger(fatal_notification{
+                            "KDF (mm2_cheetah) daemon did not become responsive after 30 seconds.\n\n"
+                            "This may be due to a corrupted binary, missing libraries, or an architecture mismatch.\n"
+                            "Check the KDF log file for details."});
                         std::filesystem::remove(kdf_cfg_path);
                         return;
                     }
@@ -2680,9 +2704,9 @@ namespace atomic_dex
                     }
                 })
             .then(
-                [this](pplx::task<void> previous_task)
+                [this, ticker](pplx::task<void> previous_task)
                 {
-                    this->handle_exception_pplx_task(previous_task, "process_tx_tokenscan", {});
+                    this->handle_exception_pplx_task(previous_task, "process_tx_tokenscan", {}, ticker);
                 });
     }
 
@@ -3108,7 +3132,7 @@ namespace atomic_dex
     }
 
     void
-    kdf_service::handle_exception_pplx_task(pplx::task<void> previous_task, const std::string& from, nlohmann::json request)
+    kdf_service::handle_exception_pplx_task(pplx::task<void> previous_task, const std::string& from, nlohmann::json request, std::optional<std::string> ticker)
     {
         try
         {
@@ -3132,6 +3156,11 @@ namespace atomic_dex
                     SPDLOG_WARN("We should reset connection here");
                     this->dispatcher_.trigger(fatal_notification{"connection dropped"});
                 }
+            }
+
+            if (from == "process_tx_tokenscan" && ticker.has_value())
+            {
+                this->dispatcher_.trigger(tx_fetch_finished{true, ticker.value()});
             }
         }
     }

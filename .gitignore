@@ -4,6 +4,7 @@
 /build-macos-anaconda3
 /build-macos-anaconda3-test
 /build-macos-analysis
+/build-macos-apple-silicon
 /libwally-core-install
 
 # ---------------------------------------------------------

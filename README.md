@@ -14,6 +14,9 @@ Store your assets, manage balances, and trade directly from your own wallet with
 > The KDF daemon now ships as a Universal2 binary (arm64 + x86_64). A diagnostics run
 > confirms end-to-end wallet operation.
 
+The build script automatically downloads the KDF daemon binary from the
+Komodo DeFi Framework releases. No manual download is required.
+
 The recommended build path on Apple Silicon uses the Anaconda3 Qt build and Homebrew
 for native libraries.
 
@@ -33,20 +36,12 @@ for native libraries.
 ./build-macos-anaconda.sh
 ```
 
-The script wipes and recreates `build-macos-anaconda3/`, configures with CMake + Ninja,
+The script wipes and recreates `build-macos-apple-silicon/`, configures with CMake + Ninja,
 and places the finished app bundle at:
 
 ```
-build-macos-anaconda3/bin/litecoincashdex.app
+build-macos-apple-silicon/bin/litecoincashdex.app
 ```
-
-> Note: After every build the KDF daemon must be copied into the bundle manually
-> because the build script wipes the output directory:
-> ```bash
-> cp assets/tools/kdf/mm2_cheetah \
->    build-macos-anaconda3/bin/litecoincashdex.app/Contents/Resources/assets/tools/kdf/mm2_cheetah
-> chmod +x build-macos-anaconda3/bin/litecoincashdex.app/Contents/Resources/assets/tools/kdf/mm2_cheetah
-> ```
 
 ### Known issues
 

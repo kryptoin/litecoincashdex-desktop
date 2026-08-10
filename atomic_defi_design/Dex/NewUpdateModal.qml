@@ -30,10 +30,6 @@ Dex.MultipageModal
             console.log("init updateInfo.newVersion: " + Dex.API.app.updateCheckerService.updateInfo.newVersion)
             console.log("init updateInfo.downloadUrl: " + Dex.API.app.updateCheckerService.updateInfo.downloadUrl)
             console.log("init updateInfo.changelog: " + Dex.API.app.updateCheckerService.updateInfo.changelog)
-            if (Dex.API.app.updateCheckerService.updateInfo.updateNeeded == true)
-            {
-                root.open()
-            }
         }
     }
 
@@ -165,13 +161,6 @@ Dex.MultipageModal
             console.log("updateInfo.newVersion: " + Dex.API.app.updateCheckerService.updateInfo.newVersion)
             console.log("updateInfo.downloadUrl: " + Dex.API.app.updateCheckerService.updateInfo.downloadUrl)
             console.log("updateInfo.changelog: " + Dex.API.app.updateCheckerService.updateInfo.changelog)
-            if (Dex.API.app.updateCheckerService.updateInfo)
-            {
-                if (Dex.API.app.updateCheckerService.updateInfo.updateNeeded == true)
-                {
-                    root.open()
-                }
-            }
         }
     }
 }

@@ -836,7 +836,15 @@ Qaterial.Dialog
                     family: DexTypo.fontFamily,
                     weight: Font.Normal
                 })
-                onClicked: newUpdateModal.open()
+                onClicked: app.showDialog(
+                {
+                    title: qsTr("Update status"),
+                    text: qsTr("There are no updates available."),
+                    titleBold: true,
+                    showCancelBtn: false,
+                    standardButtons: Dialog.Ok,
+                    yesButtonText: qsTr("Ok")
+                })
             }
 
             DexAppButton

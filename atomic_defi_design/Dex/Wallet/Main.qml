@@ -38,6 +38,35 @@ Item
         }
     }
 
+    property bool tx_fetch_timeout_reached: false
+
+    Timer
+    {
+        id: tx_fetch_timeout_timer
+        interval: 30000
+        repeat: false
+        onTriggered: {
+            root.tx_fetch_timeout_reached = true
+        }
+    }
+
+    Connections
+    {
+        target: api_wallet_page
+        onTxFetchingStatusChanged: {
+            if (api_wallet_page.tx_fetching_busy)
+            {
+                root.tx_fetch_timeout_reached = false
+                tx_fetch_timeout_timer.start()
+            }
+            else
+            {
+                tx_fetch_timeout_timer.stop()
+                root.tx_fetch_timeout_reached = false
+            }
+        }
+    }
+
     function loadingPercentage(remaining)
     {
         return General.formatPercent((100 * (1 - parseFloat(remaining)/parseFloat(current_ticker_infos.current_block))).toFixed(3), false)
@@ -1070,6 +1099,7 @@ Item
                             {
                                 if (activation_pct != 100) return qsTr("Please wait, %1 is %2").arg(api_wallet_page.ticker).arg(activation_pct) + qsTr("% activated...")
                             }
+                            if (root.tx_fetch_timeout_reached) return qsTr('No transactions available.')
                             if (api_wallet_page.tx_fetching_busy) return qsTr("Fetching transactions...")
                             return qsTr('No transactions available.')
                         }
@@ -1082,7 +1112,7 @@ Item
                         Layout.preferredHeight: Layout.preferredWidth
                         indicatorSize: 32
                         indicatorDotSize: 5
-                        visible: api_wallet_page.tx_fetching_busy
+                        visible: api_wallet_page.tx_fetching_busy && !root.tx_fetch_timeout_reached
                     }
 
                     Item { Layout.fillHeight: true }

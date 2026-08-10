@@ -1957,119 +1957,120 @@ They will be removed from the orderbook until you log in again.</source>
     </message>
     <message>
         <location filename="../../Dex/Exchange/Trade/SimpleView/Main.qml" line="103"/>
-        <location filename="../../Dex/Wallet/Main.qml" line="533"/>
+        <location filename="../../Dex/Wallet/Main.qml" line="562"/>
         <source>Swap</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Wallet/Main.qml" line="188"/>
+        <location filename="../../Dex/Wallet/Main.qml" line="217"/>
         <source>Price</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Wallet/Main.qml" line="218"/>
+        <location filename="../../Dex/Wallet/Main.qml" line="247"/>
         <source>Change 24hr</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Wallet/Main.qml" line="249"/>
+        <location filename="../../Dex/Wallet/Main.qml" line="278"/>
         <source>Portfolio</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Wallet/Main.qml" line="306"/>
+        <location filename="../../Dex/Wallet/Main.qml" line="335"/>
         <source> Contract Address</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Wallet/Main.qml" line="372"/>
+        <location filename="../../Dex/Wallet/Main.qml" line="401"/>
         <source>Send</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Wallet/Main.qml" line="427"/>
+        <location filename="../../Dex/Wallet/Main.qml" line="456"/>
         <source>Enable %1 ?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Wallet/Main.qml" line="434"/>
+        <location filename="../../Dex/Wallet/Main.qml" line="463"/>
         <source>Yes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Wallet/Main.qml" line="449"/>
+        <location filename="../../Dex/Wallet/Main.qml" line="478"/>
         <source>No</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Wallet/Main.qml" line="483"/>
+        <location filename="../../Dex/Wallet/Main.qml" line="512"/>
         <source>Receive</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Wallet/Main.qml" line="562"/>
+        <location filename="../../Dex/Wallet/Main.qml" line="591"/>
         <source> is wallet only</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Wallet/Main.qml" line="580"/>
+        <location filename="../../Dex/Wallet/Main.qml" line="609"/>
         <source>Rewards</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Wallet/Main.qml" line="628"/>
+        <location filename="../../Dex/Wallet/Main.qml" line="657"/>
         <source>Faucet</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Wallet/Main.qml" line="672"/>
+        <location filename="../../Dex/Wallet/Main.qml" line="701"/>
         <source>Vote Info</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Wallet/Main.qml" line="727"/>
-        <location filename="../../Dex/Wallet/Main.qml" line="762"/>
-        <location filename="../../Dex/Wallet/Main.qml" line="794"/>
+        <location filename="../../Dex/Wallet/Main.qml" line="756"/>
+        <location filename="../../Dex/Wallet/Main.qml" line="791"/>
+        <location filename="../../Dex/Wallet/Main.qml" line="823"/>
         <source>Public Key</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Wallet/Main.qml" line="794"/>
+        <location filename="../../Dex/Wallet/Main.qml" line="823"/>
         <source>Copied to Clipboard</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Wallet/Main.qml" line="828"/>
+        <location filename="../../Dex/Wallet/Main.qml" line="857"/>
         <source>Explore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Wallet/Main.qml" line="994"/>
+        <location filename="../../Dex/Wallet/Main.qml" line="1023"/>
         <source>Loading ticker chart data</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Wallet/Main.qml" line="1001"/>
+        <location filename="../../Dex/Wallet/Main.qml" line="1030"/>
         <source>There is no chart data for this ticker yet</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Wallet/Main.qml" line="1071"/>
+        <location filename="../../Dex/Wallet/Main.qml" line="1100"/>
         <source>Please wait, %1 is %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Wallet/Main.qml" line="1071"/>
+        <location filename="../../Dex/Wallet/Main.qml" line="1100"/>
         <source>% activated...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Wallet/Main.qml" line="1073"/>
+        <location filename="../../Dex/Wallet/Main.qml" line="1103"/>
         <source>Fetching transactions...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Wallet/Main.qml" line="1074"/>
+        <location filename="../../Dex/Wallet/Main.qml" line="1102"/>
+        <location filename="../../Dex/Wallet/Main.qml" line="1104"/>
         <source>No transactions available.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2167,63 +2168,63 @@ They will be removed from the orderbook until you log in again.</source>
 <context>
     <name>NewUpdateModal</name>
     <message>
-        <location filename="../../Dex/NewUpdateModal.qml" line="45"/>
-        <location filename="../../Dex/NewUpdateModal.qml" line="75"/>
-        <location filename="../../Dex/NewUpdateModal.qml" line="137"/>
+        <location filename="../../Dex/NewUpdateModal.qml" line="41"/>
+        <location filename="../../Dex/NewUpdateModal.qml" line="71"/>
+        <location filename="../../Dex/NewUpdateModal.qml" line="133"/>
         <source>Searching new updates</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/NewUpdateModal.qml" line="52"/>
+        <location filename="../../Dex/NewUpdateModal.qml" line="48"/>
         <source>Fetching...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/NewUpdateModal.qml" line="66"/>
-        <location filename="../../Dex/NewUpdateModal.qml" line="89"/>
-        <location filename="../../Dex/NewUpdateModal.qml" line="129"/>
-        <location filename="../../Dex/NewUpdateModal.qml" line="151"/>
+        <location filename="../../Dex/NewUpdateModal.qml" line="62"/>
+        <location filename="../../Dex/NewUpdateModal.qml" line="85"/>
+        <location filename="../../Dex/NewUpdateModal.qml" line="125"/>
+        <location filename="../../Dex/NewUpdateModal.qml" line="147"/>
         <source>Close</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/NewUpdateModal.qml" line="81"/>
+        <location filename="../../Dex/NewUpdateModal.qml" line="77"/>
         <source>Could not check new updates for the following reason: 
 %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/NewUpdateModal.qml" line="99"/>
+        <location filename="../../Dex/NewUpdateModal.qml" line="95"/>
         <source>Mandatory version found</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/NewUpdateModal.qml" line="100"/>
+        <location filename="../../Dex/NewUpdateModal.qml" line="96"/>
         <source>New version found</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/NewUpdateModal.qml" line="107"/>
+        <location filename="../../Dex/NewUpdateModal.qml" line="103"/>
         <source>%1 %2 is available !</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/NewUpdateModal.qml" line="114"/>
+        <location filename="../../Dex/NewUpdateModal.qml" line="110"/>
         <source>This update is mandatory to continue using the application</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/NewUpdateModal.qml" line="123"/>
+        <location filename="../../Dex/NewUpdateModal.qml" line="119"/>
         <source>Download</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/NewUpdateModal.qml" line="129"/>
+        <location filename="../../Dex/NewUpdateModal.qml" line="125"/>
         <source>Close Dex</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/NewUpdateModal.qml" line="143"/>
+        <location filename="../../Dex/NewUpdateModal.qml" line="139"/>
         <source>Your application is up to date!</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3642,6 +3643,7 @@ Please select a new order.</source>
     <message>
         <location filename="../../Dex/Settings/SettingModal.qml" line="596"/>
         <location filename="../../Dex/Settings/SettingModal.qml" line="614"/>
+        <location filename="../../Dex/Settings/SettingModal.qml" line="846"/>
         <source>Ok</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3759,7 +3761,17 @@ Please select a new order.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Settings/SettingModal.qml" line="844"/>
+        <location filename="../../Dex/Settings/SettingModal.qml" line="841"/>
+        <source>Update status</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Dex/Settings/SettingModal.qml" line="842"/>
+        <source>There are no updates available.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Dex/Settings/SettingModal.qml" line="852"/>
         <source>Logout</source>
         <translation type="unfinished"></translation>
     </message>

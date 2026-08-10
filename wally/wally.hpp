@@ -519,8 +519,8 @@ WALLY_FN_B33_A(bip32_key_from_seed_alloc, bip32_key_from_seed_alloc)
 WALLY_FN_B33_A(wif_from_bytes, wally_wif_from_bytes)
 WALLY_FN_B33_BS(scriptpubkey_csv_2of2_then_1_from_bytes,
                 wally_scriptpubkey_csv_2of2_then_1_from_bytes)
-WALLY_FN_B33_BS(scriptpubkey_csv_2of3_then_2_from_bytes,
-                wally_scriptpubkey_csv_2of3_then_2_from_bytes)
+// WALLY_FN_B33_BS(scriptpubkey_csv_2of3_then_2_from_bytes,
+//                 wally_scriptpubkey_csv_2of3_then_2_from_bytes)
 WALLY_FN_B33_BS(scriptpubkey_multisig_from_bytes,
                 wally_scriptpubkey_multisig_from_bytes)
 WALLY_FN_B33_P(bip32_key_from_seed, bip32_key_from_seed)
@@ -632,7 +632,7 @@ template <typename O> inline int clear(O &out) {
 }
 
 inline bool is_elements_build() {
-  uint64_t ret = 0;
+  size_t ret = 0;
   ::wally_is_elements_build(&ret);
   return ret != 0;
 }
