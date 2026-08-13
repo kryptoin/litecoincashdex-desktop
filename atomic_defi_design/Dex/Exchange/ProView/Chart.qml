@@ -11,7 +11,6 @@ import AtomicDEX.MarketMode 1.0
 Item
 {
     id: root
-
     readonly property string theme: Dex.CurrentTheme.getColorMode() === Dex.CurrentTheme.ColorMode.Dark ? "dark" : "light"
     property string loaded_symbol
     property bool pair_supported: false
@@ -23,16 +22,22 @@ Item
     property string chart_source: "livecoinwatch"
     property string chart_right: ""
     property string chart_left: ""
-    onPair_supportedChanged: if (!pair_supported) webEngineViewPlaceHolder.visible = false
 
-    // Safety net: if a chart load never reports a terminal status (network
-    // hang, widget unreachable, superseded load), force the chart area visible
-    // so the loading spinner cannot spin forever.
+    // Single source of truth for the loading state. When true, the chart area is
+    // hidden and the spinner / "no data" overlay is shown; when false, the chart
+    // area is revealed. This replaces the previous fragile bidirectional sync
+    // between webEngineViewPlaceHolder.visible and webEngineView.visible, which
+    // could get stuck false and leave the spinner spinning forever.
+    property bool chart_loading: false
+
+    // Safety net: if a chart load never reports a terminal status (network hang,
+    // widget unreachable, superseded load), drop the loading state so the spinner
+    // cannot spin forever.
     Timer
     {
         id: chartLoadTimer
         interval: 15000
-        onTriggered: dashboard.webEngineView.visible = true
+        onTriggered: root.chart_loading = false
     }
 
     function loadChart(right_ticker, left_ticker, force = false, source="livecoinwatch")
@@ -42,6 +47,12 @@ Item
         root.chart_source = source
         root.chart_right = right_ticker
         root.chart_left = left_ticker
+
+        // Enter the loading state: the chart area is hidden and the spinner / "no
+        // data" overlay is shown until the load terminates (or the safety timer
+        // fires). Resetting it here also clears any stale loading state left by a
+        // previously stuck pair.
+        root.chart_loading = true
 
         // <script defer src="https://www.livecoinwatch.com/static/lcw-widget.js"></script> <div class="livecoinwatch-widget-1" lcw-coin="BTC" lcw-base="USD" lcw-secondary="BTC" lcw-period="w" lcw-color-tx="#ffffff" lcw-color-pr="#58c7c5" lcw-color-bg="#1f2434" lcw-border-w="1" lcw-digits="8" ></div>
 
@@ -60,6 +71,7 @@ Item
                 pair_supported = false
                 selected_testcoin = left_ticker
                 console.log("no chart, testcoin", selected_testcoin)
+                root.chart_loading = false
                 return
             }
             if (General.is_testcoin(right_ticker))
@@ -67,6 +79,7 @@ Item
                 pair_supported = false
                 selected_testcoin = right_ticker
                 console.log("no chart, testcoin", selected_testcoin)
+                root.chart_loading = false
                 return
             }
 
@@ -81,7 +94,7 @@ Item
                 
                 if (symbol === loaded_symbol && !force)
                 {
-                    webEngineViewPlaceHolder.visible = true
+                    root.chart_loading = false
                     console.log("symbol === loaded_symbol, ok")
                     return
                 }
@@ -114,6 +127,7 @@ Item
             {
                 pair_supported = false
                 console.log("pair not supported", pair, pair_reversed)
+                root.chart_loading = false
                 return
             }
 
@@ -121,7 +135,7 @@ Item
 
             if (symbol === loaded_symbol && !force)
             {
-                webEngineViewPlaceHolder.visible = true
+                root.chart_loading = false
                 return
             }
 
@@ -154,10 +168,10 @@ Item
             </div>
             <!-- TradingView Widget END -->`
         }
-        // Show the loading spinner while the (re)load is in flight, and arm the
-        // safety timer. Restarting on every call keeps rapid pair switches from
-        // leaving a stale timer that could hide a still-loading chart.
-        dashboard.webEngineView.visible = false
+        // chart_loading was set true at the top of loadChart, so the chart area is
+        // already hidden and the spinner / "no data" overlay shown. Arm the safety
+        // timer; restarting on every call keeps rapid pair switches from leaving a
+        // stale timer that could hide a still-loading chart.
         chartLoadTimer.restart()
         dashboard.webEngineView.loadHtml(chart_html)
     }
@@ -225,7 +239,10 @@ Item
         id: webEngineViewPlaceHolder
         anchors.fill: parent
         anchors.centerIn: parent
-        visible: true
+        // Hidden while loading (spinner / "no data" overlay shown) or when the
+        // pair is unsupported (message overlay shown); revealed once the load
+        // terminates via the chart_loading flag.
+        visible: !root.chart_loading && root.pair_supported
 
         Component.onCompleted:
         {
@@ -237,46 +254,40 @@ Item
             dashboard.webEngineView.visible = false
             dashboard.webEngineView.stop()
         }
-        onVisibleChanged: dashboard.webEngineView.visible = visible
 
         Connections
         {
             target: dashboard.webEngineView
 
-        function onVisibleChanged()
-        {
-            webEngineViewPlaceHolder.visible = dashboard.webEngineView.visible
-        }
-
-        // A chart load terminating (success OR failure OR superseded by a newer
-        // load) must always reveal the chart area so the spinner clears. The old
-        // code only revealed on success, which left the spinner spinning forever
-        // for unavailable pairs / unreachable widgets.
-        function onLoadingChanged(loadRequest)
-        {
-            if (loadRequest.status === WebEngineLoadRequest.LoadSucceededStatus ||
-                loadRequest.status === WebEngineLoadRequest.LoadFailedStatus ||
-                loadRequest.status === WebEngineLoadRequest.LoadStoppedStatus)
+            // A chart load terminating (success OR failure OR superseded by a newer
+            // load) drops the loading state so the chart area is revealed and the
+            // spinner clears. The old code only revealed on success, which left the
+            // spinner spinning forever for unavailable pairs / unreachable widgets.
+            function onLoadingChanged(loadRequest)
             {
-                dashboard.webEngineView.visible = true
-            }
+                if (loadRequest.status === WebEngineLoadRequest.LoadSucceededStatus ||
+                    loadRequest.status === WebEngineLoadRequest.LoadFailedStatus ||
+                    loadRequest.status === WebEngineLoadRequest.LoadStoppedStatus)
+                {
+                    root.chart_loading = false
+                }
 
-            // Livecoinwatch is an external site. If its load genuinely fails
-            // (e.g. unreachable / blocked), retry the same pair with the
-            // TradingView widget, which is sourced from General.supported_pairs
-            // and does not depend on livecoinwatch. Only do this on a real failure
-            // (not LoadStoppedStatus, which just means a newer load superseded
-            // this one) and only once (chart_source is updated to "tradingview"
-            // by the retry call, preventing any loop).
-            if (loadRequest.status === WebEngineLoadRequest.LoadFailedStatus &&
-                root.chart_source === "livecoinwatch")
-            {
-                console.log("livecoinwatch chart failed; falling back to TradingView for",
-                            root.chart_left, "/", root.chart_right)
-                loadChart(root.chart_right, root.chart_left, true, "tradingview")
+                // Livecoinwatch is an external site. If its load genuinely fails
+                // (e.g. unreachable / blocked), retry the same pair with the
+                // TradingView widget, which is sourced from General.supported_pairs
+                // and does not depend on livecoinwatch. Only do this on a real
+                // failure (not LoadStoppedStatus, which just means a newer load
+                // superseded this one) and only once (chart_source is updated to
+                // "tradingview" by the retry call, preventing any loop).
+                if (loadRequest.status === WebEngineLoadRequest.LoadFailedStatus &&
+                    root.chart_source === "livecoinwatch")
+                {
+                    console.log("livecoinwatch chart failed; falling back to TradingView for",
+                                root.chart_left, "/", root.chart_right)
+                    loadChart(root.chart_right, root.chart_left, true, "tradingview")
+                }
             }
         }
-    }
     }
 
     MouseArea {
