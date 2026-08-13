@@ -10,15 +10,23 @@ Store your assets, manage balances, and trade directly from your own wallet with
 
 ## Building on macOS (Apple Silicon)
 
-> Status — 2026-08-08: The app compiles and the Qt/QML UI loads cleanly on arm64.
-> The KDF daemon now ships as a Universal2 binary (arm64 + x86_64). A diagnostics run
-> confirms end-to-end wallet operation.
+> Status — 2026-08-12: Builds and runs on arm64. The KDF daemon ships as a Universal2
+> binary (arm64 + x86_64) and is auto-downloaded then ad-hoc signed. Recent fixes cover
+> KDF daemon startup/teardown, ERC-20/BEP-20 transaction-history timeouts, and the Pro
+> view chart infinite-spinner.
 
-The build script automatically downloads the KDF daemon binary from the
-Komodo DeFi Framework releases. No manual download is required.
+The build is driven entirely by `build-macos-apple-silicon.sh`. It:
 
-The recommended build path on Apple Silicon uses the Anaconda3 Qt build and Homebrew
-for native libraries.
+- Installs the required Homebrew dependencies if missing (`boost`, `fmt`, `spdlog`,
+  `cpprestsdk`, `libsodium`, `secp256k1`, `openssl`, `howard-hinnant-date`, `entt`,
+  `taskflow`).
+- Clones the `vendor/coins` submodule if absent (the working tree is not always a full
+  git clone, so this is fetched on demand).
+- Configures with CMake + Ninja into `build-macos-apple-silicon/`.
+- Downloads the KDF daemon (`mm2_cheetah`) and copies it into the app bundle.
+- Ad-hoc signs the KDF binary and the whole app bundle. There is **no Apple Developer
+  certificate** in this flow, so the app is ad-hoc signed only — launch it from the build
+  output (or clear the Gatekeeper quarantine) rather than distributing the bundle.
 
 ### Prerequisites
 
@@ -26,26 +34,31 @@ for native libraries.
   ```bash
   conda install -p /opt/anaconda3 qt=5.15.9 cmake ninja
   ```
-- Homebrew packages (installed automatically by the script):
-  `boost`, `fmt`, `spdlog`, `cpprestsdk`, `libsodium`, `secp256k1`, `openssl`,
-  `howard-hinnant-date`, `entt`, `taskflow`
+- Homebrew (the script installs the native libraries listed above).
 
 ### Build
 
 ```bash
-./build-macos-anaconda.sh
+./build-macos-apple-silicon.sh
 ```
 
-The script wipes and recreates `build-macos-apple-silicon/`, configures with CMake + Ninja,
-and places the finished app bundle at:
+The finished app bundle is written to:
 
 ```
 build-macos-apple-silicon/bin/litecoincashdex.app
 ```
 
-### Known issues
+### Running the tests
 
----
+A `doctest` suite is built as `litecoincashdex_tests`. Use `run-tests.sh`, which runs the
+tests from a scratch working directory:
+
+```bash
+./run-tests.sh            # offline unit tests (default)
+./run-tests.sh --build    # rebuild the test target first
+./run-tests.sh --network  # also run live-network API tests
+```
+
 
 ## Contributors / Thanks
 

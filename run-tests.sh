@@ -7,7 +7,7 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-BUILD_DIR="${ROOT_DIR}/build-macos-anaconda3"
+BUILD_DIR="${ROOT_DIR}/build-macos-apple-silicon"
 TEST_APP="${BUILD_DIR}/bin/litecoincashdex_tests.app/Contents/MacOS/litecoincashdex_tests"
 NINJA_BIN="${NINJA_BIN:-/opt/anaconda3/bin/ninja}"
 WORK_DIR="$(mktemp -d -t litecoincashdex_tests.XXXXXX)"
@@ -90,7 +90,7 @@ build_doctest_args
 
 if [ ! -x "${TEST_APP}" ]; then
   echo "Test binary not found: ${TEST_APP}" >&2
-  echo "Run ${ROOT_DIR}/build-macos-anaconda.sh first." >&2
+  echo "Run ${ROOT_DIR}/build-macos-apple-silicon.sh first." >&2
   exit 1
 fi
 
