@@ -2312,17 +2312,32 @@ namespace atomic_dex
         // Always start from a clean slate: stop any existing KDF instance
         // (orphaned from a crash, or left over from a previous wallet/login)
         // so we never bind to a daemon started with a different rpc_password
-        // or seed. Then wait until the RPC port is actually free before
-        // spawning our own.
+        // or seed. Kill, then VERIFY the RPC port is actually free before
+        // spawning our own — otherwise the new daemon would fail to bind 7783
+        // and we would silently talk to the stale instance (which has no coins
+        // enabled, yielding no orderbook / DEX data). Re-issue the kill on every
+        // iteration so a missed first kill still gets cleaned up.
         SPDLOG_INFO("Stopping any existing KDF instance before spawn");
-        atomic_dex::kill_executable(atomic_dex::g_dex_api);
-        for (int i = 0; i < 10; ++i)
+        bool kdf_port_free = false;
+        for (int i = 0; i < 30; ++i)
         {
+            atomic_dex::kill_executable(atomic_dex::g_dex_api);
             if (kdf::rpc_version() == "error occured during rpc_version")
             {
+                kdf_port_free = true;
                 break;
             }
             std::this_thread::sleep_for(std::chrono::seconds(1));
+        }
+
+        if (!kdf_port_free)
+        {
+            SPDLOG_ERROR("KDF RPC port 7783 still occupied after killing existing instances");
+            dispatcher_.trigger(fatal_notification{
+                "The KDF (mm2_cheetah) daemon could not be started because port 7783 is "
+                "still occupied by another process. Quit every running instance of the "
+                "wallet and try again."});
+            return;
         }
 
         QProcess kdf_instance;

@@ -29,13 +29,17 @@ namespace atomic_dex
     kill_executable(const char* exec_name)
     {
 #if defined(__APPLE__) || defined(__linux__)
-        std::string cmd_line_check = "pgrep " + std::string(exec_name);
+        std::string cmd_line_check = "pgrep -f " + std::string(exec_name);
         std::string response = execute(cmd_line_check);
         if (response != "")
         {
             // Send SIGKILL so the process (and the RPC port it holds) is
             // guaranteed to be released; a plain SIGTERM is not always honored
             // promptly by the daemon and would leave port 7783 occupied.
+            // killall matches only the short process name, which can miss the
+            // daemon on macOS; pkill -f matches the full binary path and is the
+            // reliable way to stop a leftover KDF.
+            execute("pkill -9 -f " + std::string(exec_name));
             std::string cmd_line = "killall -9 " + std::string(exec_name);
             std::string response = execute(cmd_line);
         }
