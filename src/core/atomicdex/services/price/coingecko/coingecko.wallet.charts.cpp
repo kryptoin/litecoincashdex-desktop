@@ -155,8 +155,10 @@ namespace atomic_dex
         using namespace std::chrono_literals;
         SPDLOG_INFO("fetch charts data of {} {}", cfg.ticker, cfg.coingecko_id);
         std::function<void(WalletChartsCategories, std::string)> market_functor;
+        constexpr std::size_t max_try = 3;
+        std::size_t           nb_try  = 0;
 
-        market_functor = [this, cfg, &market_functor](WalletChartsCategories category, std::string days)
+        market_functor = [this, cfg, &market_functor, &nb_try, max_try](WalletChartsCategories category, std::string days)
         {
             //! 30 days
             {
@@ -186,15 +188,29 @@ namespace atomic_dex
                     }
                     else
                     {
-                        std::this_thread::sleep_for(1s);
-                        market_functor(category, days);
+                        if (nb_try++ < max_try)
+                        {
+                            std::this_thread::sleep_for(1s);
+                            market_functor(category, days);
+                        }
+                        else
+                        {
+                            SPDLOG_ERROR("Giving up fetching chart data for {} {} after {} tries", cfg.ticker, cfg.coingecko_id, max_try);
+                        }
                     }
                 }
                 catch (const std::exception& error)
                 {
                     SPDLOG_ERROR("Caught exception: {} - retrying.", error.what());
-                    std::this_thread::sleep_for(1s);
-                    market_functor(category, days);
+                    if (nb_try++ < max_try)
+                    {
+                        std::this_thread::sleep_for(1s);
+                        market_functor(category, days);
+                    }
+                    else
+                    {
+                        SPDLOG_ERROR("Giving up fetching chart data for {} {} after {} tries", cfg.ticker, cfg.coingecko_id, max_try);
+                    }
                 }
             }
         };
@@ -285,6 +301,12 @@ namespace atomic_dex
         const auto s   = std::chrono::duration_cast<std::chrono::seconds>(now - m_update_clock);
         if (s >= 1h)
         {
+            if (m_is_busy.load())
+            {
+                SPDLOG_INFO("Previous chart fetch still in progress - skipping hourly refresh");
+                m_update_clock = std::chrono::high_resolution_clock::now();
+                return;
+            }
             {
                 SPDLOG_INFO("Waiting for previous call to be finished");
                 m_executor.wait_for_all();

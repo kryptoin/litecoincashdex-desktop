@@ -119,9 +119,17 @@ namespace atomic_dex
             catch (const std::exception& e)
             {
                 SPDLOG_ERROR("pplx task error from async_fetch_ticker_stats: {} - nb_try {}", e.what(), nb_try.load());
-                using namespace std::chrono_literals;
-                std::this_thread::sleep_for(1s);
-                this->process_update();
+                if (nb_try.load() < 3)
+                {
+                    using namespace std::chrono_literals;
+                    std::this_thread::sleep_for(1s);
+                    this->process_update();
+                }
+                else
+                {
+                    SPDLOG_ERROR("Giving up fetching defi stats volumes after {} tries", nb_try.load());
+                    nb_try = 0;
+                }
             };
         };
         async_fetch_defi_stats_volumes()

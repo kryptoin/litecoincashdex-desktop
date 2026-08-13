@@ -136,9 +136,17 @@ namespace atomic_dex
               catch (const std::exception& e)
               {
                   SPDLOG_ERROR("pplx task error from coingecko::api::async_market_infos: {} - nb_try {}", e.what(), nb_try.load());
-                  using namespace std::chrono_literals;
-                  std::this_thread::sleep_for(1s);
-                  this->internal_update(ids, registry, should_move, tickers);
+                  if (nb_try.load() < 3)
+                  {
+                      using namespace std::chrono_literals;
+                      std::this_thread::sleep_for(1s);
+                      this->internal_update(ids, registry, should_move, tickers);
+                  }
+                  else
+                  {
+                      SPDLOG_ERROR("Giving up fetching coingecko market infos after {} tries", nb_try.load());
+                      nb_try = 0;
+                  }
               };
             };
             t_coingecko_market_infos_request request{.ids = std::move(ids)};

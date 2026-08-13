@@ -1794,7 +1794,8 @@ namespace atomic_dex
                                             {
                                                 using namespace std::chrono_literals;
 
-                                                static std::size_t z_nb_try      = 0;
+                                                std::size_t        z_nb_try      = 0;
+                                                constexpr std::size_t z_max_try   = 600;
                                                 nlohmann::json     z_error       = nlohmann::json::array();
                                                 nlohmann::json     z_batch_array = nlohmann::json::array();
                                                 t_enable_z_coin_status_request z_request{.task_id = task_id};
@@ -1895,7 +1896,7 @@ namespace atomic_dex
                                                     settings_system.set_zhtlc_status(z_answers[0]);
                                                     z_nb_try += 1;
 
-                                                } while (z_nb_try < 10000);
+                                                } while (z_nb_try < z_max_try);
 
                                                 try {
                                                     if (z_error[0].at("result").at("details").contains("error"))
@@ -1910,14 +1911,14 @@ namespace atomic_dex
                                                         this->dispatcher_.trigger(enabling_coin_failed{tickers[idx], z_error[0].dump(4)});
                                                         to_remove.emplace(tickers[idx]);
                                                     }
-                                                    else if (z_nb_try == 10000)
+                                                    else if (z_nb_try >= z_max_try)
                                                     {
                                                         // TODO: Handle this case.
                                                         // There could be no error message if scanning takes too long.
                                                         // Either we force disable here, or schedule to check on it later
                                                         // If this happens, address will be "Invalid" and balance will be zero.
                                                         // We could save this ticker in a list to try `enable_z_coin_status` again on it periodically until complete.
-                                                        SPDLOG_INFO("Exited {} enable loop after 10000 tries ", tickers[idx]);
+                                                        SPDLOG_INFO("Exited {} enable loop after {} tries ", tickers[idx], z_max_try);
                                                         SPDLOG_INFO(
                                                             "Bad answer for zhtlc_error: [{}] -> idx: {}, tickers size: {}, answers size: {}", tickers[idx], idx,
                                                             tickers.size(), answers.size()
