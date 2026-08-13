@@ -2309,11 +2309,29 @@ namespace atomic_dex
             return;
         }
 
+        // Always start from a clean slate: stop any existing KDF instance
+        // (orphaned from a crash, or left over from a previous wallet/login)
+        // so we never bind to a daemon started with a different rpc_password
+        // or seed. Then wait until the RPC port is actually free before
+        // spawning our own.
+        SPDLOG_INFO("Stopping any existing KDF instance before spawn");
+        atomic_dex::kill_executable(atomic_dex::g_dex_api);
+        for (int i = 0; i < 10; ++i)
+        {
+            if (kdf::rpc_version() == "error occured during rpc_version")
+            {
+                break;
+            }
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+        }
+
         QProcess kdf_instance;
         kdf_instance.setProgram(std_path_to_qstring(kdf_binary_path));
         kdf_instance.setWorkingDirectory(std_path_to_qstring(tools_path));
         kdf_instance.setProcessEnvironment(env);
-        bool started = kdf_instance.startDetached();
+        qint64 kdf_pid = 0;
+        bool   started = kdf_instance.startDetached(&kdf_pid);
+        SPDLOG_INFO("Spawned KDF daemon (pid={})", kdf_pid);
 
         if (!started)
         {
@@ -2333,7 +2351,7 @@ namespace atomic_dex
                 // std::this_thread::
                 using namespace std::chrono_literals;
                 auto               check_kdf_alive = []() { return kdf::rpc_version() != "error occured during rpc_version"; };
-                static std::size_t nb_try          = 0;
+                std::size_t        nb_try          = 0;
 
                 // The KDF daemon is a large (~120 MB) binary that performs a
                 // SQLite migration and dials seed peers on startup. On a cold
@@ -2360,7 +2378,7 @@ namespace atomic_dex
                         std::filesystem::remove(kdf_cfg_path);
                         return;
                     }
-                    std::this_thread::sleep_for(1s);
+            std::this_thread::sleep_for(std::chrono::seconds(1));
                 }
 
                 // m_kdf_client.connect_client();

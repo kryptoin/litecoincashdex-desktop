@@ -33,7 +33,10 @@ namespace atomic_dex
         std::string response = execute(cmd_line_check);
         if (response != "")
         {
-            std::string cmd_line = "killall " + std::string(exec_name);
+            // Send SIGKILL so the process (and the RPC port it holds) is
+            // guaranteed to be released; a plain SIGTERM is not always honored
+            // promptly by the daemon and would leave port 7783 occupied.
+            std::string cmd_line = "killall -9 " + std::string(exec_name);
             std::string response = execute(cmd_line);
         }
 #else
