@@ -16,6 +16,13 @@ Item
     property string loaded_symbol
     property bool pair_supported: false
     property string selected_testcoin
+
+    // Tracks the in-flight chart request so a failed load can be retried with a
+    // different source (see onLoadingChanged). Kept on root so the signal handler
+    // can read the pair that was requested.
+    property string chart_source: "livecoinwatch"
+    property string chart_right: ""
+    property string chart_left: ""
     onPair_supportedChanged: if (!pair_supported) webEngineViewPlaceHolder.visible = false
 
     // Safety net: if a chart load never reports a terminal status (network
@@ -30,6 +37,11 @@ Item
 
     function loadChart(right_ticker, left_ticker, force = false, source="livecoinwatch")
     {
+        // Remember what we are loading so a failed attempt can be retried via a
+        // different source (livecoinwatch -> TradingView).
+        root.chart_source = source
+        root.chart_right = right_ticker
+        root.chart_left = left_ticker
 
         // <script defer src="https://www.livecoinwatch.com/static/lcw-widget.js"></script> <div class="livecoinwatch-widget-1" lcw-coin="BTC" lcw-base="USD" lcw-secondary="BTC" lcw-period="w" lcw-color-tx="#ffffff" lcw-color-pr="#58c7c5" lcw-color-bg="#1f2434" lcw-border-w="1" lcw-digits="8" ></div>
 
@@ -247,6 +259,21 @@ Item
                 loadRequest.status === WebEngineLoadRequest.LoadStoppedStatus)
             {
                 dashboard.webEngineView.visible = true
+            }
+
+            // Livecoinwatch is an external site. If its load genuinely fails
+            // (e.g. unreachable / blocked), retry the same pair with the
+            // TradingView widget, which is sourced from General.supported_pairs
+            // and does not depend on livecoinwatch. Only do this on a real failure
+            // (not LoadStoppedStatus, which just means a newer load superseded
+            // this one) and only once (chart_source is updated to "tradingview"
+            // by the retry call, preventing any loop).
+            if (loadRequest.status === WebEngineLoadRequest.LoadFailedStatus &&
+                root.chart_source === "livecoinwatch")
+            {
+                console.log("livecoinwatch chart failed; falling back to TradingView for",
+                            root.chart_left, "/", root.chart_right)
+                loadChart(root.chart_right, root.chart_left, true, "tradingview")
             }
         }
     }
