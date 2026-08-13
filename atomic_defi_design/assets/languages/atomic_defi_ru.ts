@@ -2050,33 +2050,33 @@ They will be removed from the orderbook until you log in again.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Wallet/Main.qml" line="1023"/>
+        <location filename="../../Dex/Wallet/Main.qml" line="1205"/>
         <source>Loading ticker chart data</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Wallet/Main.qml" line="1030"/>
+        <location filename="../../Dex/Wallet/Main.qml" line="1212"/>
         <source>There is no chart data for this ticker yet</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Wallet/Main.qml" line="1100"/>
+        <location filename="../../Dex/Wallet/Main.qml" line="1287"/>
         <source>Please wait, %1 is %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Wallet/Main.qml" line="1100"/>
+        <location filename="../../Dex/Wallet/Main.qml" line="1287"/>
         <source>% activated...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Wallet/Main.qml" line="1103"/>
+        <location filename="../../Dex/Wallet/Main.qml" line="1290"/>
         <source>Fetching transactions...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Wallet/Main.qml" line="1102"/>
-        <location filename="../../Dex/Wallet/Main.qml" line="1104"/>
+        <location filename="../../Dex/Wallet/Main.qml" line="1289"/>
+        <location filename="../../Dex/Wallet/Main.qml" line="1291"/>
         <source>No transactions available.</source>
         <translation type="unfinished"></translation>
     </message>
