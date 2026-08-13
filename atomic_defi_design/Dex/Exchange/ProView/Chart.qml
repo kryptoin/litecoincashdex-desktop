@@ -17,6 +17,16 @@ Item
     property string selected_testcoin
     onPair_supportedChanged: if (!pair_supported) webEngineViewPlaceHolder.visible = false
 
+    // Safety net: if a chart load never reports a terminal status (network
+    // hang, widget unreachable, superseded load), force the chart area visible
+    // so the loading spinner cannot spin forever.
+    Timer
+    {
+        id: chartLoadTimer
+        interval: 15000
+        onTriggered: dashboard.webEngineView.visible = true
+    }
+
     function loadChart(right_ticker, left_ticker, force = false, source="livecoinwatch")
     {
 
@@ -131,6 +141,11 @@ Item
             </div>
             <!-- TradingView Widget END -->`
         }
+        // Show the loading spinner while the (re)load is in flight, and arm the
+        // safety timer. Restarting on every call keeps rapid pair switches from
+        // leaving a stale timer that could hide a still-loading chart.
+        dashboard.webEngineView.visible = false
+        chartLoadTimer.restart()
         dashboard.webEngineView.loadHtml(chart_html)
     }
 
@@ -215,11 +230,25 @@ Item
         {
             target: dashboard.webEngineView
 
-            function onVisibleChanged()
+        function onVisibleChanged()
+        {
+            webEngineViewPlaceHolder.visible = dashboard.webEngineView.visible
+        }
+
+        // A chart load terminating (success OR failure OR superseded by a newer
+        // load) must always reveal the chart area so the spinner clears. The old
+        // code only revealed on success, which left the spinner spinning forever
+        // for unavailable pairs / unreachable widgets.
+        function onLoadingChanged(loadRequest)
+        {
+            if (loadRequest.status === WebEngineLoadRequest.LoadSucceededStatus ||
+                loadRequest.status === WebEngineLoadRequest.LoadFailedStatus ||
+                loadRequest.status === WebEngineLoadRequest.LoadStoppedStatus)
             {
-                webEngineViewPlaceHolder.visible = dashboard.webEngineView.visible
+                dashboard.webEngineView.visible = true
             }
         }
+    }
     }
 
     MouseArea {
