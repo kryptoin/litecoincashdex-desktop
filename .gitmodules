@@ -1,0 +1,3 @@
+[submodule "vendor/coins"]
+	path = vendor/coins
+	url = https://github.com/GLEECBTC/coins.git
