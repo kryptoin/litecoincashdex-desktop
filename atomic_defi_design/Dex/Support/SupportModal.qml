@@ -99,90 +99,112 @@ Qaterial.Dialog
                 FAQLine
                 {
                     title: qsTr("Do you store my private keys?")
-                    text: qsTr("No! %1 is non-custodial. We never store any sensitive data, including your private keys, seed phrases, or PIN. This data is  only stored on the user’s device and never leaves it. You are in full control of your assets.").arg(API.app_name)
+                    text: qsTr("
+                    No! %1 is non-custodial. We never store any sensitive data, including your private keys, seed phrases, or PIN. This data is only stored on the user’s device and never leaves it. You are in full control of your assets.
+                    ").arg(API.app_name)
                 }
 
                 FAQLine
                 {
                     title: qsTr("How is trading on %1 different from trading on other DEXs?").arg(API.app_name)
-                    text: qsTr("Other DEXs generally only allow you to trade assets that are based on a single blockchain network, use proxy tokens, and only allow placing a single order with the same funds. 
+                    text: qsTr("
+                    Other DEXs generally only allow you to trade assets that are based on a single blockchain network, use proxy tokens, and only allow placing a single order with the same funds. 
 
-%1 enables you to natively trade across two different blockchain networks without proxy tokens. You can also place multiple orders with the same funds. For example, you can sell 0.1 BTC for KMD, QTUM, or VRSC — the first order that fills automatically cancels all other orders.").arg(API.app_name)
+                    %1 enables you to natively trade across two different blockchain networks without proxy tokens. You can also place multiple orders with the same funds. For example, you can sell 0.1 BTC for KMD, QTUM, or VRSC — the first order that fills automatically cancels all other orders.
+                    ").arg(API.app_name)
                 }
 
                 FAQLine
                 {
                     title: qsTr("Where can I see the orderbook or market statistics online?")
-                    text: qsTr('You can follow LitecoinCash Brasil status, pool and community links at <a href="https://litecoincash.com.br/status.php">https://litecoincash.com.br/status.php</a>.')
+                    text: qsTr('
+                    You can follow LitecoinCash Brasil status, pool and community links at <a href="https://litecoincash.com.br/status.php">https://litecoincash.com.br/status.php</a>.
+                    ')
                 }
 
                 FAQLine
                 {
                     title: qsTr("How long does each atomic swap take?")
-                    text: qsTr('Several factors determine the processing time for each swap. The block time of the traded assets depends on each network (Bitcoin typically being the slowest) Additionally, the user can customize security preferences. For example, (you can ask %1 to consider a KMD transaction as final after just 3 confirmations which makes the swap time shorter compared to waiting for a <a href="https://komodoplatform.com/security-delayed-proof-of-work-dpow/">notarization</a>.').arg(API.app_name)
+                    text: qsTr('
+                    Several factors determine the processing time for each swap. The block time of the traded assets depends on each network (Bitcoin typically being the slowest) Additionally, the user can customize security preferences. For example, (you can ask %1 to consider a KMD transaction as final after just 3 confirmations which makes the swap time shorter compared to waiting for a <a href="https://komodoplatform.com/security-delayed-proof-of-work-dpow/">notarization</a>.
+                    ').arg(API.app_name)
                 }
 
                 FAQLine
                 {
                     title: qsTr("Do I need to be online for the duration of the swap?")
-                    text: qsTr("Yes. You must remain connected to the internet and have your app running to successfully complete each atomic swap (very short breaks in connectivity are usually fine). Otherwise, there is risk of trade cancellation if you are a maker, and risk of loss of funds if you are a taker. To mitigate this, 'watchertower' nodes have been deployed to monitor the dex network for you and, where possible, complete the swaps for you if your app goes offline.
+                    text: qsTr("
+                    Yes. You must remain connected to the internet and have your app running to successfully complete each atomic swap (very short breaks in connectivity are usually fine). Otherwise, there is risk of trade cancellation if you are a maker, and risk of loss of funds if you are a taker. To mitigate this, 'watchertower' nodes have been deployed to monitor the dex network for you and, where possible, complete the swaps for you if your app goes offline.
 
-The atomic swap protocol requires both participants to stay online and monitor the involved blockchains for the process to stay atomic.
+                    The atomic swap protocol requires both participants to stay online and monitor the involved blockchains for the process to stay atomic.
 
-If you go offline, so will your orders, and any that are in progress will fail, leading to potential loss of trade / transaction fees, and a wait for the swap to timeout and issue a refund. It may also negatively affect your wallet's reputation score for future trade matching.
+                    If you go offline, so will your orders, and any that are in progress will fail, leading to potential loss of trade / transaction fees, and a wait for the swap to timeout and issue a refund. It may also negatively affect your wallet's reputation score for future trade matching.
 
-When you come back online, your orders will begin to broadcast again at the price you set before you went offline. If there has been significant price movement in the meantime, you might unintentionally offer someone a bargain!
+                    When you come back online, your orders will begin to broadcast again at the price you set before you went offline. If there has been significant price movement in the meantime, you might unintentionally offer someone a bargain!
 
-For this reason, we recommend cancelling orders before closing %1, or reviewing and revising your prices when restarting %1.").arg(API.app_name)
+                    For this reason, we recommend cancelling orders before closing %1, or reviewing and revising your prices when restarting %1.
+                    ").arg(API.app_name)
                 }
 
                 FAQLine
                 {
                     title: qsTr("How are the fees on %1 calculated?").arg(API.app_name)
-                    text: qsTr("There are two fee categories to consider when trading on %1.
+                    text: qsTr("
+                    There are two fee categories to consider when trading on %1.
 
-1. %1 charges approximately 0.13% (1/777 of trading volume but not lower than 0.0001) as the trading fee for taker orders, and maker orders have zero fees.
+                    1. %1 charges approximately 0.13% (1/777 of trading volume but not lower than 0.0001) as the trading fee for taker orders, and maker orders have zero fees.
 
-2. Both makers and takers will need to pay normal network fees to the involved blockchains when making atomic swap transactions.
+                    2. Both makers and takers will need to pay normal network fees to the involved blockchains when making atomic swap transactions.
 
-Network fees can vary greatly depending on your selected trading pair.").arg(API.app_name)
+                    Network fees can vary greatly depending on your selected trading pair.
+                    ").arg(API.app_name)
                 }
 
                 // TODO: Update link to the KP blog when relevent article available.
                 FAQLine
                 {
                     title: qsTr("I see a transaction in my wallet that was marked as 'poison'. What does this mean?")
-                    text: qsTr('Address poisoning is a relatively new type of phishing attack, where a malicious actor aims to trick you into sending funds to an address that you did not intend to send funds to.
+                    text: qsTr('
+                    Address poisoning is a relatively new type of phishing attack, where a malicious actor aims to trick you into sending funds to an address that you did not intend to send funds to.
 
-This is often done by sending a zero value transaction to your wallet from an address which looks very similar to your actual address, with the exact same letters at the start and end. This transaction will then appear in your transaction history, with the scammer hoping you will mistake the fake address for your own and send funds to it.
+                    This is often done by sending a zero value transaction to your wallet from an address which looks very similar to your actual address, with the exact same letters at the start and end. This transaction will then appear in your transaction history, with the scammer hoping you will mistake the fake address for your own and send funds to it.
 
-To protect you from this, %1 will mark any transaction that it detects as potentially being a poison transaction with a "poison" label. You should always be careful to confirm any address you send funds to is correct.
+                    To protect you from this, %1 will mark any transaction that it detects as potentially being a poison transaction with a "poison" label. You should always be careful to confirm any address you send funds to is correct.
 
-There is a toggle in settings where you can turn on/off the display of these transactions.').arg(API.app_name)
+                    There is a toggle in settings where you can turn on/off the display of these transactions.
+                    ').arg(API.app_name)
                 }
 
                 FAQLine
                 {
                     title: qsTr("Do you provide user support?")
-                    text: qsTr('Yes! %1 offers support through the <a href="%2">%1 Discord server</a>. The team and the community are always happy to help!').arg(API.app_name).arg(API.app_discord_url)
+                    text: qsTr('
+                    Yes! %1 offers support through the <a href="%2">%1 Discord server</a>. The team and the community are always happy to help!
+                    ').arg(API.app_name).arg(API.app_discord_url)
                 }
 
                 FAQLine
                 {
                     title: qsTr("Who is behind %1?").arg(API.app_name)
-                    text: qsTr("%1 is developed by the Komodo team. Komodo is one of the most established blockchain projects working on innovative solutions like atomic swaps, Delayed Proof of Work, and an interoperable multi-chain architecture.").arg(API.app_name)
+                    text: qsTr("
+                    %1 is developed by the Komodo team. Komodo is one of the most established blockchain projects working on innovative solutions like atomic swaps, Delayed Proof of Work, and an interoperable multi-chain architecture.
+                    ").arg(API.app_name)
                 }
 
                 FAQLine
                 {
                     title: qsTr("Is it possible to develop my own white-label exchange on %1?").arg(API.app_name)
-                    text: qsTr("Absolutely! You can read our developer documentation for more details or contact us with your partnership inquiries. Have a specific technical question? The %1 developer community is always ready to help!").arg(API.app_name)
+                    text: qsTr("
+                    Absolutely! You can read our developer documentation for more details or contact us with your partnership inquiries. Have a specific technical question? The %1 developer community is always ready to help!
+                    ").arg(API.app_name)
                 }
 
                 FAQLine
                 {
                     title: qsTr("Which devices can I use %1 on?").arg(API.app_name)
-                    text: qsTr('%1 is available for mobile on both <a href="%2">Android and iPhone, and for desktop on Windows, Mac, and Linux</a> operating systems.').arg(API.app_name).arg(API.app_website_url)
+                    text: qsTr('
+                    %1 is available for mobile on both <a href="%2">Android and iPhone, and for desktop on Windows, Mac, and Linux</a> operating systems.
+                    ').arg(API.app_name).arg(API.app_website_url)
                 }
             }
         }
