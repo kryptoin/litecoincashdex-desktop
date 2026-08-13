@@ -255,6 +255,19 @@ Item
             dashboard.webEngineView.stop()
         }
 
+        // The dashboard WebEngineView is created hidden (visible: false) and is
+        // reparented into this placeholder. Reveal it whenever this placeholder is
+        // shown so the loaded chart actually renders. This only ever forces it
+        // true; while the placeholder is hidden the chart area (and the view) is
+        // hidden regardless, so we never risk getting stuck invisible.
+        onVisibleChanged:
+        {
+            if (visible)
+            {
+                dashboard.webEngineView.visible = true
+            }
+        }
+
         Connections
         {
             target: dashboard.webEngineView
