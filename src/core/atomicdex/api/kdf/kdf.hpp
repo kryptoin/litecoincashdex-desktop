@@ -17,6 +17,7 @@
 #pragma once
 
 //! STD
+#include <chrono>
 #include <unordered_set>
 
 //! Deps
@@ -36,10 +37,22 @@ namespace ag = antara::gaming;
 namespace atomic_dex::kdf
 {
     inline constexpr const char*                           g_etherscan_proxy_endpoint = "https://etherscan-proxy.komodo.earth/";
+
+    //! Proxy clients (ERC-20/BEP-20 tx history, Qtum token infos) must have an
+    //! explicit timeout. Without one, a slow or unreachable proxy leaves the
+    //! request hanging forever: tx_fetch_finished is never triggered, so the
+    //! ETH/BEP-20 wallet views stay on an infinite spinner. On timeout the
+    //! request throws and handle_exception_pplx_task() clears the spinner.
+    inline web::http::client::http_client_config g_proxy_http_client_cfg{[]() {
+        web::http::client::http_client_config cfg;
+        cfg.set_timeout(std::chrono::seconds(30));
+        return cfg;
+    }()};
+
     inline std::unique_ptr<web::http::client::http_client> g_etherscan_proxy_http_client{
-        std::make_unique<web::http::client::http_client>(FROM_STD_STR(g_etherscan_proxy_endpoint))};
+        std::make_unique<web::http::client::http_client>(FROM_STD_STR(g_etherscan_proxy_endpoint), g_proxy_http_client_cfg)};
     inline std::unique_ptr<web::http::client::http_client> g_qtum_proxy_http_client{
-        std::make_unique<web::http::client::http_client>(FROM_STD_STR(::atomic_dex::g_qtum_infos_endpoint))};
+        std::make_unique<web::http::client::http_client>(FROM_STD_STR(::atomic_dex::g_qtum_infos_endpoint), g_proxy_http_client_cfg)};
 
     nlohmann::json basic_batch_answer(const web::http::http_response& resp);
 
