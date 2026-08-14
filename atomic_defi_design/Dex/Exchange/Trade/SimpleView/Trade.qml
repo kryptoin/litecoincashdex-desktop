@@ -505,7 +505,7 @@ ClipRRect // Trade Card
                     anchors.left: parent.left
                     anchors.leftMargin: 2
                     text: Constants.API.app.trading_pg.total_amount
-                    color: Dex.CurrentTheme.textDisabledColor
+                    color: Dex.CurrentTheme.foregroundColor
                     font.pixelSize: Constants.Style.textSizeSmall5
                     background: Rectangle { color: swap_from_card.color}
                 }
