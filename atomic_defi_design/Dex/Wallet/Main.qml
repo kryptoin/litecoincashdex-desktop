@@ -28,7 +28,7 @@ Item
     readonly property string    headerTextFont: Style.textSize
     readonly property string    headerSmallTitleFont: Style.textSizeSmall4
     readonly property string    headerSmallFont: Style.textSizeSmall2
-    readonly property string    addressURL: General.getAddressExplorerURL(api_wallet_page.ticker, current_ticker_infos.address)
+    readonly property string    explorerURL: General.getExplorerURL(api_wallet_page.ticker)
     property int activation_pct: General.zhtlcActivationProgress(API.app.get_zhtlc_status(api_wallet_page.ticker), api_wallet_page.ticker)
     Connections
     {
@@ -846,14 +846,13 @@ Item
             {
                 Layout.preferredHeight: 40
                 Layout.preferredWidth: 165
-                enabled: addressURL != ""
-                
+                enabled: explorerURL != ""
 
                 DefaultButton
                 {
                     radius: 18
                     anchors.fill: parent
-                    onClicked: Qt.openUrlExternally(addressURL)
+                    onClicked: Qt.openUrlExternally(explorerURL)
                     label.text: qsTr("Explore")
                     label.font.pixelSize: 16
                     content.anchors.left: content.parent.left

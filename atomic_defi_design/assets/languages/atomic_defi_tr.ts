@@ -1503,67 +1503,67 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Constants/General.qml" line="937"/>
+        <location filename="../../Dex/Constants/General.qml" line="943"/>
         <source>Trading Fee</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Constants/General.qml" line="947"/>
+        <location filename="../../Dex/Constants/General.qml" line="953"/>
         <source>Minimum Trading Amount</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Constants/General.qml" line="958"/>
+        <location filename="../../Dex/Constants/General.qml" line="964"/>
         <source>Wallet %1 already exists</source>
         <comment>WALLETNAME</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Constants/General.qml" line="967"/>
-        <location filename="../../Dex/Constants/General.qml" line="969"/>
+        <location filename="../../Dex/Constants/General.qml" line="973"/>
+        <location filename="../../Dex/Constants/General.qml" line="975"/>
         <source>Please wait for %1 to fully activate</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Constants/General.qml" line="971"/>
+        <location filename="../../Dex/Constants/General.qml" line="977"/>
         <source>%1 balance is lower than the fees amount: %2 %3</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Constants/General.qml" line="973"/>
+        <location filename="../../Dex/Constants/General.qml" line="979"/>
         <source>Tradable (after fees) %1 balance is lower than minimum trade amount</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Constants/General.qml" line="975"/>
+        <location filename="../../Dex/Constants/General.qml" line="981"/>
         <source>Please fill the price field</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Constants/General.qml" line="977"/>
+        <location filename="../../Dex/Constants/General.qml" line="983"/>
         <source>Please fill the volume field</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Constants/General.qml" line="979"/>
-        <location filename="../../Dex/Constants/General.qml" line="981"/>
+        <location filename="../../Dex/Constants/General.qml" line="985"/>
+        <location filename="../../Dex/Constants/General.qml" line="987"/>
         <source>%1 volume is lower than minimum trade amount</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Constants/General.qml" line="983"/>
-        <location filename="../../Dex/Constants/General.qml" line="987"/>
+        <location filename="../../Dex/Constants/General.qml" line="989"/>
+        <location filename="../../Dex/Constants/General.qml" line="993"/>
         <source>%1 needs to be enabled in order to use %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Constants/General.qml" line="985"/>
-        <location filename="../../Dex/Constants/General.qml" line="989"/>
+        <location filename="../../Dex/Constants/General.qml" line="991"/>
+        <location filename="../../Dex/Constants/General.qml" line="995"/>
         <source>%1 balance needs to be funded, a non-zero balance is required to pay the gas of %2 transactions</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Constants/General.qml" line="991"/>
+        <location filename="../../Dex/Constants/General.qml" line="997"/>
         <source>Unknown Error</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2033,38 +2033,38 @@ They will be removed from the orderbook until you log in again.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Wallet/Main.qml" line="857"/>
+        <location filename="../../Dex/Wallet/Main.qml" line="856"/>
         <source>Explore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Wallet/Main.qml" line="1205"/>
+        <location filename="../../Dex/Wallet/Main.qml" line="1204"/>
         <source>Loading ticker chart data</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Wallet/Main.qml" line="1212"/>
+        <location filename="../../Dex/Wallet/Main.qml" line="1211"/>
         <source>There is no chart data for this ticker yet</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Wallet/Main.qml" line="1287"/>
+        <location filename="../../Dex/Wallet/Main.qml" line="1286"/>
         <source>Please wait, %1 is %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Wallet/Main.qml" line="1287"/>
+        <location filename="../../Dex/Wallet/Main.qml" line="1286"/>
         <source>% activated...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Wallet/Main.qml" line="1290"/>
+        <location filename="../../Dex/Wallet/Main.qml" line="1289"/>
         <source>Fetching transactions...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Wallet/Main.qml" line="1289"/>
-        <location filename="../../Dex/Wallet/Main.qml" line="1291"/>
+        <location filename="../../Dex/Wallet/Main.qml" line="1288"/>
+        <location filename="../../Dex/Wallet/Main.qml" line="1290"/>
         <source>No transactions available.</source>
         <translation type="unfinished"></translation>
     </message>

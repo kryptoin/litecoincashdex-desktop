@@ -541,6 +541,12 @@ QtObject {
         return ""
     }
 
+    function getExplorerURL(ticker) {
+        if (privacy_mode) return ''
+        const coin_info = API.app.portfolio_pg.global_cfg_mdl.get_coin_info(ticker)
+        return coin_info.explorer_url || ""
+    }
+
     function viewTxAtExplorer(ticker, txid, add_0x=true) {
         if (privacy_mode) return ''
         if(txid !== '') {
