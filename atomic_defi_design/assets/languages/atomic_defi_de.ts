@@ -1754,7 +1754,7 @@ Try again or select &apos;Allow custom seed&apos; to continue.</source>
     </message>
     <message>
         <location filename="../../Dex/Exchange/Trade/BestOrder/List.qml" line="37"/>
-        <source>Enter volume to see best orders.</source>
+        <source>Enter a trade amount to load the best orders for this pair.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

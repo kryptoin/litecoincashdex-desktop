@@ -2757,12 +2757,18 @@ namespace atomic_dex
     kdf_service::on_refresh_orderbook_model_data(const refresh_orderbook_model_data& evt)
     {
         // SPDLOG_DEBUG("refreshing orderbook pair: [{} / {}]", evt.base, evt.rel);
+        auto&& [base, rel] = m_synchronized_ticker_pair.get();
+
+        //! Only treat a pair change as a reset. This fetches the max_taker_vol / min_trading_vol
+        //! extras batch once per new pair, while guarding against re-sending it on the periodic
+        //! orderbook tick (which calls process_orderbook(false)).
+        bool is_a_reset = evt.base != base || evt.rel != rel;
+
         this->m_synchronized_ticker_pair = std::make_pair(evt.base, evt.rel);
 
         if (this->m_kdf_running)
         {
-            // SPDLOG_DEBUG("process_orderbook(true)");
-            process_orderbook(false);
+            process_orderbook(is_a_reset);
         }
     }
 

@@ -34,7 +34,7 @@ Widget
 
         DexLabel
         {
-            text_value: qsTr("Enter volume to see best orders.")
+            text_value: qsTr("Enter a trade amount to load the best orders for this pair.")
             anchors.fill: parent
             anchors.centerIn: parent
             horizontalAlignment: Text.AlignHCenter
