@@ -19,6 +19,7 @@ namespace atomic_dex
 
         //! private fields
         t_market_registry          m_market_registry;
+        t_market_registry          m_extra_market_infos;
         mutable std::shared_mutex  m_market_mutex;
         t_komodo_prices_time_point m_clock;
 
@@ -54,6 +55,12 @@ namespace atomic_dex
 
         //! Get the last timestamp for a given ticker.
         [[nodiscard]] int64_t get_last_price_timestamp(const std::string& ticker) const;
+
+        //! Store extra market infos used as a fallback for tickers missing from the main registry.
+        void set_extra_market_infos(t_market_registry&& extra_infos);
+
+        //! Check if a ticker is present either in the main registry or in the extra fallback infos.
+        [[nodiscard]] bool is_ticker_tracked(const std::string& ticker) const;
     };
 } // namespace atomic_dex
 

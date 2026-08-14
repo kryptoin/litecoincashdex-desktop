@@ -16,8 +16,13 @@
 
 //! Project Headers
 #include "atomicdex/services/price/global.provider.hpp"
+#include "atomicdex/api/coinpaprika/coinpaprika.hpp"
+#include "atomicdex/events/events.hpp"
 #include "atomicdex/pages/qt.settings.page.hpp"
 #include "atomicdex/services/price/komodo_prices/komodo.prices.provider.hpp"
+
+#include <ctime>
+#include <unordered_map>
 
 namespace
 {
@@ -130,8 +135,10 @@ namespace atomic_dex
     global_price_service::global_price_service(entt::registry& registry, ag::ecs::system_manager& system_manager, atomic_dex::cfg& cfg) :
         system(registry), m_system_manager(system_manager), m_cfg(cfg)
     {
-        m_update_clock = std::chrono::high_resolution_clock::now();
+        m_update_clock         = std::chrono::high_resolution_clock::now();
+        m_extra_market_clock   = std::chrono::high_resolution_clock::now();
         this->dispatcher_.sink<force_update_providers>().connect<&global_price_service::on_force_update_providers>(*this);
+        this->dispatcher_.sink<fiat_rate_updated>().connect<&global_price_service::on_fiat_rate_updated>(*this);
     }
 } // namespace atomic_dex
 
@@ -498,5 +505,139 @@ namespace atomic_dex
         // SPDLOG_INFO("coin_rate_providers size: {}", m_coin_rate_providers.size());
         available = m_coin_rate_providers.find(currency) != m_coin_rate_providers.end();
         return available;
+    }
+
+    void
+    global_price_service::on_fiat_rate_updated([[maybe_unused]] const fiat_rate_updated& evt)
+    {
+        using namespace std::chrono_literals;
+        using clock   = std::chrono::high_resolution_clock;
+        const auto now = clock::now();
+        const auto s   = std::chrono::duration_cast<std::chrono::seconds>(now - m_extra_market_clock).count();
+        if (s < 30)
+        {
+            return;
+        }
+        m_extra_market_clock = now;
+        this->fetch_missing_coinpaprika_rates();
+    }
+
+    void
+    global_price_service::fetch_missing_coinpaprika_rates()
+    {
+        try
+        {
+            const auto& kdf   = m_system_manager.get_system<kdf_service>();
+            const auto& prov  = m_system_manager.get_system<komodo_prices_provider>();
+            const auto  coins = kdf.get_enabled_coins();
+
+            std::unordered_map<std::string, std::string> missing;
+            for (auto&& coin: coins)
+            {
+                if (coin.coinpaprika_id.empty() || coin.ticker.empty() || coin.coinpaprika_id == "test-coin")
+                {
+                    continue;
+                }
+                if (prov.is_ticker_tracked(coin.ticker))
+                {
+                    continue;
+                }
+                missing[coin.ticker] = coin.coinpaprika_id;
+            }
+            if (missing.empty())
+            {
+                return;
+            }
+            SPDLOG_INFO("Fetching CoinPaprika rates for {} missing tickers", missing.size());
+
+            auto extra_infos = std::make_shared<komodo_prices::api::t_komodo_tickers_price_registry>();
+
+            std::vector<std::string> tickers;
+            tickers.reserve(missing.size());
+            for (auto&& [ticker, _]: missing)
+            {
+                tickers.push_back(ticker);
+            }
+
+            auto now_ts = static_cast<int64_t>(std::time(nullptr));
+            std::string last_updated;
+            {
+                std::time_t t   = std::time(nullptr);
+                std::tm*    tmv = std::gmtime(&t);
+                char        buf[32];
+                std::strftime(buf, sizeof(buf), "%Y-%m-%dT%H:%M:%SZ", tmv);
+                last_updated.assign(buf);
+            }
+
+            auto parse_and_store = [extra_infos, now_ts, last_updated](const std::string& ticker, web::http::http_response resp)
+            {
+                try
+                {
+                    if (resp.status_code() == 200)
+                    {
+                        const auto j   = nlohmann::json::parse(TO_STD_STR(resp.extract_string(true).get()));
+                        const auto cot = j.get<coinpaprika::api::ticker_infos>();
+                        if (cot.last_price != "0" && cot.last_price != "0.00")
+                        {
+                            komodo_prices::api::komodo_ticker_infos entry;
+                            entry.ticker                 = ticker;
+                            entry.last_price             = cot.last_price;
+                            entry.last_updated           = last_updated;
+                            entry.last_updated_timestamp = now_ts;
+                            entry.volume24_h             = cot.volume24_h;
+                            entry.price_provider         = komodo_prices::api::provider::coinpaprika;
+                            entry.volume_provider        = komodo_prices::api::provider::coinpaprika;
+                            entry.change_24_h            = cot.change_24h;
+                            entry.change_24_h_provider   = komodo_prices::api::provider::coinpaprika;
+                            entry.sparkline_7_d          = nlohmann::json::array();
+                            (*extra_infos)[ticker]       = std::move(entry);
+                        }
+                    }
+                }
+                catch (const std::exception& error)
+                {
+                    SPDLOG_ERROR("Error while fetching CoinPaprika rate for {}: {}", ticker, error.what());
+                }
+            };
+
+            pplx::task<void> chain = pplx::task_from_result();
+            for (auto&& ticker: tickers)
+            {
+                const std::string& coinpaprika_id = missing.at(ticker);
+                chain = chain
+                            .then([coinpaprika_id](pplx::task<void> previous_task)
+                                  {
+                                      previous_task.wait();
+                                      return coinpaprika::api::async_ticker(coinpaprika::api::ticker_request{coinpaprika_id, "USD"});
+                                  })
+                            .then([parse_and_store, ticker](pplx::task<web::http::http_response> prev)
+                                  {
+                                      const auto resp = prev.get(); // propagate failures to next functor
+                                      parse_and_store(ticker, resp);
+                                  });
+            }
+
+            const auto finalize = [this, extra_infos](pplx::task<void> previous_task)
+            {
+                try
+                {
+                    previous_task.wait();
+                }
+                catch (const std::exception& error)
+                {
+                    SPDLOG_ERROR("Error while fetching CoinPaprika rates: {}", error.what());
+                }
+                if (!extra_infos->empty())
+                {
+                    m_system_manager.get_system<komodo_prices_provider>().set_extra_market_infos(std::move(*extra_infos));
+                    dispatcher_.trigger(update_portfolio_values{});
+                }
+            };
+            chain.then(finalize);
+        }
+        catch (const std::exception& error)
+        {
+            SPDLOG_ERROR("Exception caught in fetch_missing_coinpaprika_rates: {}", error.what());
+        }
     }
 } // namespace atomic_dex

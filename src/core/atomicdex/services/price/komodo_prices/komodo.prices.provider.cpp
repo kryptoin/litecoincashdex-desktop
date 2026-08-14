@@ -25,8 +25,13 @@ namespace atomic_dex
     {
         std::shared_lock lock(m_market_mutex);
         // SPDLOG_INFO("Looking for ticker: {}", ticker);
-        const auto it = m_market_registry.find(ticker);
-        return it != m_market_registry.cend() ? it->second : komodo_prices::api::komodo_ticker_infos{.ticker = ticker};
+        auto it = m_market_registry.find(ticker);
+        if (it != m_market_registry.cend())
+        {
+            return it->second;
+        }
+        it = m_extra_market_infos.find(ticker);
+        return it != m_extra_market_infos.cend() ? it->second : komodo_prices::api::komodo_ticker_infos{.ticker = ticker};
     }
 
     void
@@ -151,5 +156,19 @@ namespace atomic_dex
     komodo_prices_provider::get_last_price_timestamp(const std::string& ticker) const
     {
         return get_info_answer(ticker).last_updated_timestamp;
+    }
+
+    void
+    komodo_prices_provider::set_extra_market_infos(t_market_registry&& extra_infos)
+    {
+        std::unique_lock lock(m_market_mutex);
+        m_extra_market_infos = std::move(extra_infos);
+    }
+
+    bool
+    komodo_prices_provider::is_ticker_tracked(const std::string& ticker) const
+    {
+        std::shared_lock lock(m_market_mutex);
+        return m_market_registry.find(ticker) != m_market_registry.cend() || m_extra_market_infos.find(ticker) != m_extra_market_infos.cend();
     }
 } // namespace atomic_dex

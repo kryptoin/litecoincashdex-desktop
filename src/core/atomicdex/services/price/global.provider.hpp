@@ -65,6 +65,11 @@ namespace atomic_dex
 
         //! Events
         void on_force_update_providers([[maybe_unused]] const force_update_providers& evt);
+        void on_fiat_rate_updated([[maybe_unused]] const fiat_rate_updated& evt);
+
+      private:
+        void fetch_missing_coinpaprika_rates();
+        t_update_time_point m_extra_market_clock;
     };
 } // namespace atomic_dex
 
