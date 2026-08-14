@@ -85,10 +85,17 @@ Item
 
             let rel_ticker = General.getChartTicker(right_ticker)
             let base_ticker = General.getChartTicker(left_ticker)
-            if (rel_ticker != "" && base_ticker != "")
+            let cp_ticker = General.getCoinPaprikaTicker(right_ticker)
+
+            // LiveCoinWatch does not expose price data for every coin even when a
+            // livecoinwatch_id exists in the coin config (e.g. thin assets like MAZA).
+            // The embedded script probes LiveCoinWatch's API and, when the coin has no
+            // data there, falls back to a CoinPaprika daily price chart instead of
+            // rendering a blank widget.
+            if (rel_ticker != "" || (cp_ticker != "" && cp_ticker != "test-coin"))
             {
                 pair_supported = true
-                symbol = rel_ticker+"-"+base_ticker
+                symbol = (rel_ticker != "" ? rel_ticker : right_ticker)+"-"+(base_ticker != "" ? base_ticker : left_ticker)
                 console.log("symbol", symbol)
                 console.log("loaded_symbol", loaded_symbol)
                 
@@ -98,18 +105,134 @@ Item
                     console.log("symbol === loaded_symbol, ok")
                     return
                 }
+                loaded_symbol = symbol
+
                 chart_html = `
                 <style>
-                    body { margin: auto; }
+                    html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: ${Dex.CurrentTheme.comboBoxBackgroundColor}; }
                     .livecoinwatch-widget-1 {
                         transform: scale(${Math.min(scale_x, scale_y)});
                         transform-origin: top left;
                     }
                     a { pointer-events: none; }
+                    #cp { width: 100%; height: 100%; display: flex; flex-direction: column; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; }
+                    #cpHead { display: flex; justify-content: space-between; align-items: baseline; padding: 12px 16px 0 16px; }
+                    #cpName { font-size: 13px; color: ${Dex.CurrentTheme.foregroundColor}; font-weight: 600; }
+                    #cpPrice { font-size: 18px; color: ${Dex.CurrentTheme.foregroundColor}; font-weight: 600; }
+                    #cpChange { font-size: 12px; margin-left: 8px; }
+                    #cpChart { flex: 1; min-height: 0; padding: 6px 12px 8px 12px; }
+                    #cpFoot { font-size: 10px; color: ${Dex.CurrentTheme.foregroundColor}; opacity: .6; text-align: right; padding: 0 16px 8px 16px; }
                 </style>
-                <script defer src="https://www.livecoinwatch.com/static/lcw-widget.js"></script>
-                <div class="livecoinwatch-widget-1" lcw-coin="${rel_ticker}" lcw-base="${base_ticker}" lcw-secondary="USDC" lcw-period="w" lcw-color-tx="${Dex.CurrentTheme.foregroundColor}" lcw-color-pr="#58c7c5" lcw-color-bg="${Dex.CurrentTheme.comboBoxBackgroundColor}" lcw-border-w="0" lcw-digits="8" ></div>
-                `
+                <body>
+                <div id="cp" style="display:none;">
+                    <div id="cpHead"><span id="cpName"></span><span id="cpPrice"></span></div>
+                    <div id="cpChart"></div>
+                    <div id="cpFoot">Daily prices in USD - CoinPaprika</div>
+                </div>
+                <script>
+                    (function()
+                    {
+                        var LCW = "${rel_ticker}";
+                        var CP  = "${cp_ticker}";
+                        var BASE = "${base_ticker}";
+                        var COIN = "${right_ticker}";
+
+                        var GRAD_TOP    = "${Dex.CurrentTheme.dark_theme ? Dex.CurrentTheme.colorGreen3 : Dex.CurrentTheme.colorGreen}";
+                        var GRAD_BOTTOM = "${Dex.CurrentTheme.dark_theme ? Dex.CurrentTheme.colorGreen2 : Dex.CurrentTheme.colorGreen3}";
+                        var LINE_COLOR  = "${Dex.CurrentTheme.colorGreen2}";
+
+                        function noData() { document.title = "chart:nodata"; }
+
+                        function injectCoinPaprika(rows)
+                        {
+                            var prices = rows.map(function(r){ return r.price; });
+                            var min = Math.min.apply(null, prices);
+                            var max = Math.max.apply(null, prices);
+                            if (min === max) { min *= 0.99; max *= 1.01; }
+                            var range = max - min;
+                            var W = 380, H = 140, P = 8;
+                            var pts = [];
+                            for (var i = 0; i < prices.length; i++)
+                            {
+                                var x = P + (i / (prices.length - 1)) * (W - 2*P);
+                                var y = H - P - ((prices[i] - min) / range) * (H - 2*P);
+                                pts.push(x.toFixed(1) + "," + y.toFixed(1));
+                            }
+                            var last = prices[prices.length - 1];
+                            var first = prices[0];
+                            var chg = (last / first - 1) * 100;
+                            var chgColor = chg >= 0 ? "#26da71" : "#fb0000";
+                            var poly = pts.join(" ");
+                            var svg = '<svg width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">'
+                                + '<defs><linearGradient id="grad" x1="0" y1="0" x2="0" y2="1">'
+                                + '<stop offset="0" stop-color="' + GRAD_TOP + '"/>'
+                                + '<stop offset="1" stop-color="' + GRAD_BOTTOM + '"/>'
+                                + '</linearGradient></defs>'
+                                + '<polygon points="' + P + ',' + (H - P) + ' ' + poly + ' ' + (W - P) + ',' + (H - P) + '" fill="url(#grad)"/>'
+                                + '<polyline points="' + poly + '" fill="none" stroke="' + LINE_COLOR + '" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>'
+                                + '</svg>';
+                            var priceStr = last < 1 ? last.toFixed(8) : last < 100 ? last.toFixed(4) : last.toFixed(2);
+                            document.getElementById("cpChart").innerHTML = svg;
+                            document.getElementById("cpName").textContent = COIN + " - last " + rows.length + " days";
+                            document.getElementById("cpPrice").innerHTML = "$" + priceStr + '<span id="cpChange" style="color:' + chgColor + '">' + (chg >= 0 ? "+" : "") + chg.toFixed(2) + "%</span>";
+                            document.getElementById("cp").style.display = "flex";
+                            document.title = "chart:ok";
+                        }
+
+                        function injectLiveCoinWatch()
+                        {
+                            var div = document.createElement("div");
+                            div.className = "livecoinwatch-widget-1";
+                            div.setAttribute("lcw-coin", LCW);
+                            div.setAttribute("lcw-base", BASE);
+                            div.setAttribute("lcw-secondary", "USDC");
+                            div.setAttribute("lcw-period", "w");
+                            div.setAttribute("lcw-color-tx", "${Dex.CurrentTheme.foregroundColor}");
+                            div.setAttribute("lcw-color-pr", "#58c7c5");
+                            div.setAttribute("lcw-color-bg", "${Dex.CurrentTheme.comboBoxBackgroundColor}");
+                            div.setAttribute("lcw-border-w", "0");
+                            div.setAttribute("lcw-digits", "8");
+                            document.body.appendChild(div);
+                            var s = document.createElement("script");
+                            s.src = "https://www.livecoinwatch.com/static/lcw-widget.js";
+                            document.head.appendChild(s);
+                            document.title = "chart:ok";
+                        }
+
+                        function tryCoinPaprika()
+                        {
+                            if (!CP || CP === "test-coin") { noData(); return; }
+                            var end = new Date();
+                            var start = new Date(end.getTime() - 90*86400000);
+                            var url = "https://api.coinpaprika.com/v1/tickers/" + CP + "/historical?start=" + start.toISOString().slice(0,10) + "&end=" + end.toISOString().slice(0,10) + "&interval=1d";
+                            fetch(url)
+                                .then(function(r){ return r.json(); })
+                                .then(function(rows)
+                                {
+                                    if (Array.isArray(rows) && rows.length >= 2) injectCoinPaprika(rows);
+                                    else noData();
+                                })
+                                .catch(noData);
+                        }
+
+                        if (!LCW || LCW === "test-coin")
+                        {
+                            tryCoinPaprika();
+                            return;
+                        }
+
+                        var check = "https://http-api.livecoinwatch.com/widgets/coins?only=" + LCW + "&currency=" + BASE + "&location=" + encodeURIComponent(window.location.href) + "&utm_medium=widgets&utm_source=atomicdex&utm_campaign=coin-widget";
+                        fetch(check)
+                            .then(function(j){ return j.json(); })
+                            .then(function(j)
+                            {
+                                if (j && j.data && j.data.length > 0) injectLiveCoinWatch();
+                                else tryCoinPaprika();
+                            })
+                            .catch(function(){ tryCoinPaprika(); });
+                    })();
+                </script>
+                </body>`
             }
         }
         console.log(chart_html)
@@ -337,6 +460,27 @@ Item
             loadChart(left_ticker?? atomic_app_primary_coin,
                       right_ticker?? atomic_app_secondary_coin,
                       true)
+        }
+    }
+
+    // The embedded livecoinwatch/CoinPaprika probe reports its result through the
+    // page title. "chart:ok" reveals the chart; "chart:nodata" (no data on either
+    // source) marks the pair as unsupported so the message overlay is shown.
+    Connections
+    {
+        target: dashboard.webEngineView
+        function onTitleChanged()
+        {
+            const t = dashboard.webEngineView.title
+            if (t === "chart:nodata")
+            {
+                root.chart_loading = false
+                root.pair_supported = false
+            }
+            else if (t === "chart:ok")
+            {
+                root.pair_supported = true
+            }
         }
     }
 }

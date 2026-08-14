@@ -515,17 +515,17 @@
 <context>
     <name>Chart</name>
     <message>
-        <location filename="../../Dex/Exchange/ProView/Chart.qml" line="219"/>
+        <location filename="../../Dex/Exchange/ProView/Chart.qml" line="342"/>
         <source>Loading pair chart data</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Exchange/ProView/Chart.qml" line="225"/>
+        <location filename="../../Dex/Exchange/ProView/Chart.qml" line="348"/>
         <source>There is no chart data for this pair</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Exchange/ProView/Chart.qml" line="233"/>
+        <location filename="../../Dex/Exchange/ProView/Chart.qml" line="356"/>
         <source>There is no chart data for %1 (testcoin) pairs</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1406,14 +1406,14 @@
 <context>
     <name>General</name>
     <message numerus="yes">
-        <location filename="../../Dex/Constants/General.qml" line="380"/>
+        <location filename="../../Dex/Constants/General.qml" line="386"/>
         <source>%n day(s)</source>
         <translation type="unfinished">
             <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../../Dex/Constants/General.qml" line="390"/>
+        <location filename="../../Dex/Constants/General.qml" line="396"/>
         <source>%nd</source>
         <comment>day</comment>
         <translation type="unfinished">
@@ -1421,7 +1421,7 @@
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../../Dex/Constants/General.qml" line="391"/>
+        <location filename="../../Dex/Constants/General.qml" line="397"/>
         <source>%nh</source>
         <comment>hours</comment>
         <translation type="unfinished">
@@ -1429,7 +1429,7 @@
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../../Dex/Constants/General.qml" line="392"/>
+        <location filename="../../Dex/Constants/General.qml" line="398"/>
         <source>%nm</source>
         <comment>minutes</comment>
         <translation type="unfinished">
@@ -1437,7 +1437,7 @@
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../../Dex/Constants/General.qml" line="393"/>
+        <location filename="../../Dex/Constants/General.qml" line="399"/>
         <source>%ns</source>
         <comment>seconds</comment>
         <translation type="unfinished">
@@ -1445,7 +1445,7 @@
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../../Dex/Constants/General.qml" line="394"/>
+        <location filename="../../Dex/Constants/General.qml" line="400"/>
         <source>%nms</source>
         <comment>milliseconds</comment>
         <translation type="unfinished">
@@ -1453,117 +1453,117 @@
         </translation>
     </message>
     <message>
-        <location filename="../../Dex/Constants/General.qml" line="395"/>
+        <location filename="../../Dex/Constants/General.qml" line="401"/>
         <source>-</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Constants/General.qml" line="439"/>
+        <location filename="../../Dex/Constants/General.qml" line="445"/>
         <source>&lt;b&gt;Taker tx fee:&lt;/b&gt; </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Constants/General.qml" line="440"/>
+        <location filename="../../Dex/Constants/General.qml" line="446"/>
         <source>&lt;b&gt;Dex tx fee:&lt;/b&gt; </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Constants/General.qml" line="441"/>
+        <location filename="../../Dex/Constants/General.qml" line="447"/>
         <source>&lt;b&gt;Dex fee:&lt;/b&gt; </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Constants/General.qml" line="442"/>
+        <location filename="../../Dex/Constants/General.qml" line="448"/>
         <source>&lt;b&gt;Maker tx fee:&lt;/b&gt; </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Constants/General.qml" line="469"/>
+        <location filename="../../Dex/Constants/General.qml" line="475"/>
         <source>Balance is zero!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Constants/General.qml" line="473"/>
+        <location filename="../../Dex/Constants/General.qml" line="479"/>
         <source>Activating %1 (%2%)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Constants/General.qml" line="477"/>
+        <location filename="../../Dex/Constants/General.qml" line="483"/>
         <source>Calculating max...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Constants/General.qml" line="481"/>
+        <location filename="../../Dex/Constants/General.qml" line="487"/>
         <source>Min: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Constants/General.qml" line="483"/>
+        <location filename="../../Dex/Constants/General.qml" line="489"/>
         <source>Enter an amount</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Constants/General.qml" line="931"/>
+        <location filename="../../Dex/Constants/General.qml" line="937"/>
         <source>Trading Fee</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Constants/General.qml" line="941"/>
+        <location filename="../../Dex/Constants/General.qml" line="947"/>
         <source>Minimum Trading Amount</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Constants/General.qml" line="952"/>
+        <location filename="../../Dex/Constants/General.qml" line="958"/>
         <source>Wallet %1 already exists</source>
         <comment>WALLETNAME</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Constants/General.qml" line="961"/>
-        <location filename="../../Dex/Constants/General.qml" line="963"/>
+        <location filename="../../Dex/Constants/General.qml" line="967"/>
+        <location filename="../../Dex/Constants/General.qml" line="969"/>
         <source>Please wait for %1 to fully activate</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Constants/General.qml" line="965"/>
+        <location filename="../../Dex/Constants/General.qml" line="971"/>
         <source>%1 balance is lower than the fees amount: %2 %3</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Constants/General.qml" line="967"/>
+        <location filename="../../Dex/Constants/General.qml" line="973"/>
         <source>Tradable (after fees) %1 balance is lower than minimum trade amount</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Constants/General.qml" line="969"/>
+        <location filename="../../Dex/Constants/General.qml" line="975"/>
         <source>Please fill the price field</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Constants/General.qml" line="971"/>
+        <location filename="../../Dex/Constants/General.qml" line="977"/>
         <source>Please fill the volume field</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Constants/General.qml" line="973"/>
-        <location filename="../../Dex/Constants/General.qml" line="975"/>
+        <location filename="../../Dex/Constants/General.qml" line="979"/>
+        <location filename="../../Dex/Constants/General.qml" line="981"/>
         <source>%1 volume is lower than minimum trade amount</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Constants/General.qml" line="977"/>
-        <location filename="../../Dex/Constants/General.qml" line="981"/>
+        <location filename="../../Dex/Constants/General.qml" line="983"/>
+        <location filename="../../Dex/Constants/General.qml" line="987"/>
         <source>%1 needs to be enabled in order to use %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Constants/General.qml" line="979"/>
-        <location filename="../../Dex/Constants/General.qml" line="983"/>
+        <location filename="../../Dex/Constants/General.qml" line="985"/>
+        <location filename="../../Dex/Constants/General.qml" line="989"/>
         <source>%1 balance needs to be funded, a non-zero balance is required to pay the gas of %2 transactions</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Constants/General.qml" line="985"/>
+        <location filename="../../Dex/Constants/General.qml" line="991"/>
         <source>Unknown Error</source>
         <translation type="unfinished"></translation>
     </message>
