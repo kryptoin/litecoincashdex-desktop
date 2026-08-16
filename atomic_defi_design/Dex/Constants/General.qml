@@ -621,6 +621,21 @@ QtObject {
                 + " " + (amount < 1E5 ? formatDouble(parseFloat(amount), sf, true) : nFormatter(parseFloat(amount), sf))
     }
 
+    function formatFiatSmart(received, amount, fiat) {
+        const value = parseFloat(amount)
+        if (isNaN(value)) return formatFiat(received, amount, fiat)
+        // Micro-cap amounts: when the default 2-digit formatting would present a
+        // real non-zero price as $0.00, show the actual (tiny) value instead.
+        if (value > 0 && value.toFixed(2) == "0.00")
+        {
+            const stripped = formatDouble(value, defaultPrecision, false)
+            return diffPrefix(received) +
+                (fiat === API.app.settings_pg.current_fiat ? API.app.settings_pg.current_fiat_sign : API.app.settings_pg.current_currency_sign)
+                + " " + stripped
+        }
+        return formatFiat(received, amount, fiat)
+    }
+
     function formatPercent(value, show_prefix=true) {
         if (privacy_mode) return ''
         let prefix = ''
@@ -2071,15 +2086,6 @@ QtObject {
                                                 "KCS/UST": "KUCOIN:KCSUSDT",
                                                 "KCS/DAI": "KUCOIN:KCSUSDT",
                                                 "KCS/PAX": "KUCOIN:KCSUSDT",
-                                                "KMD/BTC": "BINANCE:KMDBTC",
-                                                "KMD/USDT": "BINANCE:KMDUSD",
-                                                "KMD/BUSD": "BINANCE:KMDUSD",
-                                                "KMD/USDC": "BINANCE:KMDUSD",
-                                                "KMD/TUSD": "BINANCE:KMDUSD",
-                                                "KMD/HUSD": "BINANCE:KMDUSD",
-                                                "KMD/UST": "BINANCE:KMDUSD",
-                                                "KMD/DAI": "BINANCE:KMDUSD",
-                                                "KMD/PAX": "BINANCE:KMDUSD",
                                                 "KNC/BTC": "BINANCE:KNCBTC",
                                                 "KNC/ETH": "BINANCE:KNCETH",
                                                 "KNC/USDT": "COINBASE:KNCUSD",

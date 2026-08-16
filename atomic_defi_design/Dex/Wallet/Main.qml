@@ -224,8 +224,11 @@ Item
                         {
                             text_value:
                             {
-                                const v = General.formatFiat('', current_ticker_infos.current_currency_ticker_price, API.app.settings_pg.current_currency)
-                                return current_ticker_infos.current_currency_ticker_price == 0 ? 'N/A' : v
+                                if (parseFloat(current_ticker_infos.current_currency_ticker_price) > 0)
+                                {
+                                    return General.formatFiatSmart('', current_ticker_infos.current_currency_ticker_price, API.app.settings_pg.current_currency)
+                                }
+                                return 'N/A'
                             }
                             Layout.alignment: Qt.AlignHCenter
                             font.pixelSize: headerTextFont
