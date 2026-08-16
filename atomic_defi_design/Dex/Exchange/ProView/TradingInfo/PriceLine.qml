@@ -97,7 +97,7 @@ ColumnLayout
                 id: price_diff_text
                 anchors.horizontalCenter: parent.horizontalCenter
                 color: parseFloat(cexPriceDiff) <= 0 ? Dex.CurrentTheme.okColor : Dex.CurrentTheme.warningColor
-                text_value: (parseFloat(cexPriceDiff) > 0 ? qsTr("Expensive") : qsTr("Expedient")) + ":&nbsp;&nbsp;&nbsp;&nbsp;" + qsTr("%1 compared to CEX", "PRICE_DIFF%").arg("<b>" + General.formatPercent(General.limitDigits(cexPriceDiff)) + "</b>")
+                text_value: (parseFloat(cexPriceDiff) > 0 ? qsTr("Expensive") : qsTr("Expedient")) + ":&nbsp;&nbsp;&nbsp;&nbsp;" + qsTr("%1 compared to CEX", "PRICE_DIFF%").arg("<b>" + General.formatComparison(cexPriceDiff) + "</b>")
                 font.pixelSize: fontSizeBigger
             }
             

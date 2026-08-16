@@ -648,6 +648,18 @@ QtObject {
         return (show_prefix ? prefix : '') + parseFloat(value).toFixed(3) + ' %'
     }
 
+    // Comparison percentage used by the price line, bounded so an absurdly large
+    // price/CEX deviation cannot overflow the label and overlap surrounding gauges.
+    function formatComparison(value) {
+        if (privacy_mode) return ''
+        const v = parseFloat(value)
+        if (isNaN(v)) return ''
+        const max = 10000
+        if (v > max) return '+ > ' + max.toLocaleString() + ' %'
+        if (v < -max) return '- > ' + max.toLocaleString() + ' %'
+        return formatPercent(v, true)
+    }
+
 
     function formatCexRates(value) {
         if (value === "0") return "N/A"
