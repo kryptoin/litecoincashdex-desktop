@@ -9,13 +9,24 @@
 #     current user as a substring — CMakeLists, git internals, logs, manifests, etc.).
 #   - *.log glob is corrected (old script used "*log", matching e.g. "changelog").
 #   - --dry-run flag supported throughout.
+#   - --clean-build / -c runs `ninja -t clean` in the active build dir
+#     (build-macos-apple-silicon) to force a from-scratch rebuild; off by
+#     default since it wipes all compiled artifacts of the current build.
 set -euo pipefail
 
 DRY_RUN=0
-if [ "${1:-}" = "--dry-run" ]; then
-  DRY_RUN=1
-  echo "== DRY RUN: nothing will be deleted =="
-fi
+CLEAN_BUILD=0
+for arg in "$@"; do
+  case "$arg" in
+    --dry-run)
+      DRY_RUN=1
+      echo "== DRY RUN: nothing will be deleted =="
+      ;;
+    --clean-build|-c)
+      CLEAN_BUILD=1
+      ;;
+  esac
+done
 
 do_rm() {
   if [ "$DRY_RUN" -eq 1 ]; then
@@ -101,5 +112,30 @@ for build_dir in build-macos-apple-silicon-test build-macos-analysis; do
                 -o -type f -name "*.exe" \) \
                 -print0)
 done
+
+# -----------------------------------------------------------------------
+# 6. Optional: full clean of the active build dir (--clean-build)
+#    Runs `ninja -t clean` in build-macos-apple-silicon to force a
+#    from-scratch rebuild. Off by default: unlike the sections above,
+#    this wipes all compiled artifacts of the current build.
+# -----------------------------------------------------------------------
+if [ "$CLEAN_BUILD" -eq 1 ]; then
+  BUILD_DIR="build-macos-apple-silicon"
+  NINJA_BIN="${NINJA_BIN:-/opt/anaconda3/bin/ninja}"
+  if [ -d "$BUILD_DIR" ]; then
+    if [ "$DRY_RUN" -eq 1 ]; then
+      echo "would clean build dir: $BUILD_DIR"
+    else
+      echo "Cleaning build dir: $BUILD_DIR"
+      if [ -x "$NINJA_BIN" ]; then
+        (cd "$BUILD_DIR" && "$NINJA_BIN" -t clean) || echo "ninja clean failed; build dir left as-is" >&2
+      else
+        echo "ninja not found at $NINJA_BIN; pass NINJA_BIN=... to override" >&2
+      fi
+    fi
+  else
+    echo "active build dir $BUILD_DIR not found; skipping ninja clean" >&2
+  fi
+fi
 
 echo "Cleanup complete."
