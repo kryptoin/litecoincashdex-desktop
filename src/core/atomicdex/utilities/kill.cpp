@@ -52,14 +52,20 @@ namespace atomic_dex
     std::string
     execute(const std::string& command)
     {
-        system((command + " > temp.txt").c_str());
+        //! Write the redirected output to the system temp dir, never to the
+        //! current working directory. When the app is launched from Finder /
+        //! LaunchServices the CWD is "/", which is not writable, so a CWD-relative
+        //! temp.txt made the redirect silently fail and callers (kill_executable)
+        //! would then see an empty response and skip the kill — leaving a stale
+        //! KDF daemon holding port 7783 and hanging login.
+        const std::filesystem::path temp_path = std::filesystem::temp_directory_path() / "atomicdex_execute.txt";
+        system((command + " > '" + temp_path.string() + "' 2>/dev/null").c_str());
 
-        std::ifstream ifs("temp.txt");
+        std::ifstream ifs(temp_path.string());
         std::string ret{ std::istreambuf_iterator<char>(ifs), std::istreambuf_iterator<char>() };
         ifs.close(); // must close the inout stream so the file can be cleaned up
-        if (std::remove("temp.txt") != 0) {
-            SPDLOG_DEBUG("Error deleting temporary file");
-        }
+        std::error_code ec;
+        std::filesystem::remove(temp_path, ec);
         return ret;
     }
 } // namespace atomic_dex
