@@ -1,0 +1,16 @@
+test(config): add bundled-asset sanity checks for the packaged app
+
+package-macos.sh ships assets/config/0.9.8-coins.json inside the .app
+bundle, and the price/chart fallbacks (coinpaprika ids for MAZA/AVN/CAS,
+komodo registry lookups) depend on that data reaching users unchanged.
+
+Add offline doctest checks that fail fast if a future package drops,
+corrupts, or strips the bundled coins config:
+
+- bundled coins config is present and parseable
+- keeps the core coin set (KMD, MAZA, AVN, CAS)
+- keeps non-empty coinpaprika_id for the thinly traded coins
+- round-trips into coin_config_t (surfaces schema breaks)
+
+Tests resolve assets via ag::core::assets_real_path(), so they exercise
+the packaged Content/Resources/assets rather than the source tree.
