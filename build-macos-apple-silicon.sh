@@ -367,7 +367,12 @@ if [ -f "${ROOT_DIR}/assets/tools/kdf/mm2_cheetah" ]; then
 fi
 
 # ── Bundle QtWebEngineProcess ──────────────────────────────────────────────
-FRAMEWORK_DIR="${APP_BUNDLE}/Contents/Frameworks/QtWebEngineCore.framework"
+# NOTE: the conda Qt used here is a *dylib* (non-framework) build — there is no
+# QtWebEngineCore.framework.  QtWebEngine::subProcessPath() for a dylib build
+# only looks for "QtWebEngineProcess" in applicationDirPath() (Contents/MacOS)
+# and QLibraryInfo::LibraryExecutablesPath.  Deploying it inside a synthetic
+# framework's Versions/A/Helpers/... is therefore wrong and the browser process
+# dies with "Could not find QtWebEngineProcess" as soon as a web view is shown.
 QTWEBENGINE_PROCESS=""
 for candidate in \
     "${QT_PREFIX}/libexec/QtWebEngineProcess" \
@@ -376,58 +381,22 @@ for candidate in \
 done
 
 if [ -n "${QTWEBENGINE_PROCESS}" ]; then
-    log "Bundling QtWebEngineProcess from ${QTWEBENGINE_PROCESS}..."
-    mkdir -p "${FRAMEWORK_DIR}/Versions/A/Helpers/QtWebEngineProcess.app/Contents/MacOS"
-    mkdir -p "${FRAMEWORK_DIR}/Versions/A/Resources"
-
-    cp "${QTWEBENGINE_PROCESS}" \
-       "${FRAMEWORK_DIR}/Versions/A/Helpers/QtWebEngineProcess.app/Contents/MacOS/QtWebEngineProcess"
-    chmod +x "${FRAMEWORK_DIR}/Versions/A/Helpers/QtWebEngineProcess.app/Contents/MacOS/QtWebEngineProcess"
-
-    ln -sf "A"                          "${FRAMEWORK_DIR}/Versions/Current"
-    ln -sf "Versions/Current/Resources" "${FRAMEWORK_DIR}/Resources"
-    ln -sf "Versions/Current/Helpers"   "${FRAMEWORK_DIR}/Helpers"
-
-    "${INSTALL_NAME_TOOL}" -add_rpath "@executable_path/../../../../../../Frameworks" \
-       "${FRAMEWORK_DIR}/Versions/A/Helpers/QtWebEngineProcess.app/Contents/MacOS/QtWebEngineProcess" 2>/dev/null || true
-
-    cat > "${FRAMEWORK_DIR}/Versions/A/Resources/Info.plist" << 'PLISTEOF'
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-    <key>CFBundleExecutable</key><string>QtWebEngineCore</string>
-    <key>CFBundleIdentifier</key><string>org.qt-project.QtWebEngineCore</string>
-    <key>CFBundlePackageType</key><string>FMWK</string>
-    <key>CFBundleShortVersionString</key><string>5.15</string>
-    <key>CFBundleVersion</key><string>5.15</string>
-    <key>MinimumOSVersion</key><string>11.0</string>
-</dict>
-</plist>
-PLISTEOF
-
-    cat > "${FRAMEWORK_DIR}/Versions/A/Helpers/QtWebEngineProcess.app/Contents/Info.plist" << 'PLISTEOF'
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-    <key>CFBundleExecutable</key><string>QtWebEngineProcess</string>
-    <key>CFBundleIdentifier</key><string>org.qt-project.QtWebEngineProcess</string>
-    <key>CFBundlePackageType</key><string>APPL</string>
-    <key>CFBundleShortVersionString</key><string>5.15</string>
-    <key>CFBundleVersion</key><string>5.15</string>
-    <key>LSMinimumSystemVersion</key><string>11.0</string>
-</dict>
-</plist>
-PLISTEOF
+    log "Bundling QtWebEngineProcess to Contents/MacOS from ${QTWEBENGINE_PROCESS}..."
+    mkdir -p "${APP_BUNDLE}/Contents/MacOS"
+    cp "${QTWEBENGINE_PROCESS}" "${APP_BUNDLE}/Contents/MacOS/QtWebEngineProcess"
+    chmod +x "${APP_BUNDLE}/Contents/MacOS/QtWebEngineProcess"
+    # Ensure the Qt libs in Contents/Frameworks are resolvable from here.
+    "${INSTALL_NAME_TOOL}" -add_rpath "@executable_path/../Frameworks" \
+       "${APP_BUNDLE}/Contents/MacOS/QtWebEngineProcess" 2>/dev/null || true
+else
+    warn "QtWebEngineProcess binary not found; web views will crash at runtime"
 fi
 
 # ── Copy QtWebEngine QML imports ───────────────────────────────────────────
-if [ -d "${QT_QML_DIR}/QtWebEngine" ]; then
-    log "Bundling QtWebEngine QML imports..."
+if [ -d "${QT_QML_DIR}" ]; then
+    log "Bundling full Qt QML module tree..."
     mkdir -p "${APP_BUNDLE}/Contents/Resources/qml"
-    cp -r "${QT_QML_DIR}/QtWebEngine"  "${APP_BUNDLE}/Contents/Resources/qml/"
-    cp -r "${QT_QML_DIR}/QtWebChannel" "${APP_BUNDLE}/Contents/Resources/qml/" 2>/dev/null || true
+    cp -R "${QT_QML_DIR}/." "${APP_BUNDLE}/Contents/Resources/qml/"
 fi
 
 # ── Point the app at the aligned Qt at runtime ─────────────────────────────

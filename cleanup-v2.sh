@@ -47,16 +47,13 @@ done < <(find . -path ./.git -prune -o -type f -name "*.log" -print0)
 # -----------------------------------------------------------------------
 # 3. Disposable scratch / test build dirs only
 #    Preserved (never touched by this script):
-#      build-macos-anaconda3       — current active build
-#      build-macos-homebrew        — previous verified build
-#      build-macos-lwc-r1.5.6      — dependency source build
+#      build-macos-apple-silicon   — current active build
 #      libwally-core-build         — wally autotools build tree
 #      libwally-core-install       — wally installed headers + libs
 #      vendor/coins                — git submodule (GLEECBTC/coins); not a build
 #                                    artifact, never touched by this script
 # -----------------------------------------------------------------------
-for d in build-macos-anaconda3-test \
-          build-macos-homebrew-test \
+for d in build-macos-apple-silicon-test \
           build-macos-analysis \
           wally-install; do
   [ -d "$d" ] && do_rm "$d"
@@ -65,10 +62,10 @@ done
 # -----------------------------------------------------------------------
 # 4. CMake/Ninja metadata — scoped to INSIDE the disposable build dirs
 #    (not a repo-wide sweep, which would hit libwally-core-build etc.).
-#    Active build dirs (build-macos-anaconda3 / build-macos-homebrew) are
+#    Active build dirs (build-macos-apple-silicon) are
 #    preserved as-is so an existing build stays usable.
 # -----------------------------------------------------------------------
-for build_dir in build-macos-anaconda3-test build-macos-homebrew-test build-macos-analysis; do
+for build_dir in build-macos-apple-silicon-test build-macos-analysis; do
   [ -d "$build_dir" ] || continue
   while IFS= read -r -d '' f; do
     do_rm "$f"
@@ -91,7 +88,7 @@ done
 #    vendor/libwally trees prevents deleting libwally-core-install/lib/*.dylib
 #    and vendored static libs.
 # -----------------------------------------------------------------------
-for build_dir in build-macos-anaconda3-test build-macos-homebrew-test build-macos-analysis; do
+for build_dir in build-macos-apple-silicon-test build-macos-analysis; do
   [ -d "$build_dir" ] || continue
   while IFS= read -r -d '' f; do
     do_rm "$f"
