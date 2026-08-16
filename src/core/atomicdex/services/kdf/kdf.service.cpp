@@ -53,6 +53,82 @@ namespace ag = antara::gaming;
 
 namespace
 {
+    //! Parse a dotted numeric version string ("0.9.6") into comparable components.
+    std::vector<int> parse_version(const std::string& version)
+    {
+        std::vector<int> out;
+        std::istringstream iss(version);
+        std::string        part;
+        while (std::getline(iss, part, '.'))
+        {
+            try
+            {
+                out.push_back(std::stoi(part));
+            }
+            catch (...)
+            {
+                break;
+            }
+        }
+        return out;
+    }
+
+    //! Returns true when lhs is strictly older than rhs (component-wise numeric).
+    bool version_is_older(const std::string& lhs, const std::string& rhs)
+    {
+        const auto l = parse_version(lhs);
+        const auto r = parse_version(rhs);
+        const auto common = std::min(l.size(), r.size());
+        for (std::size_t i = 0; i < common; ++i)
+        {
+            if (l[i] != r[i])
+            {
+                return l[i] < r[i];
+            }
+        }
+        return l.size() < r.size();
+    }
+
+    //! Discover the newest "<version>-coins.<wallet>.json" file whose version is
+    //! strictly older than the current raw version, so a version bump never loses
+    //! the user's enabled coins. Falls back to the legacy hardcoded precedent
+    //! version when nothing parseable is found.
+    std::filesystem::path find_precedent_coins_config(const std::string& wallet_name)
+    {
+        using namespace std::string_literals;
+        const std::filesystem::path cfg_path   = atomic_dex::utils::get_atomic_dex_config_folder();
+        const std::string           current    = atomic_dex::get_raw_version();
+        const std::string           wallet_sfx = "-coins." + wallet_name + ".json";
+
+        std::string newest_older;
+        for (const auto& entry: std::filesystem::directory_iterator(cfg_path))
+        {
+            const std::string fname = entry.path().filename().string();
+            const std::size_t pos   = fname.find(wallet_sfx);
+            if (pos == std::string::npos)
+            {
+                continue;
+            }
+            const std::string candidate = fname.substr(0, pos);
+            if (not candidate.empty() && version_is_older(candidate, current))
+            {
+                if (newest_older.empty() || version_is_older(newest_older, candidate))
+                {
+                    newest_older = candidate;
+                }
+            }
+        }
+
+        if (not newest_older.empty())
+        {
+            SPDLOG_INFO("Migrating wallet {} coins from discovered precedent version {}", wallet_name, newest_older);
+            return cfg_path / (newest_older + wallet_sfx);
+        }
+
+        //! Fallback: the legacy single-step precedent constant.
+        return cfg_path / (std::string(atomic_dex::get_precedent_raw_version()) + wallet_sfx);
+    }
+
     void check_for_reconfiguration(const std::string& wallet_name)
     {
         try
@@ -60,9 +136,8 @@ namespace
             using namespace std::string_literals;
             SPDLOG_DEBUG("checking for reconfiguration");
 
-            std::filesystem::path    cfg_path                   = atomic_dex::utils::get_atomic_dex_config_folder();
-            std::string filename                   = std::string(atomic_dex::get_precedent_raw_version()) + "-coins." + wallet_name + ".json";
-            std::filesystem::path    precedent_version_cfg_path = cfg_path / filename;
+            std::filesystem::path cfg_path                   = atomic_dex::utils::get_atomic_dex_config_folder();
+            std::filesystem::path precedent_version_cfg_path = find_precedent_coins_config(wallet_name);
 
             if (std::filesystem::exists(precedent_version_cfg_path))
             {
