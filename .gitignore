@@ -22,6 +22,8 @@
 # ---------------------------------------------------------
 # Fetched / generated artifacts (do NOT commit)
 # ---------------------------------------------------------
+# Persistent FetchContent cache (qmaterial git clone reused across builds)
+/.fetchcontent-cache
 # Downloaded KDF daemon binary (populated by build script)
 /assets/tools/kdf/mm2_cheetah
 # libwally-core build tree

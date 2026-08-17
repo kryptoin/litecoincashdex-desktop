@@ -48,6 +48,7 @@ Item
     readonly property bool price_is_empty: parseFloat(non_null_price) <= 0
 
     readonly property string backend_price: API.app.trading_pg.price
+    readonly property string cex_price: API.app.trading_pg.cex_price
     readonly property int last_trading_error: API.app.trading_pg.last_trading_error
     readonly property string max_volume: API.app.trading_pg.max_volume
     readonly property string backend_volume: API.app.trading_pg.volume

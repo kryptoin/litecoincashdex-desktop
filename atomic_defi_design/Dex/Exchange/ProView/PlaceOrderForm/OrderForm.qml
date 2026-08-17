@@ -60,6 +60,17 @@ ColumnLayout
         target: exchange_trade
         function onBackend_priceChanged() { input_price.text = exchange_trade.backend_price; }
         function onBackend_volumeChanged() { input_volume.text = exchange_trade.backend_volume; }
+        function onCexPriceChanged()
+        {
+            // A fresh CEX rate can arrive after the form completed (e.g. the CoinPaprika
+            // fallback fetches lazily). Adopt it while the field still holds the default
+            // (unset) value or the initial price=1 fallback.
+            if (API.app.trading_pg.invalid_cex_price)
+                return
+            const txt = input_price.text
+            if (['', '0', '0.00', '0.00000000', '1'].indexOf(txt) !== -1)
+                input_price.text = General.formatDouble(exchange_trade.cex_price)
+        }
     }
 
     // Market mode selector
@@ -116,7 +127,10 @@ ColumnLayout
                 setPrice(text)
                 reset_fees_state()
             }
-            Component.onCompleted: text = General.formatDouble(API.app.trading_pg.cex_price) ? General.formatDouble(API.app.trading_pg.cex_price) : 1
+            // Init price from the CEX rate, falling back to a neutral 1 when the
+            // rate is invalid. NB: formatDouble("0.00") is a truthy string, so it
+            // must not be used in a ternary to test whether the rate is usable.
+            Component.onCompleted: text = API.app.trading_pg.invalid_cex_price ? 1 : General.formatDouble(API.app.trading_pg.cex_price)
         }
 
         OrderFormSubfield

@@ -62,6 +62,18 @@ namespace atomic_dex
             determine_max_volume();
         }
     }
+
+    void
+    trading_page::on_update_portfolio_values_event(const atomic_dex::update_portfolio_values& /*evt*/)
+    {
+        // CoinPaprika fallback rates for micro-cap pairs (e.g. MAZA/LCC) arrive
+        // asynchronously after pair selection. Re-determine the CEX rate so the
+        // UI can adopt a late-arriving price instead of showing a zero estimate.
+        if (!m_about_to_exit_the_app)
+        {
+            determine_cex_rates();
+        }
+    }
 } // namespace atomic_dex
 
 //! Public QML API
@@ -574,12 +586,14 @@ namespace atomic_dex
     trading_page::connect_signals()
     {
         dispatcher_.sink<process_orderbook_finished>().connect<&trading_page::on_process_orderbook_finished_event>(*this);
+        dispatcher_.sink<update_portfolio_values>().connect<&trading_page::on_update_portfolio_values_event>(*this);
     }
 
     void
     trading_page::disconnect_signals()
     {
         dispatcher_.sink<process_orderbook_finished>().disconnect<&trading_page::on_process_orderbook_finished_event>(*this);
+        dispatcher_.sink<update_portfolio_values>().disconnect<&trading_page::on_update_portfolio_values_event>(*this);
     }
 
     void

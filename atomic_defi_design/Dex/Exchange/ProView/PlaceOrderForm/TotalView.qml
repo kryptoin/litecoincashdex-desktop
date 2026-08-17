@@ -38,7 +38,7 @@ ColumnLayout
             font.weight: Font.DemiBold
             font.pixelSize: 16
             font.family: 'lato'
-            text_value: General.getFiatText(total_amount, right_ticker).replace(General.cex_icon, "")
+            text_value: General.formatFiatSmart('', API.app.get_fiat_from_amount(right_ticker, total_amount), API.app.settings_pg.current_fiat)
         }
     }
 

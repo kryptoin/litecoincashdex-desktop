@@ -224,6 +224,7 @@ namespace atomic_dex
 
         //! Events Callbacks
         void on_process_orderbook_finished_event(const process_orderbook_finished& evt);
+        void on_update_portfolio_values_event(const update_portfolio_values& evt);
 
       signals:
         void orderbookChanged();
