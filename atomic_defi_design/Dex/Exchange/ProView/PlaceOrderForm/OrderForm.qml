@@ -60,7 +60,7 @@ ColumnLayout
         target: exchange_trade
         function onBackend_priceChanged() { input_price.text = exchange_trade.backend_price; }
         function onBackend_volumeChanged() { input_volume.text = exchange_trade.backend_volume; }
-        function onCexPriceChanged()
+        function onCex_priceChanged()
         {
             // A fresh CEX rate can arrive after the form completed (e.g. the CoinPaprika
             // fallback fetches lazily). Adopt it while the field still holds the default
