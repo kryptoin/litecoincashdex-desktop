@@ -162,7 +162,15 @@ namespace atomic_dex
     komodo_prices_provider::set_extra_market_infos(t_market_registry&& extra_infos)
     {
         std::unique_lock lock(m_market_mutex);
-        m_extra_market_infos = std::move(extra_infos);
+        // Merge instead of replacing: each refresh only re-fetches the coins
+        // currently missing from both registries, so overwriting would wipe the
+        // previously fetched CoinPaprika-backed rates and make those assets
+        // temporarily read a 0.00 value (dropping the total and hiding them
+        // when "hide zero balances" is on) until the next fetch re-adds them.
+        for (auto&& [ticker, info]: extra_infos)
+        {
+            m_extra_market_infos[std::move(ticker)] = std::move(info);
+        }
     }
 
     bool
