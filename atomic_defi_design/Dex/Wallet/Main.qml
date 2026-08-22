@@ -1018,6 +1018,7 @@ Item
                             #cpPrice { font-size: 18px; color: ${Dex.CurrentTheme.foregroundColor}; font-weight: 600; }
                             #cpChange { font-size: 12px; margin-left: 8px; }
                             #cpChart { flex: 1; min-height: 0; padding: 6px 12px 8px 12px; }
+                            #cpChart svg { width: 100%; height: 100%; display: block; }
                             #cpFoot { font-size: 10px; color: ${Dex.CurrentTheme.foregroundColor}; opacity: .6; text-align: right; padding: 0 16px 8px 16px; }
                         </style>
                         </head>
