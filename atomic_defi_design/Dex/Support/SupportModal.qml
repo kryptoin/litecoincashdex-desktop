@@ -170,7 +170,7 @@ There is a toggle in settings where you can turn on/off the display of these tra
                 FAQLine
                 {
                     title: qsTr("Who is behind %1?").arg(API.app_name)
-                    text: qsTr("%1 is developed by the Komodo team. Komodo is one of the most established blockchain projects working on innovative solutions like atomic swaps, Delayed Proof of Work, and an interoperable multi-chain architecture.").arg(API.app_name)
+                    text: qsTr("%1 was Da developed by the Komodo team. Komodo is one of the most established blockchain projects working on innovative solutions like atomic swaps, Delayed Proof of Work, and an interoperable multi-chain architecture.").arg(API.app_name)
                 }
 
                 FAQLine
