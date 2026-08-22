@@ -278,7 +278,9 @@ DexListView
                     {
                         id: refund_hover
                         anchors.fill: parent
-                        hoverEnabled: true 
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: { if (details) API.app.orders_mdl.recover_fund(details.order_id) }
                     }
                     DefaultTooltip
                     {

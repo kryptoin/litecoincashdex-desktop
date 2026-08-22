@@ -64,7 +64,7 @@ qt5_create_translation(QM_FILES
         ${PROJECT_SOURCE_DIR}/atomic_defi_design/Dex
         ${PROJECT_SOURCE_DIR}/src
         ${TS_FILES}
-        OPTIONS -source-language en_US -no-obsolete)
+        OPTIONS -source-language en_US -no-obsolete -locations none)
 message(STATUS "QM FILES -> ${QM_FILES}")
 message(STATUS "TS FILES -> ${TS_FILES}")
 

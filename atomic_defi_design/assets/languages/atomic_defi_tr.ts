@@ -1752,8 +1752,8 @@ Try again or select &apos;Allow custom seed&apos; to continue.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Dex/Exchange/Trade/SimpleView/List.qml" line="290"/>
-        <source>Funds are recoverable</source>
+        <location filename="../../Dex/Exchange/Trade/SimpleView/List.qml" line="292"/>
+        <source>Funds are recoverable - click to recover</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
