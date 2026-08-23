@@ -30,6 +30,7 @@
 /libwally-core-build
 # vendor/coins is a git submodule (GLEECBTC/coins) — ignore its checkout
 /vendor/coins
+/build-macos-lwc-r1.5.6
 
 # ---------------------------------------------------------
 # CMake + Ninja build artifacts

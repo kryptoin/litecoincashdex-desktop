@@ -11,6 +11,7 @@
 #    chmod +x build-macos-apple-silicon.sh
 #    ./build-macos-apple-silicon.sh            # Release build (default)
 #    CMAKE_BUILD_TYPE=Debug ./build-macos-apple-silicon.sh   # Debug build
+#    ./build-macos-apple-silicon.sh --refresh-coins          # re-fetch GLEECBTC/coins
 # ===========================================================================
 set -euo pipefail
 
@@ -18,6 +19,23 @@ set -euo pipefail
 log()  { printf '\033[1;36m>>> %s\033[0m\n' "$*"; }
 warn() { printf '\033[1;33m!!! %s\033[0m\n' "$*" >&2; }
 die()  { printf '\033[1;31mERROR: %s\033[0m\n' "$*" >&2; exit 1; }
+
+# ── CLI flags ─────────────────────────────────────────────────────────────────
+#   --refresh-coins   Force a fresh checkout of vendor/coins (GLEECBTC/coins)
+#                     before building, so the bundled coin list / electrum
+#                     registry reflects the latest weekly changes.
+REFRESH_COINS=0
+for arg in "$@"; do
+    case "$arg" in
+        --refresh-coins) REFRESH_COINS=1 ;;
+        -h|--help)
+            echo "Usage: $0 [--refresh-coins]"
+            echo "  --refresh-coins   Re-fetch vendor/coins (GLEECBTC/coins) so the bundled"
+            echo "                     coin configuration is up to date before building."
+            exit 0 ;;
+        *) die "Unknown argument: $arg (use --help for usage)" ;;
+    esac
+done
 
 # ── Apple-Silicon detection ─────────────────────────────────────────────────
 ARCH="$(uname -m)"
@@ -309,19 +327,22 @@ log "KDF daemon  : ${KDF_BINARY_PATH}  (arch: $(file -b "${KDF_BINARY_PATH}" | a
 # icons/.  We only do this if the required file is missing.
 COINS_SUBMODULE_DIR="${ROOT_DIR}/vendor/coins"
 COINS_SUBMODULE_URL="https://github.com/GLEECBTC/coins.git"
+
+# --refresh-coins: discard any existing checkout so we re-fetch the latest
+# weekly coin list / electrum registry instead of reusing a stale one.
+if [ "${REFRESH_COINS}" -eq 1 ] && [ -d "${COINS_SUBMODULE_DIR}" ]; then
+    log "Refresh requested: removing existing vendor/coins checkout..."
+    rm -rf "${COINS_SUBMODULE_DIR}"
+fi
+
 if [ -f "${COINS_SUBMODULE_DIR}/utils/coins_config_tcp.json" ]; then
     log "vendor/coins already populated."
 else
     log "vendor/coins submodule missing. Cloning from ${COINS_SUBMODULE_URL}..."
-    if [ -d "${COINS_SUBMODULE_DIR}/.git" ]; then
-        git -C "${COINS_SUBMODULE_DIR}" pull --ff-only >/dev/null 2>&1 || \
-            warn "git pull of vendor/coins failed (non-fatal)"
-    else
-        rm -rf "${COINS_SUBMODULE_DIR}"
-        mkdir -p "${COINS_SUBMODULE_DIR}"
-        git clone --depth 1 "${COINS_SUBMODULE_URL}" "${COINS_SUBMODULE_DIR}" || \
-            die "Failed to clone vendor/coins from ${COINS_SUBMODULE_URL}. Please populate it manually."
-    fi
+    rm -rf "${COINS_SUBMODULE_DIR}"
+    mkdir -p "${COINS_SUBMODULE_DIR}"
+    git clone --depth 1 "${COINS_SUBMODULE_URL}" "${COINS_SUBMODULE_DIR}" || \
+        die "Failed to clone vendor/coins from ${COINS_SUBMODULE_URL}. Please populate it manually."
     [ -f "${COINS_SUBMODULE_DIR}/utils/coins_config_tcp.json" ] || \
         die "vendor/coins cloned but utils/coins_config_tcp.json still missing."
     log "vendor/coins populated."
