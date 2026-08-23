@@ -20,7 +20,7 @@ set -euo pipefail
 log()   { printf '\033[1;36m>>> %s\033[0m\n' "$*"; }
 warn()  { printf '\033[1;33m!!! %s\033[0m\n' "$*" >&2; }
 die()   { printf '\033[1;31mERROR: %s\033[0m\n' "$*" >&2; exit 1; }
-step()  { printf '\n\033[1;34m[%d/%d] %s\033[0m\n' "$STEP" "$TOTAL_STEPS" "$*"; ((STEP++)); }
+step()  { printf '\n\033[1;34m[%d/%d] %s\033[0m\n' "$STEP" "$TOTAL_STEPS" "$*"; STEP=$((STEP + 1)); }
 
 # ── parse arguments ──────────────────────────────────────────────────────────
 DO_QT_DEPLOY=0
@@ -76,7 +76,12 @@ HELPERS="${APP}/Contents/Helpers"
 
 HOMEBREW_PREFIX="$(brew --prefix 2>/dev/null || echo /opt/homebrew)"
 ANACONDA_PREFIX="/opt/anaconda3"
-MACDEPLOYQT="${ANACONDA_PREFIX}/bin/macdeployqt"
+# Prefer macdeployqt from aligned Qt env (5.15.15) over base
+MACDEPLOYQT=""
+for _qtc in "${ANACONDA_PREFIX}/envs/qt51515/bin/macdeployqt" "${ANACONDA_PREFIX}/envs/qt51512/bin/macdeployqt" "${ANACONDA_PREFIX}/bin/macdeployqt"; do
+    if [ -x "$_qtc" ]; then MACDEPLOYQT="$_qtc"; break; fi
+done
+[ -n "$MACDEPLOYQT" ] || MACDEPLOYQT="${ANACONDA_PREFIX}/bin/macdeployqt"
 
 SIGNING_IDENTITY="${MACOS_SIGNING_IDENTITY:-}"
 NOTARY_PROFILE="${MACOS_NOTARY_PROFILE:-}"
@@ -92,13 +97,13 @@ DMG_VOLUME_NAME="LiteCoinCashDEX ${VERSION}"
 
 STEP=1
 TOTAL_STEPS=0
-[ $DO_QT_DEPLOY -eq 1 ] && ((TOTAL_STEPS++))
-[ $DO_NATIVE_DEPS -eq 1 ] && ((TOTAL_STEPS++))
-[ $DO_QT_DEPLOY -eq 1 ] || [ $DO_NATIVE_DEPS -eq 1 ] && ((TOTAL_STEPS++))
-[ $DO_VERIFY -eq 1 ] && ((TOTAL_STEPS++))
-[ $DO_SIGN -eq 1 ] && ((TOTAL_STEPS++))
-[ $DO_NOTARIZE -eq 1 ] && ((TOTAL_STEPS++))
-[ $DO_DMG -eq 1 ] && ((TOTAL_STEPS++))
+[ $DO_QT_DEPLOY -eq 1 ] && TOTAL_STEPS=$((TOTAL_STEPS + 1))
+[ $DO_NATIVE_DEPS -eq 1 ] && TOTAL_STEPS=$((TOTAL_STEPS + 1))
+if [ $DO_QT_DEPLOY -eq 1 ] || [ $DO_NATIVE_DEPS -eq 1 ]; then TOTAL_STEPS=$((TOTAL_STEPS + 1)); fi
+[ $DO_VERIFY -eq 1 ] && TOTAL_STEPS=$((TOTAL_STEPS + 1))
+[ $DO_SIGN -eq 1 ] && TOTAL_STEPS=$((TOTAL_STEPS + 1))
+[ $DO_NOTARIZE -eq 1 ] && TOTAL_STEPS=$((TOTAL_STEPS + 1))
+[ $DO_DMG -eq 1 ] && TOTAL_STEPS=$((TOTAL_STEPS + 1))
 
 # ── validate app exists ──────────────────────────────────────────────────────
 validate_app() {
@@ -127,7 +132,15 @@ deploy_qt() {
     "$MACDEPLOYQT" "$APP" -verbose=2
 
     # macdeployqt may miss some components; deploy them manually
+    # Prefer aligned Qt env (qt51515) over base anaconda, matching build-macos-apple-silicon.sh
     local QT_PREFIX="$ANACONDA_PREFIX"
+    for candidate in "${ANACONDA_PREFIX}/envs/qt51515" "${ANACONDA_PREFIX}/envs/qt51512" "${ANACONDA_PREFIX}"; do
+        if [ -x "${candidate}/bin/qmake" ] && [ -f "${candidate}/lib/libQt5Core.dylib" ]; then
+            QT_PREFIX="$candidate"
+            break
+        fi
+    done
+    log "Qt prefix for manual deploy: $QT_PREFIX"
 
     # Deploy platform plugin (required for Qt GUI apps)
     log "Deploying platform plugin..."
@@ -241,7 +254,7 @@ deploy_native_deps() {
     local i=0
     while [ $i -lt ${#queue[@]} ]; do
         local current="${queue[$i]}"
-        ((i++))
+        i=$((i+1))
 
         # Skip if already processed
         local skip=0
@@ -374,10 +387,32 @@ deploy_native_deps() {
     # 2) Drop the stale developer rpath left on the main executable by the
     #    build (libwally-core is linked statically, so the rpath is unused).
     local stale_rpath="${ROOT_DIR}/libwally-core-install/lib"
-    if otool -l "$MAIN_EXE" 2>/dev/null | grep -A1 'LC_RPATH' | grep -q "$stale_rpath"; then
+    if otool -l "$MAIN_EXE" 2>/dev/null | grep -A2 'LC_RPATH' | grep -q "$stale_rpath"; then
         log "Removing stale developer rpath: $stale_rpath"
         install_name_tool -delete_rpath "$stale_rpath" "$MAIN_EXE" 2>/dev/null || \
             warn "Failed to remove stale rpath from $MAIN_EXE"
+    fi
+
+    # 3) Drop absolute Anaconda rpaths — bundle must be relocatable via @executable_path only
+    for rp in "${ANACONDA_PREFIX}/lib" "${ANACONDA_PREFIX}/envs/qt51515/lib" "${ANACONDA_PREFIX}/envs/qt51512/lib"; do
+        if otool -l "$MAIN_EXE" 2>/dev/null | grep -A2 'LC_RPATH' | grep -q "$rp"; then
+            log "Removing anaconda rpath: $rp"
+            install_name_tool -delete_rpath "$rp" "$MAIN_EXE" 2>/dev/null || warn "Failed to remove anaconda rpath $rp"
+        fi
+    done
+    # Also drop HOMEBREW rpath if present (bundled libs are in Frameworks)
+    if otool -l "$MAIN_EXE" 2>/dev/null | grep -A2 'LC_RPATH' | grep -q "$HOMEBREW_PREFIX"; then
+        for rp in $(otool -l "$MAIN_EXE" 2>/dev/null | grep -A2 'LC_RPATH' | grep 'path ' | awk '{print $2}' | grep -E "homebrew|/opt/homebrew"); do
+            log "Removing homebrew rpath: $rp"
+            install_name_tool -delete_rpath "$rp" "$MAIN_EXE" 2>/dev/null || true
+        done
+    fi
+
+    # 4) Ensure Frameworks rpath exists (macdeployqt usually adds it, but be explicit)
+    if ! otool -l "$MAIN_EXE" 2>/dev/null | grep -A2 'LC_RPATH' | grep -q '@executable_path/../Frameworks'; then
+        log "Adding Frameworks rpath"
+        install_name_tool -add_rpath "@executable_path/../Frameworks" "$MAIN_EXE" 2>/dev/null || true
+        install_name_tool -add_rpath "@executable_path/../Frameworks" "$APP/Contents/MacOS/QtWebEngineProcess" 2>/dev/null || true
     fi
 }
 
@@ -405,9 +440,14 @@ fix_plist_and_resign() {
     # and this ad-hoc step is skipped.
     if [ $DO_SIGN -eq 0 ]; then
         log "  Ad-hoc re-signing $APP..."
-        codesign --force --deep --sign - "$APP" 2>&1 || die "Ad-hoc re-sign failed"
+        # Remove stale _CodeSignature left by cctools-port fake signing to ensure clean ad-hoc
+        rm -rf "${APP}/Contents/_CodeSignature" 2>/dev/null || true
+        # Ensure correct bundle id is used as signing identifier
+        codesign --force --deep --sign - --identifier "$bundle_id" --options runtime "$APP" 2>&1 || die "Ad-hoc re-sign failed"
         codesign --verify --deep --strict --verbose=2 "$APP" 2>&1 || \
             warn "codesign --verify reports issues (see output above)"
+        # Double-check identifier now matches
+        codesign -dv --verbose=2 "$APP" 2>&1 | head -n 20
     else
         log "  Skipping ad-hoc re-sign (real signing runs in sign_app)"
     fi
@@ -429,7 +469,7 @@ verify_deployment() {
             case "$dep" in
                 /opt/homebrew/*|/opt/anaconda3/*|/Users/*|/miniconda*)
                     echo "ERROR: Unresolved external dependency in $f: $dep" >&2
-                    ((errors++))
+                    errors=$((errors+1))
                     ;;
             esac
         done
@@ -441,18 +481,18 @@ verify_deployment() {
         file -b "$f" | grep -q Mach-O || continue
         if ! file -b "$f" | grep -q arm64; then
             echo "ERROR: Non-arm64 binary found: $f" >&2
-            ((errors++))
+            errors=$((errors+1))
         fi
     done < <(find "$APP" -type f -print0 2>/dev/null || true)
 
     # Check KDF
     log "Verifying KDF executable..."
-    [ -x "$KDF" ] || { echo "ERROR: KDF not executable" >&2; ((errors++)); }
-    file -b "$KDF" | grep -q arm64 || { echo "ERROR: KDF not arm64" >&2; ((errors++)); }
+    [ -x "$KDF" ] || { echo "ERROR: KDF not executable" >&2; errors=$((errors+1)); }
+    file -b "$KDF" | grep -q arm64 || { echo "ERROR: KDF not arm64" >&2; errors=$((errors+1)); }
 
     # Check Qt WebEngine resources
     log "Verifying Qt WebEngine resources..."
-    [ -f "${APP}/Contents/MacOS/QtWebEngineProcess" ] || { echo "ERROR: QtWebEngineProcess missing in Contents/MacOS" >&2; ((errors++)); }
+    [ -f "${APP}/Contents/MacOS/QtWebEngineProcess" ] || { echo "ERROR: QtWebEngineProcess missing in Contents/MacOS" >&2; errors=$((errors+1)); }
     [ -f "${RESOURCES}/qtwebengine_resources.pak" ] || warn "qtwebengine_resources.pak not found (may be embedded)"
     [ -f "${RESOURCES}/icudtl.dat" ] || warn "icudtl.dat not found (may be embedded)"
 
@@ -467,7 +507,7 @@ verify_deployment() {
         "QtGraphicalEffects/qmldir" \
         "QtCharts/qmldir" \
         "QtWebEngine/qmldir"; do
-        [ -f "${RESOURCES}/qml/${qmlmod}" ] || { echo "ERROR: Missing QML module ${qmlmod}" >&2; ((errors++)); }
+        [ -f "${RESOURCES}/qml/${qmlmod}" ] || { echo "ERROR: Missing QML module ${qmlmod}" >&2; errors=$((errors+1)); }
     done
 
     # Check Qt plugins were deployed
@@ -478,18 +518,28 @@ verify_deployment() {
         "imageformats/libqjpeg.dylib" \
         "iconengines/libqsvgicon.dylib" \
         "styles/libqmacstyle.dylib"; do
-        [ -f "${PLUGINS}/${plug}" ] || { echo "ERROR: Missing Qt plugin ${plug}" >&2; ((errors++)); }
+        [ -f "${PLUGINS}/${plug}" ] || { echo "ERROR: Missing Qt plugin ${plug}" >&2; errors=$((errors+1)); }
     done
 
     # No bundled libc++ (should resolve to the OS copy)
     log "Verifying no bundled libc++ remains..."
-    [ -f "$FRAMEWORKS/libc++.1.dylib" ] && { echo "ERROR: Bundled libc++.1.dylib still present" >&2; ((errors++)); }
+    [ -f "$FRAMEWORKS/libc++.1.dylib" ] && { echo "ERROR: Bundled libc++.1.dylib still present" >&2; errors=$((errors+1)); }
 
     # No stale developer rpath on the main executable
     log "Verifying no stale developer rpath on main executable..."
-    if otool -l "$MAIN_EXE" 2>/dev/null | grep -A1 'LC_RPATH' | grep -q "${ROOT_DIR}"; then
+    if otool -l "$MAIN_EXE" 2>/dev/null | grep -A2 'LC_RPATH' | grep -q "${ROOT_DIR}"; then
         echo "ERROR: Stale developer rpath still present on $MAIN_EXE" >&2
-        ((errors++))
+        errors=$((errors+1))
+    fi
+    # No absolute conda/homebrew rpaths
+    log "Verifying no absolute conda rpath on main executable..."
+    if otool -l "$MAIN_EXE" 2>/dev/null | grep -A2 'LC_RPATH' | grep -q "/opt/anaconda3"; then
+        echo "ERROR: Absolute anaconda rpath still present on $MAIN_EXE" >&2
+        errors=$((errors+1))
+    fi
+    if otool -l "$MAIN_EXE" 2>/dev/null | grep -A2 'LC_RPATH' | grep -q "/opt/homebrew"; then
+        echo "ERROR: Absolute homebrew rpath still present on $MAIN_EXE" >&2
+        errors=$((errors+1))
     fi
 
     [ $errors -eq 0 ] || die "Verification failed with $errors error(s)"

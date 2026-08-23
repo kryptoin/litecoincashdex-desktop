@@ -224,12 +224,27 @@ done
 WALLY_INSTALL_DIR="${ROOT_DIR}/libwally-core-install"
 if [ ! -f "${WALLY_INSTALL_DIR}/lib/libwallycore.a" ]; then
     log "libwallycore not found in ${WALLY_INSTALL_DIR}. Building libwallycore..."
-    WALLY_BUILD_DIR="${ROOT_DIR}/libwally-core-build"
+    WALLY_BUILD_DIR="${ROOT_DIR}/build-macos-lwc-r1.5.6"
+    [ -d "${WALLY_BUILD_DIR}" ] || die "libwally-core source not found at ${WALLY_BUILD_DIR}"
     (
         cd "${WALLY_BUILD_DIR}"
         ln -sf _CMakeLists.txt CMakeLists.txt
         ln -sf _cmake cmake
         ln -sf _CMakeLists.txt src/CMakeLists.txt
+        # Clone secp256k1-zkp submodule if missing
+        if [ ! -f "src/secp256k1/CMakeLists.txt" ]; then
+            log "secp256k1-zkp submodule missing. Cloning..."
+            rm -rf src/secp256k1
+            git clone --depth 1 https://github.com/BlockstreamResearch/secp256k1-zkp.git src/secp256k1
+        fi
+        # Download missing headers from upstream libwally-core 1.5.6
+        # (The local source tree is missing these)
+        for hdr in wally_address.h wally_script.h wally_transaction.h; do
+            if [ ! -f "include/${hdr}" ]; then
+                log "Downloading missing header: ${hdr}"
+                curl -sL "https://raw.githubusercontent.com/ElementsProject/libwally-core/release_1.5.6/include/${hdr}" -o "include/${hdr}"
+            fi
+        done
         rm -rf build
         "${CMAKE_BIN}" -S . -B build \
             -DCMAKE_INSTALL_PREFIX="${WALLY_INSTALL_DIR}" \
