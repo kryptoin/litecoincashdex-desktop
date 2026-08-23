@@ -4,24 +4,34 @@
 
 ## What is Litecoin Cash DEX Wallet?
 
-Litecoin Cash DEX Wallet is a secure non-custodial desktop wallet and decentralized exchange focused on Litecoin Cash and peer-to-peer atomic swaps.
-
-Store your assets, manage balances, and trade directly from your own wallet without giving up control of your funds.
+Litecoin Cash DEX Wallet is a secure, non-custodial desktop wallet and decentralized exchange built for Litecoin Cash (LCC) and peer-to-peer atomic swaps. It combines the security and control of a self-custodial wallet with the functionality of a decentralized trading platform, allowing users to hold, manage, and exchange LCC and supported digital assets directly from their desktop. Powered by the Komodo DeFi Framework, the wallet enables peer-to-peer, trustless trading through atomic swaps, allowing participants to exchange assets directly without relying on a centralized exchange or giving up custody of their funds.
 
 ## Building on macOS (Apple Silicon)
 
-> Status — 2026-08-12: Builds and runs on arm64. The KDF daemon ships as a Universal2
-> binary (arm64 + x86_64) and is auto-downloaded then ad-hoc signed. Recent fixes cover
-> KDF daemon startup/teardown, ERC-20/BEP-20 transaction-history timeouts, and the Pro
-> view chart infinite-spinner.
+> Status — 2026-08-23: Builds and runs on arm64 (Apple Silicon). The KDF daemon ships as a
+> Universal2 binary (arm64 + x86_64) and is auto-downloaded then ad-hoc signed. Recent
+> fixes cover KDF daemon startup/teardown, ERC-20/BEP-20 transaction-history timeouts, and
+> the Pro view chart infinite-spinner.
 
-The build is driven entirely by `build-macos-apple-silicon.sh`. It:
+The repository provides two Apple Silicon build paths, both driven by the same
+`build-macos-apple-silicon.sh` (which targets **any** Apple Silicon Mac — M1, M2, M3, …):
+
+- **`apple-silicon` branch** — the original M1 Apple Silicon support.
+- **`m2` branch** — M2 (and later) support. It fixes a Qt version mismatch that crashed
+  QtWebEngine's GPU thread on M2 (a base-anaconda Qt pair such as `qt-main` 5.15.2 +
+  `qt-webengine` 5.15.9 against a 5.15.15 build) and adds the `--refresh-coins` flag plus a
+  `cleanup-m2.sh` helper.
+
+The build script:
 
 - Installs the required Homebrew dependencies if missing (`boost`, `fmt`, `spdlog`,
   `cpprestsdk`, `libsodium`, `secp256k1`, `openssl`, `howard-hinnant-date`, `entt`,
   `taskflow`).
-- Clones the `vendor/coins` submodule if absent (the working tree is not always a full
-  git clone, so this is fetched on demand).
+- Clones the `vendor/coins` submodule (GLEECBTC/coins, a fork of jl777/coins) if absent, so
+  the bundled coin list / electrum registry is available at build time. Pass `--refresh-coins`
+  to force a fresh fetch of the latest weekly changes.
+- Picks a single, **aligned** Qt 5.15 env (see Prerequisites) to avoid the mixed-Qt-version
+  crash described above.
 - Configures with CMake + Ninja into `build-macos-apple-silicon/`.
 - Downloads the KDF daemon (`mm2_cheetah`) and copies it into the app bundle.
 - Ad-hoc signs the KDF binary and the whole app bundle. There is **no Apple Developer
@@ -30,16 +40,37 @@ The build is driven entirely by `build-macos-apple-silicon.sh`. It:
 
 ### Prerequisites
 
-- Anaconda3 at `/opt/anaconda3` with Qt 5.15 installed:
+- Anaconda3 at `/opt/anaconda3` with a **single aligned** Qt 5.15 env. A mismatched pair
+  (e.g. base env `qt-main` 5.15.2 + `qt-webengine` 5.15.9) crashes QtWebEngine's GPU thread
+  at runtime. Create the aligned env:
   ```bash
-  conda install -p /opt/anaconda3 qt=5.15.9 cmake ninja
+  conda create -p /opt/anaconda3/envs/qt51515 -c conda-forge \
+      "qt-main=5.15.15" "qt-webengine=5.15.15"
   ```
 - Homebrew (the script installs the native libraries listed above).
 
 ### Build
 
+**M1 (apple-silicon branch):**
+
 ```bash
+git checkout apple-silicon
 ./build-macos-apple-silicon.sh
+```
+
+**M2 and later (m2 branch):**
+
+```bash
+git checkout m2
+./build-macos-apple-silicon.sh --refresh-coins   # re-fetch latest coin list
+```
+
+To force a fully clean rebuild on `m2` (drops the libwally install, wally build tree, and
+optional `vendor/coins`):
+
+```bash
+./cleanup-m2.sh --reset-coins
+./build-macos-apple-silicon.sh --refresh-coins
 ```
 
 The finished app bundle is written to:
@@ -47,6 +78,19 @@ The finished app bundle is written to:
 ```
 build-macos-apple-silicon/bin/litecoincashdex.app
 ```
+
+### Packaging (DMG)
+
+`package-macos.sh` turns the built `.app` into a self-contained, signed DMG:
+
+```bash
+timeout 600 ./package-macos.sh --qt-deploy --native-deps --verify --dmg
+```
+
+This bundles the aligned Qt frameworks, strips stale absolute rpaths, ad-hoc signs the app
+(`--identifier com.litecoincash.dex`), and writes `dist/LitecoinCashDEX-macOS-arm64.dmg`.
+For a Developer-ID signed / notarized build, pass `--sign` and/or `--notarize` with
+`MACOS_SIGNING_IDENTITY` set.
 
 ### Running the tests
 
