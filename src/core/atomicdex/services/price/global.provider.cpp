@@ -17,6 +17,7 @@
 //! Project Headers
 #include "atomicdex/services/price/global.provider.hpp"
 #include "atomicdex/api/coinpaprika/coinpaprika.hpp"
+#include "atomicdex/api/coingecko/coingecko.hpp"
 #include "atomicdex/events/events.hpp"
 #include "atomicdex/pages/qt.settings.page.hpp"
 #include "atomicdex/services/price/komodo_prices/komodo.prices.provider.hpp"
@@ -532,6 +533,7 @@ namespace atomic_dex
             const auto  coins = kdf.get_enabled_coins();
 
             std::unordered_map<std::string, std::string> missing;
+            std::unordered_map<std::string, std::string> coingecko_ids;  // ticker -> coingecko_id (fallback source)
             for (auto&& coin: coins)
             {
                 if (coin.coinpaprika_id.empty() || coin.ticker.empty() || coin.coinpaprika_id == "test-coin")
@@ -543,6 +545,10 @@ namespace atomic_dex
                     continue;
                 }
                 missing[coin.ticker] = coin.coinpaprika_id;
+                if (!coin.coingecko_id.empty() && coin.coingecko_id != "test-coin")
+                {
+                    coingecko_ids[coin.ticker] = coin.coingecko_id;
+                }
             }
             if (missing.empty())
             {
@@ -610,12 +616,105 @@ namespace atomic_dex
                                       previous_task.wait();
                                       return coinpaprika::api::async_ticker(coinpaprika::api::ticker_request{coinpaprika_id, "USD"});
                                   })
-                            .then([parse_and_store, ticker](pplx::task<web::http::http_response> prev)
-                                  {
-                                      const auto resp = prev.get(); // propagate failures to next functor
-                                      parse_and_store(ticker, resp);
-                                  });
+                             .then([parse_and_store, ticker](pplx::task<web::http::http_response> prev)
+                                   {
+                                       try
+                                       {
+                                           const auto resp = prev.get(); // may throw on transport error
+                                           parse_and_store(ticker, resp);
+                                       }
+                                       catch (const std::exception& error)
+                                       {
+                                           SPDLOG_WARN("CoinPaprika rate fetch failed for {} (fallback will retry): {}", ticker, error.what());
+                                       }
+                                   });
             }
+
+            // CoinGecko fallback: CoinPaprika has delisted some coins (e.g. AVN/avian
+            // "avn-avian" returns {"error":"id not found"}). For any ticker that
+            // CoinPaprika did not resolve, retry with its coingecko_id so the price
+            // still shows. Results are merged into the same extra_infos registry.
+            chain = chain.then([extra_infos, coingecko_ids]()
+                               {
+                                   try
+                                   {
+                                       std::vector<std::pair<std::string, std::string>> need;
+                                       for (auto&& [ticker, cg_id]: coingecko_ids)
+                                       {
+                                           if (extra_infos->count(ticker) == 0)
+                                           {
+                                               need.emplace_back(ticker, cg_id);
+                                           }
+                                       }
+                                       if (need.empty())
+                                       {
+                                           return;
+                                       }
+
+                                       coingecko::api::market_infos_request cg_req;
+                                       cg_req.vs_currency          = "usd";
+                                       cg_req.with_sparkline       = false;
+                                       cg_req.price_change_percentage = "24h";
+                                       coingecko::api::t_coingecko_registry cg_registry;  // coingecko id -> ticker
+                                       for (auto&& [ticker, cg_id]: need)
+                                       {
+                                           cg_req.ids.emplace_back(cg_id);
+                                           cg_registry[cg_id] = ticker;
+                                       }
+
+                                       coingecko::api::async_market_infos(std::move(cg_req))
+                                           .then([extra_infos, cg_registry](pplx::task<web::http::http_response> prev)
+                                                 {
+                                                     try
+                                                     {
+                                                         const auto resp = prev.get();
+                                                         if (resp.status_code() == 200)
+                                                         {
+                                                             const auto                       body = TO_STD_STR(resp.extract_string(true).get());
+                                                             coingecko::api::market_infos_answer ans;
+                                                             coingecko::api::from_json(nlohmann::json::parse(body), ans, cg_registry);
+                                                             const auto now_ts = static_cast<int64_t>(std::time(nullptr));
+                                                             std::string last_updated;
+                                                             {
+                                                                 std::time_t t   = std::time(nullptr);
+                                                                 std::tm*    tmv = std::gmtime(&t);
+                                                                 char        buf[32];
+                                                                 std::strftime(buf, sizeof(buf), "%Y-%m-%dT%H:%M:%SZ", tmv);
+                                                                 last_updated.assign(buf);
+                                                             }
+                                                             for (auto&& [ticker, info]: ans.result)
+                                                             {
+                                                                 if (!info.current_price.empty() && info.current_price != "0")
+                                                                 {
+                                                                     komodo_prices::api::komodo_ticker_infos entry;
+                                                                     entry.ticker                 = ticker;
+                                                                     entry.last_price             = info.current_price;
+                                                                     entry.last_updated           = last_updated;
+                                                                     entry.last_updated_timestamp = now_ts;
+                                                                     entry.volume24_h             = info.total_volume;
+                                                                     entry.price_provider         = komodo_prices::api::provider::coingecko;
+                                                                     entry.volume_provider        = komodo_prices::api::provider::coingecko;
+                                                                     entry.change_24_h            = info.price_change_24h;
+                                                                     entry.change_24_h_provider   = komodo_prices::api::provider::coingecko;
+                                                                     entry.sparkline_7_d          = nlohmann::json::array();
+                                                                     (*extra_infos)[ticker]       = std::move(entry);
+                                                                     SPDLOG_INFO("CoinGecko fallback price for {}: {}", ticker, info.current_price);
+                                                                 }
+                                                             }
+                                                         }
+                                                     }
+                                                     catch (const std::exception& error)
+                                                     {
+                                                         SPDLOG_ERROR("Error while fetching CoinGecko fallback rates: {}", error.what());
+                                                     }
+                                                 })
+                                           .wait();
+                                   }
+                                   catch (const std::exception& error)
+                                   {
+                                       SPDLOG_ERROR("CoinGecko fallback stage error: {}", error.what());
+                                   }
+                               });
 
             const auto finalize = [this, extra_infos](pplx::task<void> previous_task)
             {

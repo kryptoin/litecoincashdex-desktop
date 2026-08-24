@@ -44,6 +44,11 @@ namespace atomic_dex
             SPDLOG_INFO("process_best_orders is busy - skipping");
             return;
         }
+        if (m_bestorders_timed_out)
+        {
+            SPDLOG_INFO("process_best_orders timed out previously - skipping until the in-flight request completes");
+            return;
+        }
 
         // SPDLOG_INFO("process_best_orders processing");
         if (m_system_manager.has_system<kdf_service>())
@@ -65,6 +70,7 @@ namespace atomic_dex
                     {
                         // SPDLOG_DEBUG("error: bad answer json for process_best_orders: {}", rpc.error->error);
                         this->m_bestorders_busy = false;
+                        this->m_bestorders_timed_out = false;
                         // SPDLOG_DEBUG("Triggering [process_orderbook_finished]: true");
                         this->dispatcher_.trigger(process_orderbook_finished{true});
                     }
@@ -75,6 +81,7 @@ namespace atomic_dex
                             this->m_best_orders_infos = rpc.result.value();
                         }
                         this->m_bestorders_busy = false;
+                        this->m_bestorders_timed_out = false;
                         // SPDLOG_DEBUG("Triggering [process_orderbook_finished]: false");
                         this->dispatcher_.trigger(process_orderbook_finished{false});
                         emit trading_pg.get_orderbook_wrapper()->bestOrdersBusyChanged();
@@ -83,6 +90,8 @@ namespace atomic_dex
 
 
                 this->m_bestorders_busy = true;
+                this->m_bestorders_busy_since = std::chrono::high_resolution_clock::now();
+                this->m_bestorders_timed_out  = false;
                 emit trading_pg.get_orderbook_wrapper()->bestOrdersBusyChanged();
                 kdf::bestorders_rpc rpc{.request={.coin = std::move(coin), .volume = std::move(volume), .action = std::move(action)}};
                 kdf_system.get_kdf_client().process_rpc_async<atomic_dex::kdf::bestorders_rpc>(rpc.request, callback);
@@ -107,6 +116,24 @@ namespace atomic_dex
     {
         //! Scan orderbook widget every 30 seconds if there is not any update
         using namespace std::chrono_literals;
+
+        if (m_bestorders_busy.load())
+        {
+            const auto wnow = std::chrono::high_resolution_clock::now();
+            if (wnow - m_bestorders_busy_since >= best_orders_timeout)
+            {
+                SPDLOG_WARN("best_orders request did not complete within {}s; releasing busy state to avoid an infinite UI spinner", best_orders_timeout.count());
+                m_bestorders_busy    = false;
+                m_bestorders_timed_out = true;
+                try
+                {
+                    const auto& trading_pg = m_system_manager.get_system<trading_page>();
+                    emit trading_pg.get_orderbook_wrapper()->bestOrdersBusyChanged();
+                    this->dispatcher_.trigger(process_orderbook_finished{true});
+                }
+                catch (...) {}
+            }
+        }
 
         const auto now = std::chrono::high_resolution_clock::now();
         const auto s   = std::chrono::duration_cast<std::chrono::seconds>(now - m_update_clock);
