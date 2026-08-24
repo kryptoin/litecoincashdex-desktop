@@ -7,7 +7,13 @@
 #  signed, notarized DMG.
 #
 #  Usage:
-#    ./package-macos.sh [--sign] [--notarize] [--dmg] [--all]
+#    ./package-macos.sh [--qt-deploy] [--native-deps] [--verify] [--dmg]
+#                      [--sign] [--notarize] [--all] [--ad-hoc]
+#
+#    --ad-hoc : identity-free build. Ad-hoc signs the bundle (codesign -),
+#               skips real code signing and notarization, and produces a
+#               shareable, unsigned DMG. No Apple Developer ID required and
+#               no personal/org identity is embedded.
 #
 #  Prerequisites:
 #    - Built app at build-macos-apple-silicon/bin/litecoincashdex.app
@@ -30,6 +36,7 @@ DO_SIGN=0
 DO_NOTARIZE=0
 DO_DMG=0
 DO_ALL=0
+DO_AD_HOC=0
 
 for arg in "$@"; do
     case $arg in
@@ -40,6 +47,7 @@ for arg in "$@"; do
         --notarize)    DO_NOTARIZE=1 ;;
         --dmg)         DO_DMG=1 ;;
         --all)         DO_ALL=1 ;;
+        --ad-hoc)      DO_AD_HOC=1; DO_QT_DEPLOY=1; DO_NATIVE_DEPS=1; DO_VERIFY=1; DO_DMG=1; DO_SIGN=0; DO_NOTARIZE=0; DO_ALL=0 ;;
         *) die "Unknown argument: $arg" ;;
     esac
 done
@@ -89,6 +97,13 @@ NOTARY_APPLE_ID="${MACOS_NOTARY_APPLE_ID:-}"
 NOTARY_TEAM_ID="${MACOS_NOTARY_TEAM_ID:-}"
 NOTARY_PASSWORD="${MACOS_NOTARY_PASSWORD:-}"
 
+# --ad-hoc: identity-free build. Force-clear any signing/notary credentials so
+# the bundle is ad-hoc signed (codesign -) with no Developer ID or org name.
+if [ $DO_AD_HOC -eq 1 ]; then
+    SIGNING_IDENTITY=""
+    NOTARY_PROFILE=""; NOTARY_APPLE_ID=""; NOTARY_TEAM_ID=""; NOTARY_PASSWORD=""
+fi
+
 DIST_DIR="${ROOT_DIR}/dist"
 DMG_NAME="LitecoinCashDEX-macOS-arm64.dmg"
 DMG_PATH="${DIST_DIR}/${DMG_NAME}"
@@ -99,7 +114,7 @@ STEP=1
 TOTAL_STEPS=0
 [ $DO_QT_DEPLOY -eq 1 ] && TOTAL_STEPS=$((TOTAL_STEPS + 1))
 [ $DO_NATIVE_DEPS -eq 1 ] && TOTAL_STEPS=$((TOTAL_STEPS + 1))
-if [ $DO_QT_DEPLOY -eq 1 ] || [ $DO_NATIVE_DEPS -eq 1 ]; then TOTAL_STEPS=$((TOTAL_STEPS + 1)); fi
+if [ $DO_QT_DEPLOY -eq 1 ] || [ $DO_NATIVE_DEPS -eq 1 ]; then TOTAL_STEPS=$((TOTAL_STEPS + 2)); fi
 [ $DO_VERIFY -eq 1 ] && TOTAL_STEPS=$((TOTAL_STEPS + 1))
 [ $DO_SIGN -eq 1 ] && TOTAL_STEPS=$((TOTAL_STEPS + 1))
 [ $DO_NOTARIZE -eq 1 ] && TOTAL_STEPS=$((TOTAL_STEPS + 1))
@@ -416,6 +431,51 @@ deploy_native_deps() {
     fi
 }
 
+# ── Phase 3: Clean bundle of build artifacts ────────────────────────────────
+# Runs AFTER all deploy/copy steps and BEFORE re-sign, so the shipped .app
+# never contains stray developer artifacts (debug symbols, framework Headers
+# that can leak C++ source, .DS_Store/AppleDouble, quarantine xattrs, or
+# leaked developer paths/username in text/config files).
+clean_bundle() {
+    step "Cleaning bundle of build artifacts and metadata"
+
+    log "Removing stray files that should not ship in the final app..."
+    find "$APP" \( \
+        -name '.DS_Store' -o -name '._*' -o -name '__MACOSX' \
+        -o -name '*.dSYM' -o -name '*.prl' -o -name '*.la' \
+        -o -name '__pycache__' -o -name '*.pyc' -o -name '*.pyo' \
+        -o -name '*.o' -o -name '*.gcno' -o -name '*.gcda' -o -name '*.profraw' \
+        -o -name '*.swp' -o -name '*.bak' -o -name 'Thumbs.db' -o -name '*.orig' \
+        -o -name '.git' -o -name 'CMakeFiles' -o -name '*.cmake' -o -name 'Makefile' \
+    \) -print -delete 2>/dev/null || true
+
+    # Framework Headers / PrivateHeaders are not needed at runtime and can
+    # leak C++ source. Safe to drop.
+    log "Removing framework Headers/PrivateHeaders..."
+    find "$FRAMEWORKS" -type d \( -name Headers -o -name PrivateHeaders \) -print -exec rm -rf {} + 2>/dev/null || true
+
+    # Strip extended attributes (quarantine, com.apple.* metadata) that can
+    # carry developer info or trip Gatekeeper on recipient machines.
+    log "Clearing extended attributes..."
+    xattr -rc "$APP" 2>/dev/null || true
+
+    # Guard: warn (non-fatal) if a developer path leaked into a shipped TEXT
+    # file. Catches e.g. an embedded absolute build path or the builder's
+    # username, which would otherwise reveal identity in the distributed DMG.
+    log "Scanning shipped text files for developer-path leaks..."
+    local leaks=0
+    while IFS= read -r -d '' f; do
+        grep -Iq -e "$ROOT_DIR" -e "/Users/$USER" "$f" 2>/dev/null && {
+            echo "WARN: developer path reference in $f" >&2
+            grep -Ion -e "$ROOT_DIR" -e "/Users/$USER" "$f" 2>/dev/null | head -3 >&2
+            leaks=$((leaks+1))
+        }
+    done < <(find "$APP" -type f -print0 2>/dev/null || true)
+    [ $leaks -eq 0 ] || warn "Found $leaks text file(s) with developer-path references (review above)"
+
+    log "Bundle cleanup complete"
+}
+
 # ── Phase 3.5: Fix Info.plist + final re-sign ───────────────────────────────
 fix_plist_and_resign() {
     step "Fixing Info.plist and re-signing (final step after all modifications)"
@@ -442,8 +502,12 @@ fix_plist_and_resign() {
         log "  Ad-hoc re-signing $APP..."
         # Remove stale _CodeSignature left by cctools-port fake signing to ensure clean ad-hoc
         rm -rf "${APP}/Contents/_CodeSignature" 2>/dev/null || true
-        # Ensure correct bundle id is used as signing identifier
-        codesign --force --deep --sign - --identifier "$bundle_id" --options runtime "$APP" 2>&1 || die "Ad-hoc re-sign failed"
+        # Ad-hoc (identity-free) signing intentionally omits --options runtime:
+        # hardened runtime requires an entitlements profile (allow-jit, etc.)
+        # that we cannot provide without a Developer ID cert, and QtWebEngine
+        # would crash under it. Hardened runtime is only needed for notarization,
+        # which an ad-hoc build does not perform.
+        codesign --force --deep --sign - --identifier "$bundle_id" "$APP" 2>&1 || die "Ad-hoc re-sign failed"
         codesign --verify --deep --strict --verbose=2 "$APP" 2>&1 || \
             warn "codesign --verify reports issues (see output above)"
         # Double-check identifier now matches
@@ -698,7 +762,10 @@ main() {
 
     [ $DO_QT_DEPLOY -eq 1 ] && deploy_qt
     [ $DO_NATIVE_DEPS -eq 1 ] && deploy_native_deps
-    [ $DO_QT_DEPLOY -eq 1 ] || [ $DO_NATIVE_DEPS -eq 1 ] && fix_plist_and_resign
+    if [ $DO_QT_DEPLOY -eq 1 ] || [ $DO_NATIVE_DEPS -eq 1 ]; then
+        clean_bundle
+        fix_plist_and_resign
+    fi
     [ $DO_VERIFY -eq 1 ] && verify_deployment
     [ $DO_SIGN -eq 1 ] && sign_app
     [ $DO_NOTARIZE -eq 1 ] && notarize_app
