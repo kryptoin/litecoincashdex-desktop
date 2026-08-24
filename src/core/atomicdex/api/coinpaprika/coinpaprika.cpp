@@ -81,4 +81,15 @@ namespace atomic_dex::coinpaprika::api
         req.set_request_uri(FROM_STD_STR(url));
         return coinpaprika_client()->request(req);
     }
+
+    pplx::task<web::http::http_response>
+    async_ohlcv_latest(ohlcv_latest_request&& request)
+    {
+        web::http::http_request req;
+        req.set_method(web::http::methods::GET);
+        std::string url = "/v1/coins/" + request.id + "/ohlcv/latest?quote=" + request.quote;
+        SPDLOG_INFO("url: {}", TO_STD_STR(coinpaprika_client()->base_uri().to_string()) + url);
+        req.set_request_uri(FROM_STD_STR(url));
+        return coinpaprika_client()->request(req);
+    }
 } // namespace atomic_dex::coinpaprika::api

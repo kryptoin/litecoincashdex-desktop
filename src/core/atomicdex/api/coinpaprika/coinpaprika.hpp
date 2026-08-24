@@ -12,6 +12,12 @@ namespace atomic_dex::coinpaprika::api
         std::string quotes{"USD"};
     };
 
+    struct ohlcv_latest_request
+    {
+        std::string id;
+        std::string quote{"USD"};
+    };
+
     struct ticker_infos
     {
         std::string       last_price{"0.00"};
@@ -23,6 +29,7 @@ namespace atomic_dex::coinpaprika::api
     void from_json(const nlohmann::json& j, ticker_infos& x);
 
     ENTT_API pplx::task<web::http::http_response> async_ticker(ticker_request&& request);
+    ENTT_API pplx::task<web::http::http_response> async_ohlcv_latest(ohlcv_latest_request&& request);
 } // namespace atomic_dex::coinpaprika::api
 
 namespace atomic_dex

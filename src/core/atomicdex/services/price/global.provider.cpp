@@ -710,9 +710,72 @@ namespace atomic_dex
                                                  })
                                            .wait();
                                    }
+                                    catch (const std::exception& error)
+                                    {
+                                        SPDLOG_ERROR("CoinGecko fallback stage error: {}", error.what());
+                                    }
+                                });
+
+            // CoinPaprika OHLCV fallback: the /tickers endpoint is delisted for some
+            // coins (e.g. AVN "avn-avian" -> {"error":"id not found"}), but the
+            // /coins/{id}/ohlcv/latest endpoint still returns a daily close price.
+            // Use it as a last-resort price source for any ticker still missing.
+            chain = chain.then([extra_infos, missing]()
+                               {
+                                   try
+                                   {
+                                       std::vector<std::pair<std::string, std::string>> need;
+                                       for (auto&& [ticker, cp_id]: missing)
+                                       {
+                                           if (extra_infos->count(ticker) == 0)
+                                           {
+                                               need.emplace_back(ticker, cp_id);
+                                           }
+                                       }
+                                       if (need.empty())
+                                       {
+                                           return;
+                                       }
+                                       for (auto&& [ticker, cp_id]: need)
+                                       {
+                                           coinpaprika::api::ohlcv_latest_request req{.id = cp_id, .quote = "USD"};
+                                           auto                                   resp = coinpaprika::api::async_ohlcv_latest(std::move(req)).get();
+                                           if (resp.status_code() == 200)
+                                           {
+                                               const auto body = TO_STD_STR(resp.extract_string(true).get());
+                                               auto        arr  = nlohmann::json::parse(body).get<std::vector<nlohmann::json>>();
+                                               if (!arr.empty() && arr[0].contains("close"))
+                                               {
+                                                   const auto close         = arr[0]["close"].get<double>();
+                                                   const auto now_ts        = static_cast<int64_t>(std::time(nullptr));
+                                                   std::string last_updated;
+                                                   {
+                                                       std::time_t t   = std::time(nullptr);
+                                                       std::tm*    tmv = std::gmtime(&t);
+                                                       char        buf[32];
+                                                       std::strftime(buf, sizeof(buf), "%Y-%m-%dT%H:%M:%SZ", tmv);
+                                                       last_updated.assign(buf);
+                                                   }
+                                                   komodo_prices::api::komodo_ticker_infos entry;
+                                                   entry.ticker                 = ticker;
+                                                   entry.last_price             = std::to_string(close);
+                                                   entry.last_updated           = last_updated;
+                                                   entry.last_updated_timestamp = now_ts;
+                                                   entry.volume24_h             = "0";
+                                                   entry.price_provider         = komodo_prices::api::provider::coinpaprika;
+                                                   entry.volume_provider        = komodo_prices::api::provider::coinpaprika;
+                                                   entry.change_24_h            = "0";
+                                                   entry.change_24_h_provider   = komodo_prices::api::provider::coinpaprika;
+                                                   entry.sparkline_7_d          = nlohmann::json::array();
+                                                   (*extra_infos)[ticker]       = std::move(entry);
+                                                   SPDLOG_INFO("CoinPaprika OHLCV fallback price for {}: {}", ticker, close);
+                                               }
+                                           }
+                                       }
+                                   }
                                    catch (const std::exception& error)
                                    {
-                                       SPDLOG_ERROR("CoinGecko fallback stage error: {}", error.what());
+                                       SPDLOG_ERROR("CoinPaprika OHLCV fallback stage error: {}", error.what());
                                    }
                                });
 
