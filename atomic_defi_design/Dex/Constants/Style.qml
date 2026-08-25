@@ -261,7 +261,6 @@ QtObject {
     function getCoinColor(ticker) {
         let info = API.app.portfolio_pg.global_cfg_mdl.get_coin_info(ticker)
         if (!info.type) { return colorWhite3 }
-        let color = getCoinGroupTextColor(info.type)
         let base_ticker = atomic_qt_utilities.retrieve_main_ticker(ticker)
         if (colorCoin.hasOwnProperty(base_ticker) && !dark_theme)
         {
@@ -271,7 +270,20 @@ QtObject {
         {
             return colorCoinDark[base_ticker]
         }
-        return color
+        // No curated colour for this ticker: derive a stable, distinct colour
+        // from the ticker so coins that share a group (e.g. several green
+        // UTXO/Smart Chain assets) stay visually distinguishable in the
+        // portfolio pie, coin lists and badges.
+        return fallbackCoinColor(base_ticker)
+    }
+
+    function fallbackCoinColor(ticker) {
+        let h = 0
+        for (let i = 0; i < ticker.length; i++)
+        {
+            h = (h * 31 + ticker.charCodeAt(i)) >>> 0
+        }
+        return colorCoinFallback[h % colorCoinFallback.length]
     }
 
     readonly property var colorCoin: ({
@@ -323,6 +335,16 @@ QtObject {
                                           "UTXO": "#349d5f",
                                           "default": "#c8c8c8",
                                           "IDO": "#536E93",
-                                          "WALLET ONLY": "#cccccc"
-                                      })
+                                           "WALLET ONLY": "#cccccc"
+                                       })
+
+    //! Curated, well-spread palette used as a stable fallback for any ticker
+    //! that has no explicit entry in colorCoin / colorCoinDark. Indexed by a
+    //! hash of the ticker so the same coin always maps to the same colour.
+    readonly property var colorCoinFallback: ([
+                                          "#E84142", "#F6A623", "#F8E71C", "#7ED321", "#50E3C2", "#4A90E2",
+                                          "#9013FE", "#BD10E0", "#FF6FA5", "#B8E986", "#417505", "#8B572A",
+                                          "#00BCD4", "#3F51B5", "#009688", "#FF5722", "#795548", "#607D8B",
+                                          "#E91E63", "#CDDC39", "#FFC107", "#00ACC1", "#9C27B0", "#4CAF50"
+                                      ])
 }

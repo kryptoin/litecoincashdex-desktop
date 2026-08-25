@@ -46,7 +46,11 @@ namespace atomic_dex
 
         m_pie_chart_proxy_model->setSourceModel(this);
         m_pie_chart_proxy_model->setDynamicSortFilter(true);
-        m_pie_chart_proxy_model->set_with_fiat_balance(true);
+        // Include every coin that has a non-zero balance, even when it has no
+        // price feed (and therefore a zero fiat value). Filtering on fiat balance
+        // here previously dropped no-price coins such as KMDCL from the asset
+        // count, the breakdown list and the donut, even though they hold funds.
+        m_pie_chart_proxy_model->set_with_balance(true);
         m_pie_chart_proxy_model->sort_by_currency_balance(false);
         m_pie_chart_proxy_model->setFilterRole(NameAndTicker);
         m_pie_chart_proxy_model->setFilterCaseSensitivity(Qt::CaseInsensitive);
@@ -601,10 +605,17 @@ namespace atomic_dex
             {
                 t_float_50 balance_all_f         = safe_float(balance_all.toStdString());
                 t_float_50 main_currency_balance = safe_float(this->data(res.at(0), MainCurrencyBalanceRole).toString().toStdString());
-                if (balance_all_f > 0 && main_currency_balance > 0)
+                t_float_50 balance               = safe_float(this->data(res.at(0), BalanceRole).toString().toStdString());
+                // Coins with a balance but no price feed have a zero fiat value;
+                // show them as 0.00 % rather than leaving the field blank.
+                if (balance > 0)
                 {
-                    t_float_50 res_f   = (100 * main_currency_balance) / balance_all_f;
-                    auto       percent = QString::fromStdString(res_f.str(2, std::ios::fixed));
+                    t_float_50 res_f = t_float_50(0);
+                    if (balance_all_f > 0 && main_currency_balance > 0)
+                    {
+                        res_f = (100 * main_currency_balance) / balance_all_f;
+                    }
+                    auto percent = QString::fromStdString(res_f.str(2, std::ios::fixed));
                     update_value(PortfolioRoles::PercentMainCurrency, percent, res.at(0), *this);
                 }
                 // update_value(PortfolioRoles::PrivKey, "", res.at(0), *this);

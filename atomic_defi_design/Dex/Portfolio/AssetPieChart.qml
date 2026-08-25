@@ -28,7 +28,10 @@ ColumnLayout
     function addItem(value) {
         var item = pieSeries.append(value.ticker, value.main_currency_balance)
         item.color = Style.getCoinColor(value.ticker)
-        item.borderColor = 'transparent'
+        // Visible, theme-aware border so the donut (and its segments) stay
+        // legible even when a slice colour is close to the background
+        // (e.g. green coins on the green LCC theme).
+        item.borderColor = DexTheme.foregroundColor
         item.borderWidth = 2
         item.holeSize = 1
         item.labelColor = 'white'
