@@ -163,6 +163,13 @@ namespace atomic_dex
     }
 
     void
+    portfolio_proxy_model::sort_by_balance(bool is_ascending)
+    {
+        this->setSortRole(atomic_dex::portfolio_model::BalanceRole);
+        this->sort(0, is_ascending ? Qt::AscendingOrder : Qt::DescendingOrder);
+    }
+
+    void
     portfolio_proxy_model::sort_by_currency_balance(bool is_ascending)
     {
         this->setSortRole(atomic_dex::portfolio_model::MainCurrencyBalanceRole);

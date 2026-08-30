@@ -116,6 +116,9 @@ namespace atomic_dex
         void                              set_recover_fund_data(QVariant rpc_data);
         [[nodiscard]] int                 get_nb_pages() const;
 
+        //! Returns the {min, max} local QDate spanned by the orders/swaps currently in the model.
+        [[nodiscard]] QVariantMap get_date_range() const;
+
         //! getter
         [[nodiscard]] t_filtering_infos get_filtering_infos() const;
         void                            set_filtering_infos(t_filtering_infos infos);

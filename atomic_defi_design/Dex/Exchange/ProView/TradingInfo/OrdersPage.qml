@@ -14,8 +14,12 @@ import Dex.Themes 1.0 as Dex
 Item {
     id: root
 
-    readonly property date default_min_date: new Date("2019-01-01")
-    readonly property date default_max_date: new Date(new Date().setDate(new Date().getDate() + 30))
+    readonly property date default_min_date: new Date(2014, 0, 1)
+    readonly property date default_max_date: new Date(new Date().getFullYear() + 2, 11, 31)
+
+    //! Set to true once the user manually changes the date pickers, so we stop
+    //! auto-fitting the range to the data and keep their selection.
+    property bool userTouchedDate: false
 
     property var list_model: API.app.orders_mdl
     property var list_model_proxy: API.app.orders_mdl.orders_proxy_mdl
@@ -35,10 +39,33 @@ Item {
     }
 
     function reset() {
+        fitDateRangeToData()
         list_model_proxy.is_history = !is_history
         applyFilter()
         list_model_proxy.apply_all_filtering()
         list_model_proxy.is_history = is_history
+    }
+
+    //! Fit the date pickers (and thus the visible filter label) to the actual
+    //! span of orders/swaps in the model, so the range is not a hardcoded window.
+    function fitDateRangeToData() {
+        if (root.userTouchedDate)
+            return
+
+        const range = list_model.get_date_range()
+        if (range.min === undefined)
+            return
+
+        let lo = range.min
+        let hi = range.max
+        if (lo < default_min_date)
+            lo = default_min_date
+        if (hi > default_max_date)
+            hi = default_max_date
+
+        min_date.selectedDate = lo
+        max_date.selectedDate = hi
+        applyDateFilter()
     }
 
     Component.onDestruction: reset()
@@ -76,6 +103,7 @@ Item {
 
     Component.onCompleted: {
         list_model_proxy.is_history = root.is_history
+        fitDateRangeToData()
         applyFilter()
         list_model_proxy.apply_all_filtering()
     }
@@ -220,7 +248,10 @@ Item {
                     minimumDate: default_min_date
                     maximumDate:  default_max_date
                     selectedDate: default_min_date
-                    onAccepted: applyDateFilter()
+                    onAccepted: {
+                        root.userTouchedDate = true
+                        applyDateFilter()
+                    }
                 }
 
                 Item { width: parent.width * 0.1; height: 1 }
@@ -233,7 +264,10 @@ Item {
                     minimumDate: default_min_date
                     maximumDate: default_max_date
                     selectedDate: default_max_date
-                    onAccepted: applyDateFilter()
+                    onAccepted: {
+                        root.userTouchedDate = true
+                        applyDateFilter()
+                    }
                 }
             }
         }

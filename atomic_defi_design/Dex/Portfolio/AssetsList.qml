@@ -53,7 +53,7 @@ Dex.DexListView
                 Layout.preferredWidth: _assetBalanceColumnWidth
                 Layout.fillHeight: true
                 h_align: Text.AlignRight
-                sort_type: sort_by_value
+                sort_type: sort_by_balance
                 text: qsTr("Balance")
             }
 

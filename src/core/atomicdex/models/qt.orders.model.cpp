@@ -280,6 +280,39 @@ namespace atomic_dex
         return m_model_proxy;
     }
 
+    QVariantMap
+    orders_model::get_date_range() const
+    {
+        qulonglong min_ts = 0;
+        qulonglong max_ts = 0;
+        const int  nb     = this->rowCount();
+        for (int i = 0; i < nb; ++i)
+        {
+            const qulonglong ts = this->data(this->index(i, 0), atomic_dex::orders_model::OrdersRoles::UnixTimestampRole).toULongLong();
+            if (ts == 0)
+            {
+                continue;
+            }
+            if (min_ts == 0 || ts < min_ts)
+            {
+                min_ts = ts;
+            }
+            if (ts > max_ts)
+            {
+                max_ts = ts;
+            }
+        }
+
+        QVariantMap res;
+        if (min_ts != 0)
+        {
+            // Keep the same local-time conversion used by the proxy's date filtering.
+            res["min"] = QDateTime::fromMSecsSinceEpoch(static_cast<qint64>(min_ts)).date();
+            res["max"] = QDateTime::fromMSecsSinceEpoch(static_cast<qint64>(max_ts)).date();
+        }
+        return res;
+    }
+
     QVariant
     atomic_dex::orders_model::get_average_events_time_registry() const
     {
