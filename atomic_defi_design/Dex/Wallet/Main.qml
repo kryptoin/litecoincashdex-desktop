@@ -291,7 +291,12 @@ Item
                             {
                                 const fiat_amount = parseFloat(current_ticker_infos.fiat_amount)
                                 const portfolio_balance = parseFloat(API.app.portfolio_pg.balance_fiat_all)
-                                if(fiat_amount <= 0 || portfolio_balance <= 0) return "N/A"
+                                const balance = parseFloat(current_ticker_infos.balance)
+                                if (portfolio_balance <= 0) return "N/A"
+                                // A coin with a balance but no price feed contributes 0 to the
+                                // portfolio value, so show 0% instead of "N/A".
+                                if (fiat_amount <= 0)
+                                    return balance > 0 ? General.formatPercent("0.00", false) : "N/A"
                                 return General.formatPercent((100 * fiat_amount/portfolio_balance).toFixed(2), false)
                             }
                             font.pixelSize: headerTextFont
