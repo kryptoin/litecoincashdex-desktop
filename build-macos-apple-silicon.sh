@@ -79,23 +79,21 @@ ANACONDA_PREFIX="/opt/anaconda3"
 # GPU thread at runtime. Create it with:
 #   conda create -p /opt/anaconda3/envs/qt51515 -c conda-forge \
 #       "qt-main=5.15.15" "qt-webengine=5.15.15"
-QT_ENVS=(
-    "${ANACONDA_PREFIX}/envs/qt51515"
-    "${ANACONDA_PREFIX}/envs/qt51512"
-    "${ANACONDA_PREFIX}"
-)
-QT_PREFIX=""
-for candidate in "${QT_ENVS[@]}"; do
-    if [ -x "${candidate}/bin/qmake" ] && [ -f "${candidate}/lib/cmake/Qt5/Qt5Config.cmake" ]; then
-        QT_PREFIX="${candidate}"
-        break
-    fi
-done
-if [ -z "${QT_PREFIX}" ]; then
-    die "No suitable Qt5 found under ${ANACONDA_PREFIX}.
-Create an aligned Qt env with:
-  conda create -p /opt/anaconda3/envs/qt51515 -c conda-forge 'qt-main=5.15.15' 'qt-webengine=5.15.15'"
+# STRICT: this project is pinned to the *aligned* 5.15.15 env. The base Anaconda
+# env ships a mismatched pair (qt-main 5.15.2 + qt-webengine 5.15.9). Falling
+# back to it produces a bundle that mixes 5.15.2 with 5.15.15 and dies at launch
+# with "Cannot mix incompatible Qt library", so no fallback is allowed here.
+QT_REQUIRED_VERSION="5.15.15"
+QT_ENV="${ANACONDA_PREFIX}/envs/qt51515"
+
+if [ ! -x "${QT_ENV}/bin/qmake" ] || [ ! -f "${QT_ENV}/lib/cmake/Qt5/Qt5Config.cmake" ]; then
+    die "Aligned Qt ${QT_REQUIRED_VERSION} env not found at ${QT_ENV}.
+Create it with:
+  conda create -p /opt/anaconda3/envs/qt51515 -c conda-forge 'qt-main=5.15.15' 'qt-webengine=5.15.15'
+(The base ${ANACONDA_PREFIX} Qt is intentionally NOT used: it is Qt 5.15.2 and
+would produce a mixed, non-launching bundle.)"
 fi
+QT_PREFIX="${QT_ENV}"
 log "Qt prefix       : ${QT_PREFIX}"
 
 # ---- Locate Qt5 cmake config ------------------------------------------
@@ -125,6 +123,12 @@ Install with: conda create -p /opt/anaconda3/envs/qt51515 -c conda-forge 'qt-mai
 fi
 QT_VERSION="$("${QT_QMAKE}" -query QT_VERSION 2>/dev/null || echo 'unknown')"
 log "Qt5 version     : ${QT_VERSION}"
+if [ "${QT_VERSION}" != "${QT_REQUIRED_VERSION}" ]; then
+    die "Qt version mismatch: ${QT_QMAKE} reports '${QT_VERSION}', but this project
+requires exactly ${QT_REQUIRED_VERSION}. A mixed-version bundle cannot launch
+('Cannot mix incompatible Qt library'). Recreate the env with:
+  conda create -p /opt/anaconda3/envs/qt51515 -c conda-forge 'qt-main=5.15.15' 'qt-webengine=5.15.15'"
+fi
 
 # ── cmake and ninja ────────────────────────────────────────────────────────
 # Prefer Anaconda versions if they exist, otherwise fall back to Homebrew.
@@ -443,11 +447,13 @@ fi
 # and re-add it after the aligned env to control ordering.
 APP_EXE="${APP_BUNDLE}/Contents/MacOS/litecoincashdex"
 if [ "${QT_PREFIX}" != "${ANACONDA_PREFIX}" ]; then
-    log "Reordering app rpath: ${QT_PREFIX}/lib first (aligned Qt)..."
+    log "Reordering app rpath: ${QT_PREFIX}/lib first (aligned Qt ${QT_VERSION})..."
     "${INSTALL_NAME_TOOL}" -delete_rpath "${QT_PREFIX}/lib"      "${APP_EXE}" 2>/dev/null || true
     "${INSTALL_NAME_TOOL}" -delete_rpath "${ANACONDA_PREFIX}/lib" "${APP_EXE}" 2>/dev/null || true
-    "${INSTALL_NAME_TOOL}" -add_rpath "${QT_PREFIX}/lib"         "${APP_EXE}"
-    "${INSTALL_NAME_TOOL}" -add_rpath "${ANACONDA_PREFIX}/lib"    "${APP_EXE}"
+    # NOTE: the base Anaconda lib dir (Qt 5.15.2) is deliberately NOT re-added.
+    # Leaving it in the rpath lets macdeployqt resolve Qt against 5.15.2 and
+    # produces a bundle that mixes Qt versions and fails to launch.
+    "${INSTALL_NAME_TOOL}" -add_rpath "${QT_PREFIX}/lib" "${APP_EXE}"
 fi
 
 # ── Re-sign app bundle (ad-hoc) ───────────────────────────────────────────

@@ -85,11 +85,16 @@ HELPERS="${APP}/Contents/Helpers"
 HOMEBREW_PREFIX="$(brew --prefix 2>/dev/null || echo /opt/homebrew)"
 ANACONDA_PREFIX="/opt/anaconda3"
 # Prefer macdeployqt from aligned Qt env (5.15.15) over base
-MACDEPLOYQT=""
-for _qtc in "${ANACONDA_PREFIX}/envs/qt51515/bin/macdeployqt" "${ANACONDA_PREFIX}/envs/qt51512/bin/macdeployqt" "${ANACONDA_PREFIX}/bin/macdeployqt"; do
-    if [ -x "$_qtc" ]; then MACDEPLOYQT="$_qtc"; break; fi
-done
-[ -n "$MACDEPLOYQT" ] || MACDEPLOYQT="${ANACONDA_PREFIX}/bin/macdeployqt"
+# STRICT: use only macdeployqt from the aligned 5.15.15 env. The base Anaconda
+# macdeployqt is Qt 5.15.2 and would deploy a mixed Qt set into the bundle,
+# producing an app that dies at startup with "Cannot mix incompatible Qt library".
+QT_REQUIRED_VERSION="5.15.15"
+QT_ENV="${ANACONDA_PREFIX}/envs/qt51515"
+MACDEPLOYQT="${QT_ENV}/bin/macdeployqt"
+[ -x "$MACDEPLOYQT" ] || die "macdeployqt not found at $MACDEPLOYQT (aligned Qt ${QT_REQUIRED_VERSION} env).
+Create it with:
+  conda create -p /opt/anaconda3/envs/qt51515 -c conda-forge 'qt-main=5.15.15' 'qt-webengine=5.15.15'
+The base ${ANACONDA_PREFIX} macdeployqt is intentionally NOT used (it is Qt 5.15.2)."
 
 SIGNING_IDENTITY="${MACOS_SIGNING_IDENTITY:-}"
 NOTARY_PROFILE="${MACOS_NOTARY_PROFILE:-}"
@@ -114,7 +119,8 @@ STEP=1
 TOTAL_STEPS=0
 [ $DO_QT_DEPLOY -eq 1 ] && TOTAL_STEPS=$((TOTAL_STEPS + 1))
 [ $DO_NATIVE_DEPS -eq 1 ] && TOTAL_STEPS=$((TOTAL_STEPS + 1))
-if [ $DO_QT_DEPLOY -eq 1 ] || [ $DO_NATIVE_DEPS -eq 1 ]; then TOTAL_STEPS=$((TOTAL_STEPS + 2)); fi
+# deploy steps are: clean_bundle + fix_plist_and_resign + verify_qt_alignment
+if [ $DO_QT_DEPLOY -eq 1 ] || [ $DO_NATIVE_DEPS -eq 1 ]; then TOTAL_STEPS=$((TOTAL_STEPS + 3)); fi
 [ $DO_VERIFY -eq 1 ] && TOTAL_STEPS=$((TOTAL_STEPS + 1))
 [ $DO_SIGN -eq 1 ] && TOTAL_STEPS=$((TOTAL_STEPS + 1))
 [ $DO_NOTARIZE -eq 1 ] && TOTAL_STEPS=$((TOTAL_STEPS + 1))
@@ -143,19 +149,25 @@ deploy_qt() {
     step "Deploying Qt frameworks and plugins via macdeployqt"
     [ -x "$MACDEPLOYQT" ] || die "macdeployqt not found at $MACDEPLOYQT. Ensure Anaconda Qt is installed."
 
+    # Wipe previously deployed Qt first so macdeployqt cannot reuse stale dylibs
+    # from an earlier run (e.g. 5.15.2 / 5.15.9). Mixing versions yields a bundle
+    # that dies at startup with "Cannot mix incompatible Qt library".
+    log "Cleaning previously deployed Qt (Frameworks / PlugIns / Resources/qml)..."
+    rm -rf "$FRAMEWORKS" "$PLUGINS" "${RESOURCES}/qml"
+    mkdir -p "$FRAMEWORKS" "$PLUGINS" "${RESOURCES}/qml"
+
     log "Running macdeployqt on $APP..."
     "$MACDEPLOYQT" "$APP" -verbose=2
 
-    # macdeployqt may miss some components; deploy them manually
-    # Prefer aligned Qt env (qt51515) over base anaconda, matching build-macos-apple-silicon.sh
-    local QT_PREFIX="$ANACONDA_PREFIX"
-    for candidate in "${ANACONDA_PREFIX}/envs/qt51515" "${ANACONDA_PREFIX}/envs/qt51512" "${ANACONDA_PREFIX}"; do
-        if [ -x "${candidate}/bin/qmake" ] && [ -f "${candidate}/lib/libQt5Core.dylib" ]; then
-            QT_PREFIX="$candidate"
-            break
-        fi
-    done
-    log "Qt prefix for manual deploy: $QT_PREFIX"
+    # Manual deployment must come from the *same* aligned env used to build.
+    local QT_PREFIX="$QT_ENV"
+    if [ ! -x "${QT_PREFIX}/bin/qmake" ] || [ ! -f "${QT_PREFIX}/lib/libQt5Core.dylib" ]; then
+        die "Aligned Qt ${QT_REQUIRED_VERSION} env missing at ${QT_PREFIX} (qmake or libQt5Core.dylib not found)."
+    fi
+    local _qv="$("${QT_PREFIX}/bin/qmake" -query QT_VERSION 2>/dev/null || echo unknown)"
+    [ "$_qv" = "$QT_REQUIRED_VERSION" ] || \
+        die "Qt version mismatch: ${QT_PREFIX} is '${_qv}', required ${QT_REQUIRED_VERSION}."
+    log "Qt prefix for manual deploy: $QT_PREFIX (Qt $_qv)"
 
     # Deploy platform plugin (required for Qt GUI apps)
     log "Deploying platform plugin..."
@@ -293,8 +305,46 @@ deploy_native_deps() {
             # Skip system libraries
             case "$dep" in
                 /usr/lib/*|/System/Library/*|/Library/Frameworks/*) continue ;;
-                @loader_path/*|@executable_path/*) continue ;;
+                @loader_path/*) continue ;;
             esac
+
+            # Deps already expressed relative to the bundle (e.g.
+            # @executable_path/../Frameworks/libfoo.dylib) are normally satisfied by
+            # an earlier deploy step. If the referenced file is absent, bundle it:
+            # the install name already points into Frameworks, so no rewriting is
+            # needed. Without this, wiping Frameworks loses the Homebrew libs
+            # (libcpprest, libspdlog, libfmt, libsecp256k1, libdate-tz, boost_*,
+            # libsodium) and the app dies at launch with "Library not loaded".
+            if [[ "$dep" == @executable_path/* ]]; then
+                local ep_name
+                ep_name="$(basename "$dep")"
+                [ -e "${FRAMEWORKS}/${ep_name}" ] && continue
+
+                local ep_src=""
+                for c in "$HOMEBREW_PREFIX/lib" "$ANACONDA_PREFIX/lib" "$QT_ENV/lib"; do
+                    if [ -f "$c/$ep_name" ]; then ep_src="$c/$ep_name"; break; fi
+                done
+                # Fall back to versioned Homebrew kegs (e.g. opt/boost@1.85/lib).
+                if [ -z "$ep_src" ]; then
+                    ep_src="$(ls "$HOMEBREW_PREFIX"/opt/*/lib/"$ep_name" 2>/dev/null | head -1)"
+                fi
+                if [ -z "$ep_src" ] || [ ! -f "$ep_src" ]; then
+                    warn "Unresolvable @executable_path dependency: $dep (from $current) — skipped"
+                    continue
+                fi
+
+                log "Bundling: $ep_src -> ${FRAMEWORKS}/${ep_name}"
+                cp -f "$ep_src" "${FRAMEWORKS}/${ep_name}"
+                chmod 755 "${FRAMEWORKS}/${ep_name}"
+                local ep_id
+                ep_id="$(otool -D "${FRAMEWORKS}/${ep_name}" 2>/dev/null | tail -1)"
+                if [ -n "$ep_id" ] && [ "$ep_id" != "@rpath/${ep_name}" ]; then
+                    install_name_tool -id "@rpath/${ep_name}" "${FRAMEWORKS}/${ep_name}" 2>/dev/null || true
+                fi
+                bundled+=("$ep_name")
+                queue+=("${FRAMEWORKS}/${ep_name}")
+                continue
+            fi
 
             # @rpath deps: Qt libs are handled by macdeployqt; other @rpath deps
             # (e.g. imageformats -> libjpeg.8.dylib) must be resolved and bundled.
@@ -310,12 +360,25 @@ deploy_native_deps() {
                 # still missing — e.g. libQt5QmlWorkerScript, referenced only by
                 # QML plugins — must be resolved from the Qt prefix).
                 [ -f "$FRAMEWORKS/$(basename "$rname")" ] && continue
-                # Resolve against known prefixes
+                # Resolve against known prefixes.
+                # Qt modules MUST come from the aligned env ($QT_ENV): the base
+                # Anaconda lib dir is Qt 5.15.2, and bundling those alongside the
+                # 5.15.15 the app links yields "Cannot mix incompatible Qt library".
+                # These are typically libs referenced only by QML plugins (e.g.
+                # libQt5QmlWorkerScript), which macdeployqt never sees because the
+                # QML tree is copied after it runs.
                 local resolved=""
-                for c in "$ANACONDA_PREFIX/lib" "$HOMEBREW_PREFIX/lib"; do
-                    [ -f "$c/$rname" ] && resolved="$c/$rname" && break
-                    [ -f "$c/$(basename "$rname")" ] && resolved="$c/$(basename "$rname")" && break
-                done
+                if [[ "$rname" == libQt5* ]]; then
+                    for c in "$QT_ENV/lib" "$ANACONDA_PREFIX/lib"; do
+                        [ -f "$c/$rname" ] && resolved="$c/$rname" && break
+                        [ -f "$c/$(basename "$rname")" ] && resolved="$c/$(basename "$rname")" && break
+                    done
+                else
+                    for c in "$ANACONDA_PREFIX/lib" "$HOMEBREW_PREFIX/lib"; do
+                        [ -f "$c/$rname" ] && resolved="$c/$rname" && break
+                        [ -f "$c/$(basename "$rname")" ] && resolved="$c/$(basename "$rname")" && break
+                    done
+                fi
                 if [ -z "$resolved" ]; then
                     warn "Unresolved @rpath dependency: $dep (from $current) — skipped"
                     continue
@@ -515,6 +578,37 @@ fix_plist_and_resign() {
     else
         log "  Skipping ad-hoc re-sign (real signing runs in sign_app)"
     fi
+}
+
+# ── Guard: every bundled Qt library must be the aligned 5.15.15 ──────────────
+# Runs after deployment so a mixed bundle fails *packaging* loudly instead of
+# failing obscurely at app startup.
+verify_qt_alignment() {
+    step "Verifying bundled Qt is uniformly ${QT_REQUIRED_VERSION}"
+
+    local bad=0
+    local total=0
+    while IFS= read -r -d '' f; do
+        file -b "$f" | grep -q Mach-O || continue
+        # Line 2 of otool -L carries the version of the lib itself (or its first
+        # Qt dependency), which is what identifies the Qt build.
+        local v
+        v=$(otool -L "$f" 2>/dev/null | sed -n 2p | grep -o "current version 5\.15\.[0-9]*" | grep -o "5\.15\.[0-9]*")
+        [ -z "$v" ] && continue
+        total=$((total + 1))
+        if [ "$v" != "$QT_REQUIRED_VERSION" ]; then
+            echo "ERROR: $(basename "$f") is Qt $v (expected ${QT_REQUIRED_VERSION})" >&2
+            bad=$((bad + 1))
+        fi
+    done < <(find "$FRAMEWORKS" "$PLUGINS" -type f -name 'libQt5*.dylib' -print0 2>/dev/null || true)
+
+    if [ $bad -ne 0 ]; then
+        die "Bundled Qt version mismatch: $bad of $total Qt dylibs are not ${QT_REQUIRED_VERSION}.
+A mixed bundle fails at startup with 'Cannot mix incompatible Qt library'.
+Check that macdeployqt comes from the aligned env and that no base-Anaconda
+(5.15.2) path is reachable via the executable's rpath."
+    fi
+    log "All $total bundled Qt dylibs are ${QT_REQUIRED_VERSION}"
 }
 
 # ── Phase 3: Verify deployment ───────────────────────────────────────────────
@@ -765,6 +859,7 @@ main() {
     if [ $DO_QT_DEPLOY -eq 1 ] || [ $DO_NATIVE_DEPS -eq 1 ]; then
         clean_bundle
         fix_plist_and_resign
+        verify_qt_alignment
     fi
     [ $DO_VERIFY -eq 1 ] && verify_deployment
     [ $DO_SIGN -eq 1 ] && sign_app
